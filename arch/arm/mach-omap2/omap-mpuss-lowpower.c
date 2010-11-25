@@ -52,6 +52,7 @@
 
 #include <plat/omap44xx.h>
 
+#include "iomap.h"
 #include "common.h"
 #include "omap4-sar-layout.h"
 #include "pm.h"
@@ -75,6 +76,24 @@ struct omap4_cpu_pm_info {
 static DEFINE_PER_CPU(struct omap4_cpu_pm_info, omap4_pm_info);
 static struct powerdomain *mpuss_pd, *core_pd;
 static void __iomem *sar_base;
+
+struct reg_tuple {
+	void __iomem *addr;
+	u32 val;
+};
+
+static struct reg_tuple tesla_reg[] = {
+	{.addr = OMAP4430_CM_TESLA_CLKSTCTRL},
+	{.addr = OMAP4430_CM_TESLA_TESLA_CLKCTRL},
+	{.addr = OMAP4430_PM_TESLA_PWRSTCTRL},
+};
+
+static struct reg_tuple ivahd_reg[] = {
+	{.addr = OMAP4430_CM_IVAHD_CLKSTCTRL},
+	{.addr = OMAP4430_CM_IVAHD_IVAHD_CLKCTRL},
+	{.addr = OMAP4430_CM_IVAHD_SL2_CLKCTRL},
+	{.addr = OMAP4430_PM_IVAHD_PWRSTCTRL}
+};
 
 /*
  * Program the wakeup routine address for the CPU0 and CPU1
@@ -216,6 +235,34 @@ static void save_l2x0_context(void)
 {}
 #endif
 
+static inline void save_ivahd_tesla_regs(void)
+{
+	int i;
+
+	if (!IS_PM44XX_ERRATUM(PM_OMAP4_ROM_IVAHD_TESLA_ERRATUM_xxx))
+		return;
+
+	for (i = 0; i < ARRAY_SIZE(tesla_reg); i++)
+		tesla_reg[i].val = __raw_readl(tesla_reg[i].addr);
+
+	for (i = 0; i < ARRAY_SIZE(ivahd_reg); i++)
+		ivahd_reg[i].val = __raw_readl(ivahd_reg[i].addr);
+}
+
+static inline void restore_ivahd_tesla_regs(void)
+{
+	int i;
+
+	if (!IS_PM44XX_ERRATUM(PM_OMAP4_ROM_IVAHD_TESLA_ERRATUM_xxx))
+		return;
+
+	for (i = 0; i < ARRAY_SIZE(tesla_reg); i++)
+		__raw_writel(tesla_reg[i].val, tesla_reg[i].addr);
+
+	for (i = 0; i < ARRAY_SIZE(ivahd_reg); i++)
+		__raw_writel(ivahd_reg[i].val, ivahd_reg[i].addr);
+}
+
 /**
  * omap4_enter_lowpower: OMAP4 MPUSS Low Power Entry Function
  * The purpose of this function is to manage low power programming
@@ -274,9 +321,11 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 			goto sar_save_failed;
 		omap4_cm_prepare_off();
 		omap4_dpll_prepare_off();
+		save_ivahd_tesla_regs();
 		save_state = 3;
 	} else if (pwrdm_read_next_func_pwrst(mpuss_pd) ==
 		   PWRDM_FUNC_PWRST_OSWR) {
+		save_ivahd_tesla_regs();
 		save_state = 2;
 	}
 
@@ -300,6 +349,9 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 	 */
 	wakeup_cpu = smp_processor_id();
 	set_cpu_next_pwrst(wakeup_cpu, PWRDM_FUNC_PWRST_ON);
+
+	if (omap4_mpuss_read_prev_context_state())
+		restore_ivahd_tesla_regs();
 
 	if (pwrdm_read_prev_func_pwrst(core_pd) == PWRDM_FUNC_PWRST_OFF) {
 		omap4_dpll_resume_off();
