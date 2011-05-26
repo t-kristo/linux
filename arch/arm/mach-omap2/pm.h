@@ -23,6 +23,9 @@ extern int omap3_idle_init(void);
 extern int omap4_idle_init(void);
 extern int omap_pm_clkdms_setup(struct clockdomain *clkdm, void *unused);
 extern int (*omap_pm_suspend)(void);
+extern void pm_dbg_print_regs(struct seq_file *s, int reg_set);
+extern int pm_dbg_regset_init(int reg_set);
+extern int pm_dbg_regset_save(int reg_set);
 
 #if defined(CONFIG_PM_OPP)
 extern int omap3_opp_init(void);

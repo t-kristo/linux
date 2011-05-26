@@ -35,7 +35,14 @@
 #include <plat/omap-pm.h>
 
 #include "cm2xxx_3xxx.h"
+#include "prcm44xx.h"
+#include "prcm_mpu44xx.h"
 #include "prm2xxx_3xxx.h"
+#include "prm44xx.h"
+#include "prminst44xx.h"
+#include "cminst44xx.h"
+#include "cm1_44xx.h"
+#include "cm2_44xx.h"
 #include "pm.h"
 
 u32 enable_off_mode;
@@ -47,6 +54,13 @@ u32 enable_off_mode;
 static int pm_dbg_init_done;
 
 static int pm_dbg_init(void);
+
+#define PM_DBG_MAX_REG_SETS 4
+
+struct dentry *pm_dbg_dir;
+static void *pm_dbg_reg_set[PM_DBG_MAX_REG_SETS];
+
+static void pm_dbg_regset_store(u32 *ptr);
 
 enum {
 	DEBUG_FILE_COUNTERS = 0,
@@ -60,6 +74,274 @@ static const char pwrdm_state_names[][PWRDM_MAX_FUNC_PWRSTS] = {
 	"INA",
 	"ON"
 };
+
+struct pm_module_def {
+	char *name; /* Name of the module */
+	short type; /* CM or PRM */
+	unsigned short offset;
+	int low; /* First register address on this module */
+	int high; /* Last register address on this module */
+};
+
+enum {
+	MOD_CM = 0,
+	MOD_PRM,
+	MOD_PRM_OMAP4,
+	MOD_PRCM_MPU_OMAP4,
+	MOD_CM1_OMAP4,
+	MOD_CM2_OMAP4
+};
+
+static const struct pm_module_def pm_dbg_reg_modules[] = {
+	/* CM1 */
+	{ "OCP", MOD_CM1_OMAP4, OMAP4430_CM1_OCP_SOCKET_INST, 0, 0xf0 },
+	{ "CKGEN", MOD_CM1_OMAP4, OMAP4430_CM1_CKGEN_INST, 0, 0x280 },
+	{ "MPU", MOD_CM1_OMAP4, OMAP4430_CM1_MPU_INST, 0, 0x20 },
+	{ "DSP", MOD_CM1_OMAP4, OMAP4430_CM1_TESLA_INST, 0, 0x20 },
+	{ "ABE", MOD_CM1_OMAP4, OMAP4430_CM1_ABE_INST, 0, 0x88 },
+	{ "REST", MOD_CM1_OMAP4, OMAP4430_CM1_RESTORE_INST, 0, 0x58 },
+	/*{ "INSTR", MOD_CM1_OMAP4, OMAP4430_CM1_INSTR_INST, 0, 0x30 },*/
+
+	/* CM2 */
+	{ "OCP", MOD_CM2_OMAP4, OMAP4430_CM2_OCP_SOCKET_INST, 0, 0xf0 },
+	{ "CKGEN", MOD_CM2_OMAP4, OMAP4430_CM2_CKGEN_INST, 0, 0xec },
+	{ "ALWON", MOD_CM2_OMAP4, OMAP4430_CM2_ALWAYS_ON_INST, 0, 0x40 },
+	{ "CORE", MOD_CM2_OMAP4, OMAP4430_CM2_CORE_INST, 0, 0x740 },
+	{ "IVAHD", MOD_CM2_OMAP4, OMAP4430_CM2_IVAHD_INST, 0, 0x20 },
+	{ "CAM", MOD_CM2_OMAP4, OMAP4430_CM2_CAM_INST, 0, 0x28 },
+	{ "DSS", MOD_CM2_OMAP4, OMAP4430_CM2_DSS_INST, 0, 0x28 },
+	{ "SGX", MOD_CM2_OMAP4, OMAP4430_CM2_GFX_INST, 0, 0x20 },
+	{ "L3INIT", MOD_CM2_OMAP4, OMAP4430_CM2_L3INIT_INST, 0, 0xe0 },
+	{ "L4PER", MOD_CM2_OMAP4, OMAP4430_CM2_L4PER_INST, 0, 0x1d8 },
+	{ "REST", MOD_CM2_OMAP4, OMAP4430_CM2_RESTORE_INST, 0, 0x5c },
+	/*{ "INSTR", MOD_CM2_OMAP4, OMAP4430_CM2_INSTR_INST, 0, 0x30 },*/
+
+	/* PRM */
+	{ "OCP", MOD_PRM_OMAP4, OMAP4430_PRM_OCP_SOCKET_INST, 0, 0xf0 },
+	{ "CKGEN", MOD_PRM_OMAP4, OMAP4430_PRM_CKGEN_INST, 0, 0x10 },
+	{ "MPU", MOD_PRM_OMAP4, OMAP4430_PRM_MPU_INST, 0, 0x24 },
+	{ "DSP", MOD_PRM_OMAP4, OMAP4430_PRM_TESLA_INST, 0, 0x24 },
+	{ "ABE", MOD_PRM_OMAP4, OMAP4430_PRM_ABE_INST, 0, 0x8c },
+	{ "ALWON", MOD_PRM_OMAP4, OMAP4430_PRM_ALWAYS_ON_INST, 0x28, 0x3c },
+	{ "CORE", MOD_PRM_OMAP4, OMAP4430_PRM_CORE_INST, 0, 0x744 },
+	{ "IVAHD", MOD_PRM_OMAP4, OMAP4430_PRM_IVAHD_INST, 0, 0x2c },
+	{ "CAM", MOD_PRM_OMAP4, OMAP4430_PRM_CAM_INST, 0, 0x2c },
+	{ "DSS", MOD_PRM_OMAP4, OMAP4430_PRM_DSS_INST, 0, 0x24 },
+	{ "SGX", MOD_PRM_OMAP4, OMAP4430_PRM_GFX_INST, 0, 0x24 },
+	{ "L3INIT", MOD_PRM_OMAP4, OMAP4430_PRM_L3INIT_INST, 0, 0xe4 },
+	{ "L4PER", MOD_PRM_OMAP4, OMAP4430_PRM_L4PER_INST, 0, 0x1dc },
+	{ "WKUP", MOD_PRM_OMAP4, OMAP4430_PRM_WKUP_INST, 0x24, 0x84 },
+	{ "WKUP_CM", MOD_PRM_OMAP4, OMAP4430_PRM_WKUP_CM_INST, 0, 0x88 },
+	{ "EMU", MOD_PRM_OMAP4, OMAP4430_PRM_EMU_INST, 0, 0x24 },
+	{ "EMU_CM", MOD_PRM_OMAP4, OMAP4430_PRM_EMU_CM_INST, 0, 0x20 },
+	{ "DEVICE", MOD_PRM_OMAP4, OMAP4430_PRM_DEVICE_INST, 0, 0xf8 },
+	/*{ "INSTR", MOD_PRM_OMAP4, OMAP4430_PRM_INSTR_INST, 0, 0x30 },*/
+
+	/* OMAP4 MPU PRCM partition */
+	{ "PRM", MOD_PRCM_MPU_OMAP4, OMAP4430_PRCM_MPU_DEVICE_PRM_INST, 0, 0x4c },
+	{ "CPU0", MOD_PRCM_MPU_OMAP4, OMAP4430_PRCM_MPU_CPU0_INST, 0, 0x4c },
+	{ "CPU1", MOD_PRCM_MPU_OMAP4, OMAP4430_PRCM_MPU_CPU1_INST, 0, 0x4c },
+	{ NULL, 0, 0, 0, 0 },
+};
+
+static int pm_dbg_get_regset_size(void)
+{
+	static int regset_size;
+	const struct pm_module_def *mod;
+
+	if (regset_size == 0) {
+		mod = pm_dbg_reg_modules;
+		while (mod->name != NULL) {
+			regset_size += mod->high + 4 - mod->low;
+			mod++;
+		}
+	}
+	return regset_size;
+}
+
+#define DBG_PRINTF(s, fmt, args...) {		\
+	if (s) seq_printf(s, fmt, ## args);	\
+	else pr_info(fmt, ## args);		\
+	}
+
+void pm_dbg_print_regs(struct seq_file *s, int reg_set)
+{
+	int i;
+	unsigned long val;
+	u32 *ptr;
+	void *store = NULL;
+	int regs;
+	int linefeed;
+	const struct pm_module_def *mod;
+	u32 offset;
+	char *type_name;
+
+	if (reg_set == 0) {
+		store = kmalloc(pm_dbg_get_regset_size(), GFP_KERNEL);
+		ptr = store;
+		pm_dbg_regset_store(ptr);
+	} else {
+		ptr = pm_dbg_reg_set[reg_set - 1];
+	}
+	mod = pm_dbg_reg_modules;
+	offset = 0;
+	type_name = NULL;
+
+	while (mod->name != NULL) {
+		regs = 0;
+		linefeed = 0;
+		switch (mod->type) {
+		case MOD_CM:
+			type_name = "INV";
+			break;
+		case MOD_PRM:
+			type_name = "INV";
+			break;
+		case MOD_CM1_OMAP4:
+			offset = OMAP4430_CM1_BASE;
+			type_name = "CM1";
+			break;
+		case MOD_CM2_OMAP4:
+			offset = OMAP4430_CM2_BASE;
+			type_name = "CM2";
+			break;
+		case MOD_PRCM_MPU_OMAP4:
+			offset = OMAP4430_PRCM_MPU_BASE;
+			type_name = "PRCM_MPU";
+			break;
+		case MOD_PRM_OMAP4:
+			offset = OMAP4430_PRM_BASE;
+			type_name = "PRM";
+			break;
+		}
+
+		DBG_PRINTF(s, "MOD: %s_%s (%08x)\n",
+			type_name, mod->name, offset + mod->offset);
+
+		for (i = mod->low; i <= mod->high; i += 4) {
+			val = *(ptr++);
+			if (val != 0) {
+				regs++;
+
+				if (linefeed) {
+					DBG_PRINTF(s, "\n");
+					linefeed = 0;
+				}
+				DBG_PRINTF(s, "  %02x => %08lx", i, val);
+				if (regs % 4 == 0)
+					linefeed = 1;
+			}
+		}
+		DBG_PRINTF(s, "\n");
+		mod++;
+	}
+
+	if (store != NULL)
+		kfree(store);
+}
+
+static int pm_dbg_show_regs(struct seq_file *s, void *unused)
+{
+        int reg_set = (int)s->private;
+
+	pm_dbg_print_regs(s, reg_set);
+
+	return 0;
+}
+
+static void pm_dbg_regset_store(u32 *ptr)
+{
+	int i;
+	u32 val;
+	const struct pm_module_def *mod;
+
+	mod = pm_dbg_reg_modules;
+
+	val = 0;
+	while (mod->name != NULL) {
+		for (i = mod->low; i <= mod->high; i += 4) {
+			switch (mod->type) {
+			case MOD_CM:
+				val = omap2_cm_read_mod_reg(
+					mod->offset, i);
+				break;
+			case MOD_PRM:
+				val = omap2_prm_read_mod_reg(
+					mod->offset, i);
+				break;
+			case MOD_CM1_OMAP4:
+				val = omap4_cminst_read_inst_reg(
+					OMAP4430_CM1_PARTITION,
+					mod->offset, i);
+				break;
+			case MOD_CM2_OMAP4:
+				val = omap4_cminst_read_inst_reg(
+					OMAP4430_CM2_PARTITION,
+					mod->offset, i);
+				break;
+			case MOD_PRM_OMAP4:
+				val = omap4_prminst_read_inst_reg(
+					OMAP4430_PRM_PARTITION,
+					mod->offset, i);
+				break;
+			case MOD_PRCM_MPU_OMAP4:
+				val = omap4_prminst_read_inst_reg(
+					OMAP4430_PRCM_MPU_PARTITION,
+					mod->offset, i);
+				break;
+			}
+			*(ptr++) = val;
+		}
+		mod++;
+	}
+}
+
+int pm_dbg_regset_save(int reg_set)
+{
+	if (pm_dbg_reg_set[reg_set-1] == NULL)
+		return -EINVAL;
+
+	pm_dbg_regset_store(pm_dbg_reg_set[reg_set-1]);
+
+	return 0;
+}
+
+static int pm_dbg_reg_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, pm_dbg_show_regs, inode->i_private);
+}
+
+static const struct file_operations debug_reg_fops = {
+	.open		= pm_dbg_reg_open,
+	.read		= seq_read,
+	.llseek		= seq_lseek,
+	.release	= single_release,
+};
+
+int pm_dbg_regset_init(int reg_set)
+{
+	char name[2];
+
+	if (reg_set < 1 || reg_set > PM_DBG_MAX_REG_SETS ||
+		pm_dbg_reg_set[reg_set-1] != NULL)
+		return -EINVAL;
+
+	pm_dbg_reg_set[reg_set-1] =
+		kmalloc(pm_dbg_get_regset_size(), GFP_KERNEL);
+
+	if (pm_dbg_reg_set[reg_set-1] == NULL)
+		return -ENOMEM;
+
+	if (pm_dbg_dir != NULL) {
+		sprintf(name, "%d", reg_set);
+
+		(void) debugfs_create_file(name, S_IRUGO,
+			pm_dbg_dir, (void *)reg_set, &debug_reg_fops);
+	}
+
+	return 0;
+}
+
 
 void pm_dbg_update_time(struct powerdomain *pwrdm, int prev)
 {
@@ -260,6 +542,8 @@ DEFINE_SIMPLE_ATTRIBUTE(pm_dbg_option_fops, option_get, option_set, "%llu\n");
 static int __init pm_dbg_init(void)
 {
 	struct dentry *d;
+	int i;
+	char buf[8];
 
 	if (pm_dbg_init_done)
 		return 0;
@@ -277,6 +561,21 @@ static int __init pm_dbg_init(void)
 
 	(void) debugfs_create_file("enable_off_mode", S_IRUGO | S_IWUSR, d,
 				   &enable_off_mode, &pm_dbg_option_fops);
+
+	pm_dbg_dir = debugfs_create_dir("registers", d);
+	if (IS_ERR(pm_dbg_dir))
+		return PTR_ERR(pm_dbg_dir);
+
+	(void) debugfs_create_file("current", S_IRUGO,
+		pm_dbg_dir, (void *)0, &debug_reg_fops);
+
+	for (i = 0; i < PM_DBG_MAX_REG_SETS; i++)
+		if (pm_dbg_reg_set[i] != NULL) {
+			sprintf(buf, "%d", i+1);
+			(void) debugfs_create_file(buf, S_IRUGO,
+				pm_dbg_dir, (void *)(i+1), &debug_reg_fops);
+	}
+
 	pm_dbg_init_done = 1;
 
 	return 0;
