@@ -60,6 +60,7 @@
 #include "prcm44xx.h"
 #include "prm44xx.h"
 #include "prm-regbits-44xx.h"
+#include "cm44xx.h"
 
 #ifdef CONFIG_SMP
 
@@ -265,10 +266,13 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 	 * In MPUSS OSWR or device OFF, interrupt controller context is lost.
 	 */
 	mpuss_clear_prev_logic_pwrst();
-	if (pwrdm_read_next_func_pwrst(core_pd) == PWRDM_FUNC_PWRST_OFF)
+	if (pwrdm_read_next_func_pwrst(core_pd) == PWRDM_FUNC_PWRST_OFF) {
+		omap4_dpll_prepare_off();
 		save_state = 3;
-	else if (pwrdm_read_next_func_pwrst(mpuss_pd) == PWRDM_FUNC_PWRST_OSWR)
+	} else if (pwrdm_read_next_func_pwrst(mpuss_pd) ==
+		   PWRDM_FUNC_PWRST_OSWR) {
 		save_state = 2;
+	}
 
 	cpu_clear_prev_logic_pwrst(cpu);
 	set_cpu_next_pwrst(cpu, power_state);
@@ -290,6 +294,10 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 	 */
 	wakeup_cpu = smp_processor_id();
 	set_cpu_next_pwrst(wakeup_cpu, PWRDM_FUNC_PWRST_ON);
+
+	if (pwrdm_read_prev_func_pwrst(core_pd) == PWRDM_FUNC_PWRST_OFF) {
+		omap4_dpll_resume_off();
+	}
 
 	pwrdm_post_transition();
 
