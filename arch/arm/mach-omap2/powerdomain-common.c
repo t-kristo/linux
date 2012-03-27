@@ -108,3 +108,64 @@ u32 omap2_pwrdm_get_mem_bank_stst_mask(u8 bank)
 	return 0;
 }
 
+/*
+ * Functional (i.e. logical) to internal (i.e. registers)
+ * values for the power domains states
+ */
+int omap2_pwrdm_func_to_pwrst(struct powerdomain *pwrdm, u8 func_pwrst)
+{
+	int ret;
+
+	switch (func_pwrst) {
+	case PWRDM_FUNC_PWRST_ON:
+		ret = PWRDM_POWER_ON;
+		break;
+	case PWRDM_FUNC_PWRST_INACTIVE:
+		ret = PWRDM_POWER_INACTIVE;
+		break;
+	case PWRDM_FUNC_PWRST_CSWR:
+	case PWRDM_FUNC_PWRST_OSWR:
+		ret = PWRDM_POWER_RET;
+		break;
+	case PWRDM_FUNC_PWRST_OFF:
+		ret = PWRDM_POWER_OFF;
+		break;
+	default:
+		ret = -1;
+	}
+
+	return ret;
+}
+
+/*
+ * Internal (i.e. registers) to functional (i.e. logical) values
+ * for the power domains states
+ */
+int omap2_pwrdm_pwrst_to_func(struct powerdomain *pwrdm, u8 pwrst)
+{
+	int ret;
+
+	switch (pwrst) {
+	case PWRDM_POWER_ON:
+		ret = PWRDM_FUNC_PWRST_ON;
+		break;
+	case PWRDM_POWER_INACTIVE:
+		ret = PWRDM_FUNC_PWRST_INACTIVE;
+		break;
+	case PWRDM_POWER_RET:
+		/*
+		 * XXX warning: return OSWR in case of pd in RET and
+		 * logic in OFF
+		 */
+		ret = PWRDM_FUNC_PWRST_CSWR;
+		break;
+	case PWRDM_POWER_OFF:
+		ret = PWRDM_FUNC_PWRST_OFF;
+		break;
+	default:
+		ret = -1;
+	}
+
+	return ret;
+}
+

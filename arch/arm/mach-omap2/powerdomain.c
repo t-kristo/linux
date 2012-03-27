@@ -465,6 +465,136 @@ int pwrdm_get_mem_bank_count(struct powerdomain *pwrdm)
 }
 
 /**
+ * pwrdm_func_to_pwrst - get the internal (i.e. registers) value mapped
+ * to the functional state
+ * @pwrdm: struct powerdomain * to query
+ * @func_pwrst: functional power state
+ *
+ * Convert the functional power state to the platform specific power
+ * domain state value.
+ * Returns the internal power domain state value or -EINVAL in case
+ * of invalid parameters passed in.
+ */
+int pwrdm_func_to_pwrst(struct powerdomain *pwrdm, u8 func_pwrst)
+{
+	int ret = func_pwrst;
+
+	if ((!pwrdm)|| (func_pwrst >= PWRDM_MAX_FUNC_PWRSTS))
+		return -EINVAL;
+
+	if (arch_pwrdm && arch_pwrdm->pwrdm_func_to_pwrst) {
+		ret = arch_pwrdm->pwrdm_func_to_pwrst(pwrdm, func_pwrst);
+	}
+
+	pr_debug("powerdomain: convert func %0x to pwrst %0x for %s\n",
+		 func_pwrst, ret, pwrdm->name);
+
+	return ret;
+}
+
+/**
+ * pwrdm_pwrst_to_func - get the functional (i.e. logical) value mapped
+ * to the internal state
+ * @pwrdm: struct powerdomain * to query
+ * @pwrst: internal power state
+ *
+ * Convert the internal power state to the power domain functional value.
+ * Returns the functional power domain state value or -EINVAL in case
+ * of invalid parameters passed in.
+ */
+int pwrdm_pwrst_to_func(struct powerdomain *pwrdm, u8 pwrst)
+{
+	int ret = pwrst;
+
+	if ((!pwrdm)|| (pwrst >= PWRDM_MAX_PWRSTS))
+		return -EINVAL;
+
+	pr_debug("powerdomain: convert %0x pwrst to func for %s\n",
+		 pwrst, pwrdm->name);
+
+	if (arch_pwrdm && arch_pwrdm->pwrdm_pwrst_to_func) {
+		ret = arch_pwrdm->pwrdm_pwrst_to_func(pwrdm, pwrst);
+	}
+
+	return ret;
+}
+
+/* Types of sleep_switch used in omap_set_pwrdm_state */
+#define FORCEWAKEUP_SWITCH	0
+#define LOWPOWERSTATE_SWITCH	1
+
+/**
+ * omap_set_pwrdm_state - program next powerdomain power state
+ * @pwrdm: struct powerdomain * to set
+ * @func_pwrst: power domain functional state, one of the PWRDM_FUNC_* macros
+ *
+ * This programs the pwrdm next functional state, sets the dependencies
+ * and waits for the state to be applied.
+ */
+int omap_set_pwrdm_state(struct powerdomain *pwrdm, u32 func_pwrst)
+{
+	u8 curr_pwrst, next_pwrst;
+	int pwrst = pwrdm_func_to_pwrst(pwrdm, func_pwrst);
+	int sleep_switch = -1, ret = 0, hwsup = 0;
+
+	if (!pwrdm || IS_ERR(pwrdm) || (pwrst < 0)) {
+		pr_debug("%s: invalid params: pwrdm=%p, func_pwrst=%0x\n",
+			 __func__, pwrdm, func_pwrst);
+		return -EINVAL;
+	}
+
+	pr_debug("%s: set func_pwrst %0x to pwrdm %s\n",
+		 __func__, func_pwrst, pwrdm->name);
+
+	mutex_lock(&pwrdm->lock);
+
+	while (!(pwrdm->pwrsts & (1 << pwrst))) {
+		if (pwrst == PWRDM_POWER_OFF)
+			goto out;
+		pwrst--;
+	}
+
+	next_pwrst = pwrdm_read_next_pwrst(pwrdm);
+	if (next_pwrst == pwrst)
+		goto out;
+
+	curr_pwrst = pwrdm_read_pwrst(pwrdm);
+	if (curr_pwrst < PWRDM_POWER_ON) {
+		if ((curr_pwrst > pwrst) &&
+			(pwrdm->flags & PWRDM_HAS_LOWPOWERSTATECHANGE)) {
+			sleep_switch = LOWPOWERSTATE_SWITCH;
+		} else {
+			hwsup = clkdm_in_hwsup(pwrdm->pwrdm_clkdms[0]);
+			clkdm_wakeup(pwrdm->pwrdm_clkdms[0]);
+			sleep_switch = FORCEWAKEUP_SWITCH;
+		}
+	}
+
+	ret = pwrdm_set_next_pwrst(pwrdm, pwrst);
+	if (ret)
+		pr_err("%s: unable to set power state of powerdomain: %s\n",
+		       __func__, pwrdm->name);
+
+	switch (sleep_switch) {
+	case FORCEWAKEUP_SWITCH:
+		if (hwsup)
+			clkdm_allow_idle(pwrdm->pwrdm_clkdms[0]);
+		else
+			clkdm_sleep(pwrdm->pwrdm_clkdms[0]);
+		break;
+	case LOWPOWERSTATE_SWITCH:
+		pwrdm_set_lowpwrstchange(pwrdm);
+		pwrdm_wait_transition(pwrdm);
+		pwrdm_state_switch(pwrdm);
+		break;
+	}
+
+out:
+	mutex_unlock(&pwrdm->lock);
+	return ret;
+}
+
+/**
  * pwrdm_set_next_pwrst - set next powerdomain power state
  * @pwrdm: struct powerdomain * to set
  * @pwrst: one of the PWRDM_POWER_* macros
@@ -521,6 +651,21 @@ int pwrdm_read_next_pwrst(struct powerdomain *pwrdm)
 }
 
 /**
+ * pwrdm_read_next_func_pwrst - get next powerdomain functional power state
+ * @pwrdm: struct powerdomain * to get power state
+ *
+ * Return the powerdomain @pwrdm's next functional power state.
+ * Returns -EINVAL if the powerdomain pointer is null or returns
+ * the next power state upon success.
+ */
+int pwrdm_read_next_func_pwrst(struct powerdomain *pwrdm)
+{
+	int ret = pwrdm_read_next_pwrst(pwrdm);
+
+	return pwrdm_pwrst_to_func(pwrdm, ret);
+}
+
+/**
  * pwrdm_read_pwrst - get current powerdomain power state
  * @pwrdm: struct powerdomain * to get power state
  *
@@ -542,6 +687,21 @@ int pwrdm_read_pwrst(struct powerdomain *pwrdm)
 }
 
 /**
+ * pwrdm_read_func_pwrst - get current powerdomain functional power state
+ * @pwrdm: struct powerdomain * to get power state
+ *
+ * Return the powerdomain @pwrdm's current functional power state.
+ * Returns -EINVAL if the powerdomain pointer is null or returns
+ * the current power state upon success.
+ */
+int pwrdm_read_func_pwrst(struct powerdomain *pwrdm)
+{
+	int ret = pwrdm_read_pwrst(pwrdm);
+
+	return pwrdm_pwrst_to_func(pwrdm, ret);
+}
+
+/**
  * pwrdm_read_prev_pwrst - get previous powerdomain power state
  * @pwrdm: struct powerdomain * to get previous power state
  *
@@ -560,6 +720,21 @@ int pwrdm_read_prev_pwrst(struct powerdomain *pwrdm)
 		ret = arch_pwrdm->pwrdm_read_prev_pwrst(pwrdm);
 
 	return ret;
+}
+
+/**
+ * pwrdm_read_prev_func_pwrst - get previous powerdomain functional power state
+ * @pwrdm: struct powerdomain * to get previous power state
+ *
+ * Return the powerdomain @pwrdm's previous functional power state.
+ * Returns -EINVAL if the powerdomain pointer is null or returns the
+ * previous power state upon success.
+ */
+int pwrdm_read_prev_func_pwrst(struct powerdomain *pwrdm)
+{
+	int ret = pwrdm_read_prev_pwrst(pwrdm);
+
+	return pwrdm_pwrst_to_func(pwrdm, ret);
 }
 
 /**

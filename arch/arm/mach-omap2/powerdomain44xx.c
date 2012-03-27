@@ -209,6 +209,8 @@ static int omap4_pwrdm_wait_transition(struct powerdomain *pwrdm)
 }
 
 struct pwrdm_ops omap4_pwrdm_operations = {
+	.pwrdm_func_to_pwrst	= omap2_pwrdm_func_to_pwrst,
+	.pwrdm_pwrst_to_func	= omap2_pwrdm_pwrst_to_func,
 	.pwrdm_set_next_pwrst	= omap4_pwrdm_set_next_pwrst,
 	.pwrdm_read_next_pwrst	= omap4_pwrdm_read_next_pwrst,
 	.pwrdm_read_pwrst	= omap4_pwrdm_read_pwrst,
