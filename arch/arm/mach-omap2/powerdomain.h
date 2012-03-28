@@ -19,7 +19,7 @@
 
 #include <linux/types.h>
 #include <linux/list.h>
-
+#include <linux/mutex.h>
 #include <linux/atomic.h>
 
 #include <plat/cpu.h>
@@ -124,6 +124,7 @@ struct powerdomain {
 	struct clockdomain *pwrdm_clkdms[PWRDM_MAX_CLKDMS];
 	struct list_head node;
 	struct list_head voltdm_node;
+	struct mutex lock;
 	int state;
 	unsigned state_counter[PWRDM_MAX_PWRSTS];
 	unsigned ret_logic_off_counter;

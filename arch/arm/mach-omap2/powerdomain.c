@@ -102,6 +102,7 @@ static int _pwrdm_register(struct powerdomain *pwrdm)
 	INIT_LIST_HEAD(&pwrdm->voltdm_node);
 	voltdm_add_pwrdm(voltdm, pwrdm);
 
+	mutex_init(&pwrdm->lock);
 	list_add(&pwrdm->node, &pwrdm_list);
 
 	/* Initialize the powerdomain's state counter */
@@ -269,7 +270,7 @@ int pwrdm_complete_init(void)
 		return -EACCES;
 
 	list_for_each_entry(temp_p, &pwrdm_list, node)
-		pwrdm_set_next_pwrst(temp_p, PWRDM_POWER_ON);
+		omap_set_pwrdm_state(temp_p, PWRDM_FUNC_PWRST_ON);
 
 	return 0;
 }

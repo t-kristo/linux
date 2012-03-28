@@ -86,14 +86,14 @@ static inline void set_cpu_wakeup_addr(unsigned int cpu_id, u32 addr)
 }
 
 /*
- * Set the CPUx powerdomain's previous power state
+ * Set the CPUx powerdomain's next functional power state
  */
 static inline void set_cpu_next_pwrst(unsigned int cpu_id,
 				unsigned int power_state)
 {
 	struct omap4_cpu_pm_info *pm_info = &per_cpu(omap4_pm_info, cpu_id);
 
-	pwrdm_set_next_pwrst(pm_info->pwrdm, power_state);
+	omap_set_pwrdm_state(pm_info->pwrdm, power_state);
 }
 
 /*
@@ -103,7 +103,7 @@ static inline unsigned int read_cpu_prev_pwrst(unsigned int cpu_id)
 {
 	struct omap4_cpu_pm_info *pm_info = &per_cpu(omap4_pm_info, cpu_id);
 
-	return pwrdm_read_prev_pwrst(pm_info->pwrdm);
+	return pwrdm_read_prev_func_pwrst(pm_info->pwrdm);
 }
 
 /*
@@ -125,14 +125,15 @@ static void scu_pwrst_prepare(unsigned int cpu_id, unsigned int cpu_state)
 	u32 scu_pwr_st;
 
 	switch (cpu_state) {
-	case PWRDM_POWER_RET:
+	case PWRDM_FUNC_PWRST_OSWR:
+	case PWRDM_FUNC_PWRST_CSWR:
 		scu_pwr_st = SCU_PM_DORMANT;
 		break;
-	case PWRDM_POWER_OFF:
+	case PWRDM_FUNC_PWRST_OFF:
 		scu_pwr_st = SCU_PM_POWEROFF;
 		break;
-	case PWRDM_POWER_ON:
-	case PWRDM_POWER_INACTIVE:
+	case PWRDM_FUNC_PWRST_ON:
+	case PWRDM_FUNC_PWRST_INACTIVE:
 	default:
 		scu_pwr_st = SCU_PM_NORMAL;
 		break;
@@ -231,19 +232,21 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 {
 	unsigned int save_state = 0;
 	unsigned int wakeup_cpu;
+	int mpuss_state;
 
 	if (omap_rev() == OMAP4430_REV_ES1_0)
 		return -ENXIO;
 
 	switch (power_state) {
-	case PWRDM_POWER_ON:
-	case PWRDM_POWER_INACTIVE:
+	case PWRDM_FUNC_PWRST_ON:
+	case PWRDM_FUNC_PWRST_INACTIVE:
 		save_state = 0;
 		break;
-	case PWRDM_POWER_OFF:
+	case PWRDM_FUNC_PWRST_OFF:
 		save_state = 1;
 		break;
-	case PWRDM_POWER_RET:
+	case PWRDM_FUNC_PWRST_OSWR:
+	case PWRDM_FUNC_PWRST_CSWR:
 	default:
 		/*
 		 * CPUx CSWR is invalid hardware state. Also CPUx OSWR
@@ -259,11 +262,13 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 
 	/*
 	 * Check MPUSS next state and save interrupt controller if needed.
-	 * In MPUSS OSWR or device OFF, interrupt controller  contest is lost.
+	 * In MPUSS OSWR or device OFF, interrupt controller context is lost.
 	 */
 	mpuss_clear_prev_logic_pwrst();
-	if ((pwrdm_read_next_pwrst(mpuss_pd) == PWRDM_POWER_RET) &&
-		(pwrdm_read_logic_retst(mpuss_pd) == PWRDM_POWER_OFF))
+	mpuss_state = pwrdm_read_next_func_pwrst(mpuss_pd);
+	if (((mpuss_state == PWRDM_FUNC_PWRST_CSWR) ||
+	     (mpuss_state == PWRDM_FUNC_PWRST_OSWR)) &&
+	    (pwrdm_read_logic_retst(mpuss_pd) == PWRDM_POWER_OFF))
 		save_state = 2;
 
 	cpu_clear_prev_logic_pwrst(cpu);
@@ -285,7 +290,7 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 	 * domain transition
 	 */
 	wakeup_cpu = smp_processor_id();
-	set_cpu_next_pwrst(wakeup_cpu, PWRDM_POWER_ON);
+	set_cpu_next_pwrst(wakeup_cpu, PWRDM_FUNC_PWRST_ON);
 
 	pwrdm_post_transition();
 
@@ -304,7 +309,7 @@ int __cpuinit omap4_hotplug_cpu(unsigned int cpu, unsigned int power_state)
 	if (omap_rev() == OMAP4430_REV_ES1_0)
 		return -ENXIO;
 
-	if (power_state == PWRDM_POWER_OFF)
+	if (power_state == PWRDM_FUNC_PWRST_OFF)
 		cpu_state = 1;
 
 	clear_cpu_prev_pwrst(cpu);
@@ -319,7 +324,7 @@ int __cpuinit omap4_hotplug_cpu(unsigned int cpu, unsigned int power_state)
 	 */
 	omap4_finish_suspend(cpu_state);
 
-	set_cpu_next_pwrst(cpu, PWRDM_POWER_ON);
+	set_cpu_next_pwrst(cpu, PWRDM_FUNC_PWRST_ON);
 	return 0;
 }
 
@@ -354,7 +359,7 @@ int __init omap4_mpuss_init(void)
 	cpu_clear_prev_logic_pwrst(0);
 
 	/* Initialise CPU0 power domain state to ON */
-	pwrdm_set_next_pwrst(pm_info->pwrdm, PWRDM_POWER_ON);
+	omap_set_pwrdm_state(pm_info->pwrdm, PWRDM_FUNC_PWRST_ON);
 
 	pm_info = &per_cpu(omap4_pm_info, 0x1);
 	pm_info->scu_sar_addr = sar_base + SCU_OFFSET1;
@@ -371,7 +376,7 @@ int __init omap4_mpuss_init(void)
 	cpu_clear_prev_logic_pwrst(1);
 
 	/* Initialise CPU1 power domain state to ON */
-	pwrdm_set_next_pwrst(pm_info->pwrdm, PWRDM_POWER_ON);
+	omap_set_pwrdm_state(pm_info->pwrdm, PWRDM_FUNC_PWRST_ON);
 
 	mpuss_pd = pwrdm_lookup("mpu_pwrdm");
 	if (!mpuss_pd) {

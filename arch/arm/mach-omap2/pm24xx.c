@@ -94,7 +94,7 @@ static int omap2_enter_full_retention(void)
 	 * preserve logic state during retention
 	 */
 	pwrdm_set_logic_retst(mpu_pwrdm, PWRDM_POWER_RET);
-	pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_RET);
+	omap_set_pwrdm_state(mpu_pwrdm, PWRDM_FUNC_PWRST_CSWR);
 
 	/* Workaround to kill USB */
 	l = omap_ctrl_readl(OMAP2_CONTROL_DEVCONF0) | OMAP24XX_USBSTANDBYCTRL;
@@ -251,23 +251,23 @@ static void __init prcm_setup_regs(void)
 		pwrdm_set_mem_retst(core_pwrdm, i, PWRDM_POWER_RET);
 
 	/* Set CORE powerdomain's next power state to RETENTION */
-	pwrdm_set_next_pwrst(core_pwrdm, PWRDM_POWER_RET);
+	omap_set_pwrdm_state(core_pwrdm, PWRDM_FUNC_PWRST_CSWR);
 
 	/*
 	 * Set MPU powerdomain's next power state to RETENTION;
 	 * preserve logic state during retention
 	 */
 	pwrdm_set_logic_retst(mpu_pwrdm, PWRDM_POWER_RET);
-	pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_RET);
+	omap_set_pwrdm_state(mpu_pwrdm, PWRDM_FUNC_PWRST_CSWR);
 
 	/* Force-power down DSP, GFX powerdomains */
 
 	pwrdm = clkdm_get_pwrdm(dsp_clkdm);
-	pwrdm_set_next_pwrst(pwrdm, PWRDM_POWER_OFF);
+	omap_set_pwrdm_state(pwrdm, PWRDM_FUNC_PWRST_OFF);
 	clkdm_sleep(dsp_clkdm);
 
 	pwrdm = clkdm_get_pwrdm(gfx_clkdm);
-	pwrdm_set_next_pwrst(pwrdm, PWRDM_POWER_OFF);
+	omap_set_pwrdm_state(pwrdm, PWRDM_FUNC_PWRST_OFF);
 	clkdm_sleep(gfx_clkdm);
 
 	/* Enable hardware-supervised idle for all clkdms */

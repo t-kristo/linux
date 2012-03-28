@@ -33,18 +33,18 @@ struct omap4_idle_statedata {
 
 static struct omap4_idle_statedata omap4_idle_data[] = {
 	{
-		.cpu_state = PWRDM_POWER_ON,
-		.mpu_state = PWRDM_POWER_ON,
+		.cpu_state = PWRDM_FUNC_PWRST_ON,
+		.mpu_state = PWRDM_FUNC_PWRST_ON,
 		.mpu_logic_state = PWRDM_POWER_RET,
 	},
 	{
-		.cpu_state = PWRDM_POWER_OFF,
-		.mpu_state = PWRDM_POWER_RET,
+		.cpu_state = PWRDM_FUNC_PWRST_OFF,
+		.mpu_state = PWRDM_FUNC_PWRST_CSWR,
 		.mpu_logic_state = PWRDM_POWER_RET,
 	},
 	{
-		.cpu_state = PWRDM_POWER_OFF,
-		.mpu_state = PWRDM_POWER_RET,
+		.cpu_state = PWRDM_FUNC_PWRST_OFF,
+		.mpu_state = PWRDM_FUNC_PWRST_OSWR,
 		.mpu_logic_state = PWRDM_POWER_OFF,
 	},
 };
@@ -79,8 +79,8 @@ static int omap4_enter_idle(struct cpuidle_device *dev,
 	 * Update dev->last_state so that governor stats reflects right
 	 * data.
 	 */
-	cpu1_state = pwrdm_read_pwrst(cpu1_pd);
-	if (cpu1_state != PWRDM_POWER_OFF) {
+	cpu1_state = pwrdm_read_func_pwrst(cpu1_pd);
+	if (cpu1_state != PWRDM_FUNC_PWRST_OFF) {
 		index = drv->safe_state_index;
 		cx = &omap4_idle_data[index];
 	}
@@ -92,7 +92,7 @@ static int omap4_enter_idle(struct cpuidle_device *dev,
 	 * Call idle CPU PM enter notifier chain so that
 	 * VFP and per CPU interrupt context is saved.
 	 */
-	if (cx->cpu_state == PWRDM_POWER_OFF)
+	if (cx->cpu_state == PWRDM_FUNC_PWRST_OFF)
 		cpu_pm_enter();
 
 	pwrdm_set_logic_retst(mpu_pd, cx->mpu_logic_state);
@@ -102,8 +102,9 @@ static int omap4_enter_idle(struct cpuidle_device *dev,
 	 * Call idle CPU cluster PM enter notifier chain
 	 * to save GIC and wakeupgen context.
 	 */
-	if ((cx->mpu_state == PWRDM_POWER_RET) &&
-		(cx->mpu_logic_state == PWRDM_POWER_OFF))
+	if (((cx->mpu_state == PWRDM_FUNC_PWRST_CSWR) ||
+	     (cx->mpu_state == PWRDM_FUNC_PWRST_OSWR)) &&
+	    (cx->mpu_logic_state == PWRDM_POWER_OFF))
 			cpu_cluster_pm_enter();
 
 	omap4_enter_lowpower(dev->cpu, cx->cpu_state);
@@ -113,7 +114,7 @@ static int omap4_enter_idle(struct cpuidle_device *dev,
 	 * VFP and per CPU IRQ context. Only CPU0 state is
 	 * considered since CPU1 is managed by CPU hotplug.
 	 */
-	if (pwrdm_read_prev_pwrst(cpu0_pd) == PWRDM_POWER_OFF)
+	if (pwrdm_read_prev_func_pwrst(cpu0_pd) == PWRDM_FUNC_PWRST_OFF)
 		cpu_pm_exit();
 
 	/*
