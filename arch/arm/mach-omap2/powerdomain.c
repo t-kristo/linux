@@ -129,14 +129,14 @@ static void _update_logic_membank_counters(struct powerdomain *pwrdm)
 
 	prev_logic_pwrst = pwrdm_read_prev_logic_pwrst(pwrdm);
 	if ((pwrdm->pwrsts_logic_ret == PWRSTS_OFF_RET) &&
-	    (prev_logic_pwrst == PWRDM_POWER_OFF))
+	    (prev_logic_pwrst == PWRDM_LOGIC_MEM_PWRST_OFF))
 		pwrdm->ret_logic_off_counter++;
 
 	for (i = 0; i < pwrdm->banks; i++) {
 		prev_mem_pwrst = pwrdm_read_prev_mem_pwrst(pwrdm, i);
 
 		if ((pwrdm->pwrsts_mem_ret[i] == PWRSTS_OFF_RET) &&
-		    (prev_mem_pwrst == PWRDM_POWER_OFF))
+		    (prev_mem_pwrst == PWRDM_LOGIC_MEM_PWRST_OFF))
 			pwrdm->ret_mem_off_counter[i]++;
 	}
 }
@@ -494,28 +494,65 @@ int pwrdm_func_to_pwrst(struct powerdomain *pwrdm, u8 func_pwrst)
 }
 
 /**
+ * pwrdm_func_to_logic_pwrst - get the internal (i.e. registers) value
+ * of the logic state mapped to the functional state
+ * @pwrdm: struct powerdomain * to query
+ * @func_pwrst: functional power state
+ *
+ * Convert the functional power state to the platform specific power
+ * domain logic state value.
+ * Returns the internal power domain logic state value or -EINVAL in
+ * case of invalid parameters passed in.
+ */
+int pwrdm_func_to_logic_pwrst(struct powerdomain *pwrdm, u8 func_pwrst)
+{
+	int ret = func_pwrst;
+
+	if ((!pwrdm)|| (func_pwrst >= PWRDM_MAX_FUNC_PWRSTS))
+		return -EINVAL;
+
+	if (arch_pwrdm && arch_pwrdm->pwrdm_func_to_logic_pwrst) {
+		ret = arch_pwrdm->pwrdm_func_to_logic_pwrst(pwrdm, func_pwrst);
+	}
+
+	pr_debug("powerdomain: convert func %0x to logic %0x pwrst for %s\n",
+		 func_pwrst, ret, pwrdm->name);
+
+	return ret;
+}
+
+/**
  * pwrdm_pwrst_to_func - get the functional (i.e. logical) value mapped
  * to the internal state
  * @pwrdm: struct powerdomain * to query
  * @pwrst: internal power state
+ * @logic: internal logic state
  *
- * Convert the internal power state to the power domain functional value.
+ * Convert the internal power state and logic power state to the
+ * power domain functional value.
  * Returns the functional power domain state value or -EINVAL in case
  * of invalid parameters passed in.
  */
-int pwrdm_pwrst_to_func(struct powerdomain *pwrdm, u8 pwrst)
+int pwrdm_pwrst_to_func(struct powerdomain *pwrdm, u8 pwrst, u8 logic)
 {
 	int ret = pwrst;
 
-	if ((!pwrdm)|| (pwrst >= PWRDM_MAX_PWRSTS))
+	if ((!pwrdm) || (pwrst >= PWRDM_MAX_PWRSTS) ||
+	    (logic >= PWRDM_MAX_LOGIC_MEM_PWRST))
 		return -EINVAL;
 
-	pr_debug("powerdomain: convert %0x pwrst to func for %s\n",
-		 pwrst, pwrdm->name);
+	while (!(pwrdm->pwrsts_logic_ret & (1 << logic))) {
+		if (logic == PWRDM_LOGIC_MEM_PWRST_RET)
+			break;
+		logic++;
+	}
 
 	if (arch_pwrdm && arch_pwrdm->pwrdm_pwrst_to_func) {
-		ret = arch_pwrdm->pwrdm_pwrst_to_func(pwrdm, pwrst);
+		ret = arch_pwrdm->pwrdm_pwrst_to_func(pwrdm, pwrst, logic);
 	}
+
+	pr_debug("powerdomain: convert pwrst (%0x,%0x) to func %0x for %s\n",
+		 pwrst, logic, ret, pwrdm->name);
 
 	return ret;
 }
@@ -536,9 +573,10 @@ int omap_set_pwrdm_state(struct powerdomain *pwrdm, u32 func_pwrst)
 {
 	u8 curr_pwrst, next_pwrst;
 	int pwrst = pwrdm_func_to_pwrst(pwrdm, func_pwrst);
+	int logic = pwrdm_func_to_logic_pwrst(pwrdm, func_pwrst);
 	int sleep_switch = -1, ret = 0, hwsup = 0;
 
-	if (!pwrdm || IS_ERR(pwrdm) || (pwrst < 0)) {
+	if (!pwrdm || IS_ERR(pwrdm) || (pwrst < 0) || (logic < 0)) {
 		pr_debug("%s: invalid params: pwrdm=%p, func_pwrst=%0x\n",
 			 __func__, pwrdm, func_pwrst);
 		return -EINVAL;
@@ -570,6 +608,9 @@ int omap_set_pwrdm_state(struct powerdomain *pwrdm, u32 func_pwrst)
 			sleep_switch = FORCEWAKEUP_SWITCH;
 		}
 	}
+
+	if (logic != pwrdm_read_logic_retst(pwrdm))
+		pwrdm_set_logic_retst(pwrdm, logic);
 
 	ret = pwrdm_set_next_pwrst(pwrdm, pwrst);
 	if (ret)
@@ -661,9 +702,10 @@ int pwrdm_read_next_pwrst(struct powerdomain *pwrdm)
  */
 int pwrdm_read_next_func_pwrst(struct powerdomain *pwrdm)
 {
-	int ret = pwrdm_read_next_pwrst(pwrdm);
+	int next_pwrst = pwrdm_read_next_pwrst(pwrdm);
+	int next_logic = pwrdm_read_logic_retst(pwrdm);
 
-	return pwrdm_pwrst_to_func(pwrdm, ret);
+	return pwrdm_pwrst_to_func(pwrdm, next_pwrst, next_logic);
 }
 
 /**
@@ -697,9 +739,10 @@ int pwrdm_read_pwrst(struct powerdomain *pwrdm)
  */
 int pwrdm_read_func_pwrst(struct powerdomain *pwrdm)
 {
-	int ret = pwrdm_read_pwrst(pwrdm);
+	int pwrst = pwrdm_read_pwrst(pwrdm);
+	int logic = pwrdm_read_logic_pwrst(pwrdm);
 
-	return pwrdm_pwrst_to_func(pwrdm, ret);
+	return pwrdm_pwrst_to_func(pwrdm, pwrst, logic);
 }
 
 /**
@@ -733,15 +776,16 @@ int pwrdm_read_prev_pwrst(struct powerdomain *pwrdm)
  */
 int pwrdm_read_prev_func_pwrst(struct powerdomain *pwrdm)
 {
-	int ret = pwrdm_read_prev_pwrst(pwrdm);
+	int prev_pwrst = pwrdm_read_prev_pwrst(pwrdm);
+	int prev_logic = pwrdm_read_prev_logic_pwrst(pwrdm);
 
-	return pwrdm_pwrst_to_func(pwrdm, ret);
+	return pwrdm_pwrst_to_func(pwrdm, prev_pwrst, prev_logic);
 }
 
 /**
  * pwrdm_set_logic_retst - set powerdomain logic power state upon retention
  * @pwrdm: struct powerdomain * to set
- * @pwrst: one of the PWRDM_POWER_* macros
+ * @pwrst: one of the PWRDM_LOGIC_MEM_PWRST_* macros
  *
  * Set the next power state @pwrst that the logic portion of the
  * powerdomain @pwrdm will enter when the powerdomain enters retention.
@@ -772,7 +816,7 @@ int pwrdm_set_logic_retst(struct powerdomain *pwrdm, u8 pwrst)
  * pwrdm_set_mem_onst - set memory power state while powerdomain ON
  * @pwrdm: struct powerdomain * to set
  * @bank: memory bank number to set (0-3)
- * @pwrst: one of the PWRDM_POWER_* macros
+ * @pwrst: one of the PWRDM_LOGIC_MEM_PWRST_* macros
  *
  * Set the next power state @pwrst that memory bank @bank of the
  * powerdomain @pwrdm will enter when the powerdomain enters the ON
@@ -809,7 +853,7 @@ int pwrdm_set_mem_onst(struct powerdomain *pwrdm, u8 bank, u8 pwrst)
  * pwrdm_set_mem_retst - set memory power state while powerdomain in RET
  * @pwrdm: struct powerdomain * to set
  * @bank: memory bank number to set (0-3)
- * @pwrst: one of the PWRDM_POWER_* macros
+ * @pwrst: one of the PWRDM_LOGIC_MEM_PWRST_* macros
  *
  * Set the next power state @pwrst that memory bank @bank of the
  * powerdomain @pwrdm will enter when the powerdomain enters the

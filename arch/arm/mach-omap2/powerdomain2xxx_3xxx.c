@@ -212,6 +212,7 @@ static int omap3_pwrdm_disable_hdwr_sar(struct powerdomain *pwrdm)
 
 struct pwrdm_ops omap2_pwrdm_operations = {
 	.pwrdm_func_to_pwrst	= omap2_pwrdm_func_to_pwrst,
+	.pwrdm_func_to_logic_pwrst	= omap2_pwrdm_func_to_logic_pwrst,
 	.pwrdm_pwrst_to_func	= omap2_pwrdm_pwrst_to_func,
 	.pwrdm_set_next_pwrst	= omap2_pwrdm_set_next_pwrst,
 	.pwrdm_read_next_pwrst	= omap2_pwrdm_read_next_pwrst,
@@ -226,6 +227,7 @@ struct pwrdm_ops omap2_pwrdm_operations = {
 
 struct pwrdm_ops omap3_pwrdm_operations = {
 	.pwrdm_func_to_pwrst	= omap2_pwrdm_func_to_pwrst,
+	.pwrdm_func_to_logic_pwrst	= omap2_pwrdm_func_to_logic_pwrst,
 	.pwrdm_pwrst_to_func	= omap2_pwrdm_pwrst_to_func,
 	.pwrdm_set_next_pwrst	= omap2_pwrdm_set_next_pwrst,
 	.pwrdm_read_next_pwrst	= omap2_pwrdm_read_next_pwrst,

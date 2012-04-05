@@ -138,10 +138,35 @@ int omap2_pwrdm_func_to_pwrst(struct powerdomain *pwrdm, u8 func_pwrst)
 }
 
 /*
+ * Functional (i.e. logical) to internal (i.e. registers)
+ * values for the power domains logic states
+ */
+int omap2_pwrdm_func_to_logic_pwrst(struct powerdomain *pwrdm, u8 func_pwrst)
+{
+	int ret;
+
+	switch (func_pwrst) {
+	case PWRDM_FUNC_PWRST_ON:
+	case PWRDM_FUNC_PWRST_INACTIVE:
+	case PWRDM_FUNC_PWRST_CSWR:
+		ret = PWRDM_LOGIC_MEM_PWRST_RET;
+		break;
+	case PWRDM_FUNC_PWRST_OSWR:
+	case PWRDM_FUNC_PWRST_OFF:
+		ret = PWRDM_LOGIC_MEM_PWRST_OFF;
+		break;
+	default:
+		ret = -1;
+	}
+
+	return ret;
+ }
+
+/*
  * Internal (i.e. registers) to functional (i.e. logical) values
  * for the power domains states
  */
-int omap2_pwrdm_pwrst_to_func(struct powerdomain *pwrdm, u8 pwrst)
+int omap2_pwrdm_pwrst_to_func(struct powerdomain *pwrdm, u8 pwrst, u8 logic)
 {
 	int ret;
 
@@ -153,11 +178,10 @@ int omap2_pwrdm_pwrst_to_func(struct powerdomain *pwrdm, u8 pwrst)
 		ret = PWRDM_FUNC_PWRST_INACTIVE;
 		break;
 	case PWRDM_POWER_RET:
-		/*
-		 * XXX warning: return OSWR in case of pd in RET and
-		 * logic in OFF
-		 */
-		ret = PWRDM_FUNC_PWRST_CSWR;
+		if (logic == PWRDM_LOGIC_MEM_PWRST_RET)
+			ret = PWRDM_FUNC_PWRST_CSWR;
+		else
+			ret = PWRDM_FUNC_PWRST_OSWR;
 		break;
 	case PWRDM_POWER_OFF:
 		ret = PWRDM_FUNC_PWRST_OFF;

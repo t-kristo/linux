@@ -54,6 +54,15 @@
 
 #define PWRDM_MAX_FUNC_PWRSTS	5
 
+/*
+ * Powerdomains logic and memory functional power states,
+ * used by the external API functions
+ */
+#define PWRDM_LOGIC_MEM_PWRST_OFF	0x0
+#define PWRDM_LOGIC_MEM_PWRST_RET	0x1
+
+#define PWRDM_MAX_LOGIC_MEM_PWRST	2
+
 /* Powerdomain flags */
 #define PWRDM_HAS_HDWR_SAR	(1 << 0) /* hardware save-and-restore support */
 #define PWRDM_HAS_MPU_QUIRK	(1 << 1) /* MPU pwr domain has MEM bank 0 bits
@@ -140,7 +149,9 @@ struct powerdomain {
  * struct pwrdm_ops - Arch specific function implementations
  * @pwrdm_func_to_pwrst: Convert the pd functional power state to
  *  the internal state
- * @pwrdm_pwrst_to_func: Convert the pd internal power state to
+ * @pwrdm_func_to_logic_pwrst: Convert the pd functional power state
+ *  to the internal logic state
+ * @pwrdm_pwrst_to_func: Convert the pd internal and logic power state to
  *  the functional state
  * @pwrdm_set_next_pwrst: Set the target power state for a pd
  * @pwrdm_read_next_pwrst: Read the target power state set for a pd
@@ -163,7 +174,9 @@ struct powerdomain {
  */
 struct pwrdm_ops {
 	int	(*pwrdm_func_to_pwrst)(struct powerdomain *pwrdm, u8 func_pwrst);
-	int	(*pwrdm_pwrst_to_func)(struct powerdomain *pwrdm, u8 func_pwrst);
+	int	(*pwrdm_func_to_logic_pwrst)(struct powerdomain *pwrdm, u8 func_pwrst);
+	int	(*pwrdm_pwrst_to_func)(struct powerdomain *pwrdm, u8 func_pwrst,
+				       u8 logic);
 	int	(*pwrdm_set_next_pwrst)(struct powerdomain *pwrdm, u8 pwrst);
 	int	(*pwrdm_read_next_pwrst)(struct powerdomain *pwrdm);
 	int	(*pwrdm_read_pwrst)(struct powerdomain *pwrdm);
@@ -209,7 +222,8 @@ int pwrdm_read_func_pwrst(struct powerdomain *pwrdm);
 int pwrdm_read_next_func_pwrst(struct powerdomain *pwrdm);
 
 int omap2_pwrdm_func_to_pwrst(struct powerdomain *pwrdm, u8 func_pwrst);
-int omap2_pwrdm_pwrst_to_func(struct powerdomain *pwrdm, u8 pwrst);
+int omap2_pwrdm_func_to_logic_pwrst(struct powerdomain *pwrdm, u8 func_pwrst);
+int omap2_pwrdm_pwrst_to_func(struct powerdomain *pwrdm, u8 pwrst, u8 logic);
 
 int pwrdm_set_next_pwrst(struct powerdomain *pwrdm, u8 pwrst);
 int pwrdm_read_next_pwrst(struct powerdomain *pwrdm);
