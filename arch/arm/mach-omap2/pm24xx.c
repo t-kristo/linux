@@ -93,7 +93,6 @@ static int omap2_enter_full_retention(void)
 	 * Set MPU powerdomain's next power state to RETENTION;
 	 * preserve logic state during retention
 	 */
-	pwrdm_set_logic_retst(mpu_pwrdm, PWRDM_POWER_RET);
 	omap_set_pwrdm_state(mpu_pwrdm, PWRDM_FUNC_PWRST_CSWR);
 
 	/* Workaround to kill USB */
@@ -248,7 +247,7 @@ static void __init prcm_setup_regs(void)
 	 */
 	num_mem_banks = pwrdm_get_mem_bank_count(core_pwrdm);
 	for (i = 0; i < num_mem_banks; i++)
-		pwrdm_set_mem_retst(core_pwrdm, i, PWRDM_POWER_RET);
+		pwrdm_set_mem_retst(core_pwrdm, i, PWRDM_LOGIC_MEM_PWRST_RET);
 
 	/* Set CORE powerdomain's next power state to RETENTION */
 	omap_set_pwrdm_state(core_pwrdm, PWRDM_FUNC_PWRST_CSWR);
@@ -257,7 +256,6 @@ static void __init prcm_setup_regs(void)
 	 * Set MPU powerdomain's next power state to RETENTION;
 	 * preserve logic state during retention
 	 */
-	pwrdm_set_logic_retst(mpu_pwrdm, PWRDM_POWER_RET);
 	omap_set_pwrdm_state(mpu_pwrdm, PWRDM_FUNC_PWRST_CSWR);
 
 	/* Force-power down DSP, GFX powerdomains */

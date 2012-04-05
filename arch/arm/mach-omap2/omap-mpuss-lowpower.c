@@ -232,7 +232,6 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 {
 	unsigned int save_state = 0;
 	unsigned int wakeup_cpu;
-	int mpuss_state;
 
 	if (omap_rev() == OMAP4430_REV_ES1_0)
 		return -ENXIO;
@@ -265,10 +264,7 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 	 * In MPUSS OSWR or device OFF, interrupt controller context is lost.
 	 */
 	mpuss_clear_prev_logic_pwrst();
-	mpuss_state = pwrdm_read_next_func_pwrst(mpuss_pd);
-	if (((mpuss_state == PWRDM_FUNC_PWRST_CSWR) ||
-	     (mpuss_state == PWRDM_FUNC_PWRST_OSWR)) &&
-	    (pwrdm_read_logic_retst(mpuss_pd) == PWRDM_POWER_OFF))
+	if (pwrdm_read_next_func_pwrst(mpuss_pd) == PWRDM_FUNC_PWRST_OSWR)
 		save_state = 2;
 
 	cpu_clear_prev_logic_pwrst(cpu);

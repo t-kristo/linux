@@ -27,7 +27,6 @@
 /* Machine specific information */
 struct omap4_idle_statedata {
 	u32 cpu_state;
-	u32 mpu_logic_state;
 	u32 mpu_state;
 };
 
@@ -35,17 +34,14 @@ static struct omap4_idle_statedata omap4_idle_data[] = {
 	{
 		.cpu_state = PWRDM_FUNC_PWRST_ON,
 		.mpu_state = PWRDM_FUNC_PWRST_ON,
-		.mpu_logic_state = PWRDM_POWER_RET,
 	},
 	{
 		.cpu_state = PWRDM_FUNC_PWRST_OFF,
 		.mpu_state = PWRDM_FUNC_PWRST_CSWR,
-		.mpu_logic_state = PWRDM_POWER_RET,
 	},
 	{
 		.cpu_state = PWRDM_FUNC_PWRST_OFF,
 		.mpu_state = PWRDM_FUNC_PWRST_OSWR,
-		.mpu_logic_state = PWRDM_POWER_OFF,
 	},
 };
 
@@ -95,16 +91,13 @@ static int omap4_enter_idle(struct cpuidle_device *dev,
 	if (cx->cpu_state == PWRDM_FUNC_PWRST_OFF)
 		cpu_pm_enter();
 
-	pwrdm_set_logic_retst(mpu_pd, cx->mpu_logic_state);
 	omap_set_pwrdm_state(mpu_pd, cx->mpu_state);
 
 	/*
 	 * Call idle CPU cluster PM enter notifier chain
 	 * to save GIC and wakeupgen context.
 	 */
-	if (((cx->mpu_state == PWRDM_FUNC_PWRST_CSWR) ||
-	     (cx->mpu_state == PWRDM_FUNC_PWRST_OSWR)) &&
-	    (cx->mpu_logic_state == PWRDM_POWER_OFF))
+	if (cx->mpu_state == PWRDM_FUNC_PWRST_OSWR)
 			cpu_cluster_pm_enter();
 
 	omap4_enter_lowpower(dev->cpu, cx->cpu_state);
