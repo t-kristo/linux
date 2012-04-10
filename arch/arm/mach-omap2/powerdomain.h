@@ -135,13 +135,13 @@ struct powerdomain {
 	struct list_head voltdm_node;
 	struct mutex lock;
 	int state;
-	unsigned state_counter[PWRDM_MAX_PWRSTS];
+	unsigned state_counter[PWRDM_MAX_FUNC_PWRSTS];
 	unsigned ret_logic_off_counter;
 	unsigned ret_mem_off_counter[PWRDM_MAX_MEM_BANKS];
 
 #ifdef CONFIG_PM_DEBUG
 	s64 timer;
-	s64 state_timer[PWRDM_MAX_PWRSTS];
+	s64 state_timer[PWRDM_MAX_FUNC_PWRSTS];
 #endif
 };
 

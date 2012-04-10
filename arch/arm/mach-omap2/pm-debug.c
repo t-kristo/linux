@@ -53,9 +53,10 @@ enum {
 	DEBUG_FILE_TIMERS,
 };
 
-static const char pwrdm_state_names[][PWRDM_MAX_PWRSTS] = {
+static const char pwrdm_state_names[][PWRDM_MAX_FUNC_PWRSTS] = {
 	"OFF",
-	"RET",
+	"OSWR",
+	"CSWR",
 	"INA",
 	"ON"
 };
@@ -102,13 +103,13 @@ static int pwrdm_dbg_show_counter(struct powerdomain *pwrdm, void *user)
 		strncmp(pwrdm->name, "dpll", 4) == 0)
 		return 0;
 
-	if (pwrdm->state != pwrdm_read_pwrst(pwrdm))
+	if (pwrdm->state != pwrdm_read_func_pwrst(pwrdm))
 		printk(KERN_ERR "pwrdm state mismatch(%s) %d != %d\n",
-			pwrdm->name, pwrdm->state, pwrdm_read_pwrst(pwrdm));
+		       pwrdm->name, pwrdm->state, pwrdm_read_func_pwrst(pwrdm));
 
 	seq_printf(s, "%s (%s)", pwrdm->name,
 			pwrdm_state_names[pwrdm->state]);
-	for (i = 0; i < PWRDM_MAX_PWRSTS; i++)
+	for (i = 0; i < PWRDM_MAX_FUNC_PWRSTS; i++)
 		seq_printf(s, ",%s:%d", pwrdm_state_names[i],
 			pwrdm->state_counter[i]);
 
@@ -137,7 +138,7 @@ static int pwrdm_dbg_show_timer(struct powerdomain *pwrdm, void *user)
 	seq_printf(s, "%s (%s)", pwrdm->name,
 		pwrdm_state_names[pwrdm->state]);
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < PWRDM_MAX_FUNC_PWRSTS; i++)
 		seq_printf(s, ",%s:%lld", pwrdm_state_names[i],
 			pwrdm->state_timer[i]);
 
@@ -211,7 +212,7 @@ static int __init pwrdms_setup(struct powerdomain *pwrdm, void *dir)
 
 	t = sched_clock();
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < PWRDM_MAX_FUNC_PWRSTS; i++)
 		pwrdm->state_timer[i] = 0;
 
 	pwrdm->timer = t;

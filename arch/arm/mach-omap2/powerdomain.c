@@ -106,7 +106,7 @@ static int _pwrdm_register(struct powerdomain *pwrdm)
 	list_add(&pwrdm->node, &pwrdm_list);
 
 	/* Initialize the powerdomain's state counter */
-	for (i = 0; i < PWRDM_MAX_PWRSTS; i++)
+	for (i = 0; i < PWRDM_MAX_FUNC_PWRSTS; i++)
 		pwrdm->state_counter[i] = 0;
 
 	pwrdm->ret_logic_off_counter = 0;
@@ -114,7 +114,7 @@ static int _pwrdm_register(struct powerdomain *pwrdm)
 		pwrdm->ret_mem_off_counter[i] = 0;
 
 	pwrdm_wait_transition(pwrdm);
-	pwrdm->state = pwrdm_read_pwrst(pwrdm);
+	pwrdm->state = pwrdm_read_func_pwrst(pwrdm);
 	pwrdm->state_counter[pwrdm->state] = 1;
 
 	pr_debug("powerdomain: registered %s\n", pwrdm->name);
@@ -149,17 +149,17 @@ static int _pwrdm_state_switch(struct powerdomain *pwrdm, int flag)
 	if (pwrdm == NULL)
 		return -EINVAL;
 
-	state = pwrdm_read_pwrst(pwrdm);
+	state = pwrdm_read_func_pwrst(pwrdm);
 
 	switch (flag) {
 	case PWRDM_STATE_NOW:
 		prev = pwrdm->state;
 		break;
 	case PWRDM_STATE_PREV:
-		prev = pwrdm_read_prev_pwrst(pwrdm);
+		prev = pwrdm_read_prev_func_pwrst(pwrdm);
 		if (pwrdm->state != prev)
 			pwrdm->state_counter[prev]++;
-		if (prev == PWRDM_POWER_RET)
+		if (prev == PWRDM_FUNC_PWRST_OSWR)
 			_update_logic_membank_counters(pwrdm);
 		/*
 		 * If the power domain did not hit the desired state,
@@ -1340,7 +1340,7 @@ int pwrdm_get_context_loss_count(struct powerdomain *pwrdm)
 		return -ENODEV;
 	}
 
-	count = pwrdm->state_counter[PWRDM_POWER_OFF];
+	count = pwrdm->state_counter[PWRDM_FUNC_PWRST_OFF];
 	count += pwrdm->ret_logic_off_counter;
 
 	for (i = 0; i < pwrdm->banks; i++)
