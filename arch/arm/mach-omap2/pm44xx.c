@@ -26,6 +26,9 @@
 #include "clockdomain.h"
 #include "powerdomain.h"
 #include "pm.h"
+#include "voltage.h"
+#include "prm44xx.h"
+#include "prm-regbits-44xx.h"
 
 #define EMIF_SDRAM_CONFIG2_OFFSET	0xc
 
@@ -144,6 +147,7 @@ int __init omap4_pm_init(void)
 	int ret;
 	struct clockdomain *emif_clkdm, *mpuss_clkdm, *l3_1_clkdm, *l4wkup;
 	struct clockdomain *ducati_clkdm, *l3_2_clkdm, *l4_per_clkdm;
+	struct voltagedomain *mpu_voltdm;
 
 	if (omap_rev() == OMAP4430_REV_ES1_0) {
 		WARN(1, "Power Management not supported on OMAP4430 ES1.0\n");
@@ -222,6 +226,24 @@ int __init omap4_pm_init(void)
 				"wakeup dependency\n");
 		goto err2;
 	}
+
+	/*
+	 * XXX: voltage config is not still completely valid for
+	 * OMAP4, and this causes crashes on some platform during
+	 * device off because voltage transitions for device off
+	 * are enabled on reset. Thus, we have to disable the I2C
+	 * channel completely in the VOLTCTRL register to avoid
+	 * trouble. Remove this once voltconfigs are valid.
+	 */
+	mpu_voltdm = voltdm_lookup("mpu");
+	if (!mpu_voltdm) {
+		pr_err("Failed to get MPU voltdm\n");
+		goto err2;
+	}
+	mpu_voltdm->write(OMAP4430_VDD_MPU_I2C_DISABLE_MASK |
+			  OMAP4430_VDD_CORE_I2C_DISABLE_MASK |
+			  OMAP4430_VDD_IVA_I2C_DISABLE_MASK,
+			  OMAP4_PRM_VOLTCTRL_OFFSET);
 
 	ret = omap4_mpuss_init();
 	if (ret) {
