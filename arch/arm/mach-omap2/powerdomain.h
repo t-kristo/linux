@@ -220,6 +220,7 @@ int pwrdm_get_mem_bank_count(struct powerdomain *pwrdm);
 int pwrdm_read_prev_func_pwrst(struct powerdomain *pwrdm);
 int pwrdm_read_func_pwrst(struct powerdomain *pwrdm);
 int pwrdm_read_next_func_pwrst(struct powerdomain *pwrdm);
+int pwrdm_get_achievable_func_pwrst(struct powerdomain *pwrdm, u8 func_pwrst);
 
 int omap2_pwrdm_func_to_pwrst(struct powerdomain *pwrdm, u8 func_pwrst);
 int omap2_pwrdm_func_to_logic_pwrst(struct powerdomain *pwrdm, u8 func_pwrst);

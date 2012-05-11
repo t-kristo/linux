@@ -557,6 +557,108 @@ int pwrdm_pwrst_to_func(struct powerdomain *pwrdm, u8 pwrst, u8 logic)
 	return ret;
 }
 
+/**
+ * pwrdm_get_achievable_func_pwrst() - Provide achievable functional state
+ * @pwrdm: struct powerdomain * to set
+ * @func_pwrst: minimum functional state we would like to hit
+ * (one of the PWRDM_FUNC_* macros)
+ *
+ * Power domains have varied capabilities. When attempting a low power
+ * state such as OFF/RET, a specific min requested state may not be
+ * supported on the power domain .This is because a combination
+ * of system power states where the parent PD's state is not in line
+ * with expectation can result in system instabilities.
+ *
+ * The achievable power state is first looked for in the lower power
+ * states in order to maximize the power savings, then if not found
+ * in the higher power states.
+ *
+ * Returns the achievable functional power state, or -EINVAL in case of
+ * invalid parameters.
+ */
+int pwrdm_get_achievable_func_pwrst(struct powerdomain *pwrdm, u8 func_pwrst)
+{
+	int pwrst = pwrdm_func_to_pwrst(pwrdm, func_pwrst);
+	int logic = pwrdm_func_to_logic_pwrst(pwrdm, func_pwrst);
+	int new_func_pwrst, new_pwrst, new_logic;
+	int found;
+
+	if (!pwrdm || IS_ERR(pwrdm)) {
+		pr_debug("%s: invalid params: pwrdm=%p, func_pwrst=%0x\n",
+			 __func__, pwrdm, func_pwrst);
+		return -EINVAL;
+	}
+
+	if ((pwrst < 0) || (logic < 0)) {
+		pr_debug("%s: invalid params for pwrdm %s, func_pwrst=%0x\n",
+			 __func__, pwrdm->name, func_pwrst);
+		return PWRDM_FUNC_PWRST_ON;
+	}
+
+	/*
+	 * Power state: if the requested state is not supported,
+	 * try the lower power states.
+	 */
+	found = 1;
+	new_pwrst = pwrst;
+	while (!(pwrdm->pwrsts & (1 << new_pwrst))) {
+		if (new_pwrst == PWRDM_POWER_OFF) {
+			found = 0;
+			break;
+		}
+		new_pwrst--;
+	}
+
+	/*
+	 * If no lower power state found, fallback to the higher
+	 * power states.
+	 * PWRDM_POWER_ON is always valid.
+	 */
+	if (!found) {
+		new_pwrst = pwrst;
+		while (!(pwrdm->pwrsts & (1 << new_pwrst))) {
+			if (new_pwrst == PWRDM_POWER_ON)
+				break;
+			new_pwrst++;
+		}
+	}
+
+	/*
+	 * Logic RET state: if the requested state is not supported,
+	 * try the lower logic states.
+	 */
+	found = 1;
+	new_logic = logic;
+	while (!(pwrdm->pwrsts_logic_ret & (1 << new_logic))) {
+		if (new_logic == PWRDM_LOGIC_MEM_PWRST_OFF) {
+			found = 0;
+			break;
+		}
+		new_logic--;
+	}
+
+	/*
+	 * If no lower logic state found, fallback to the higher
+	 * logic states.
+	 * PWRDM_LOGIC_MEM_PWRST_RET is always valid.
+	 */
+	if (!found) {
+		new_logic = logic;
+		while (!(pwrdm->pwrsts_logic_ret & (1 << new_logic))) {
+			if (new_logic == PWRDM_LOGIC_MEM_PWRST_RET)
+				break;
+			new_logic++;
+		}
+	}
+
+	new_func_pwrst = pwrdm_pwrst_to_func(pwrdm, new_pwrst, new_logic);
+
+	pr_debug("%s(%s, func_pwrst=%0x) returns %0x\n", __func__,
+		 pwrdm->name, func_pwrst, new_func_pwrst);
+
+	return new_func_pwrst;
+}
+
 /* Types of sleep_switch used in omap_set_pwrdm_state */
 #define FORCEWAKEUP_SWITCH	0
 #define LOWPOWERSTATE_SWITCH	1
@@ -566,35 +668,31 @@ int pwrdm_pwrst_to_func(struct powerdomain *pwrdm, u8 pwrst, u8 logic)
  * @pwrdm: struct powerdomain * to set
  * @func_pwrst: power domain functional state, one of the PWRDM_FUNC_* macros
  *
- * This programs the pwrdm next functional state, sets the dependencies
- * and waits for the state to be applied.
+ * This looks for the more suited (or achievable) next functional power
+ * state, programs it, sets the dependencies and waits for the state to
+ * be applied to the power domain.
  */
 int omap_set_pwrdm_state(struct powerdomain *pwrdm, u32 func_pwrst)
 {
-	u8 curr_pwrst, next_pwrst;
-	int pwrst = pwrdm_func_to_pwrst(pwrdm, func_pwrst);
-	int logic = pwrdm_func_to_logic_pwrst(pwrdm, func_pwrst);
 	int sleep_switch = -1, ret = 0, hwsup = 0;
+	int new_func_pwrst, next_func_pwrst, pwrst, logic;
+	u8 curr_pwrst;
 
-	if (!pwrdm || IS_ERR(pwrdm) || (pwrst < 0) || (logic < 0)) {
-		pr_debug("%s: invalid params: pwrdm=%p, func_pwrst=%0x\n",
-			 __func__, pwrdm, func_pwrst);
+	if (!pwrdm || IS_ERR(pwrdm)) {
+		pr_debug("%s: invalid params: pwrdm=%p\n", __func__, pwrdm);
 		return -EINVAL;
 	}
 
-	pr_debug("%s: set func_pwrst %0x to pwrdm %s\n",
-		 __func__, func_pwrst, pwrdm->name);
+	pr_debug("%s(%s, func_pwrst=%0x)\n", __func__, pwrdm->name, func_pwrst);
 
 	mutex_lock(&pwrdm->lock);
 
-	while (!(pwrdm->pwrsts & (1 << pwrst))) {
-		if (pwrst == PWRDM_POWER_OFF)
-			goto out;
-		pwrst--;
-	}
+	new_func_pwrst = pwrdm_get_achievable_func_pwrst(pwrdm, func_pwrst);
+	pwrst = pwrdm_func_to_pwrst(pwrdm, new_func_pwrst);
+	logic = pwrdm_func_to_logic_pwrst(pwrdm, new_func_pwrst);
 
-	next_pwrst = pwrdm_read_next_pwrst(pwrdm);
-	if (next_pwrst == pwrst)
+	next_func_pwrst = pwrdm_read_next_func_pwrst(pwrdm);
+	if (new_func_pwrst == next_func_pwrst)
 		goto out;
 
 	curr_pwrst = pwrdm_read_pwrst(pwrdm);
@@ -609,13 +707,25 @@ int omap_set_pwrdm_state(struct powerdomain *pwrdm, u32 func_pwrst)
 		}
 	}
 
-	if (logic != pwrdm_read_logic_retst(pwrdm))
-		pwrdm_set_logic_retst(pwrdm, logic);
+	pr_debug("%s: set func_pwrst %0x (%0x,%0x) to pwrdm %s\n",
+		 __func__, new_func_pwrst, pwrst, logic, pwrdm->name);
 
-	ret = pwrdm_set_next_pwrst(pwrdm, pwrst);
-	if (ret)
-		pr_err("%s: unable to set power state of powerdomain: %s\n",
-		       __func__, pwrdm->name);
+	/* Trace the pwrdm desired target state */
+	trace_power_domain_target(pwrdm->name, new_func_pwrst,
+				  smp_processor_id());
+
+	/* Program next power state */
+	if (pwrst != pwrdm_func_to_pwrst(pwrdm, next_func_pwrst)) {
+		ret = pwrdm_set_next_pwrst(pwrdm, pwrst);
+		if (ret)
+			pr_err("%s: unable to set power state of powerdomain: %s\n",
+			       __func__, pwrdm->name);
+	}
+
+	/* Program RET logic state */
+	if ((pwrst == PWRDM_POWER_RET) &&
+	    (logic != pwrdm_func_to_logic_pwrst(pwrdm, next_func_pwrst)))
+		pwrdm_set_logic_retst(pwrdm, logic);
 
 	switch (sleep_switch) {
 	case FORCEWAKEUP_SWITCH:
