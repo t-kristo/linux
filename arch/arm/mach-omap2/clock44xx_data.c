@@ -86,6 +86,7 @@ static struct clk sys_32k_ck = {
 	.name		= "sys_32k_ck",
 	.rate		= 32768,
 	.ops		= &clkops_null,
+	.clkdm_name	= "prm_clkdm",
 };
 
 static struct clk virt_12000000_ck = {
@@ -512,6 +513,7 @@ static struct clk ddrphy_ck = {
 	.name		= "ddrphy_ck",
 	.parent		= &dpll_core_m2_ck,
 	.ops		= &clkops_null,
+	.clkdm_name	= "l3_emif_clkdm",
 	.fixed_div	= 2,
 	.recalc		= &omap_fixed_divisor_recalc,
 };
@@ -1149,6 +1151,7 @@ static const struct clksel l3_div_div[] = {
 static struct clk l3_div_ck = {
 	.name		= "l3_div_ck",
 	.parent		= &div_core_ck,
+	.clkdm_name	= "cm_clkdm",
 	.clksel		= l3_div_div,
 	.clksel_reg	= OMAP4430_CM_CLKSEL_CORE,
 	.clksel_mask	= OMAP4430_CLKSEL_L3_MASK,
@@ -2824,6 +2827,7 @@ static const struct clksel trace_clk_div_div[] = {
 static struct clk trace_clk_div_ck = {
 	.name		= "trace_clk_div_ck",
 	.parent		= &pmd_trace_clk_mux_ck,
+	.clkdm_name	= "emu_sys_clkdm",
 	.clksel		= trace_clk_div_div,
 	.clksel_reg	= OMAP4430_CM_EMU_DEBUGSS_CLKCTRL,
 	.clksel_mask	= OMAP4430_CLKSEL_PMD_TRACE_CLK_MASK,
