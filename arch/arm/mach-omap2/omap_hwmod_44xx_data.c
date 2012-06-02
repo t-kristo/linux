@@ -2606,15 +2606,22 @@ static struct omap_hwmod_class omap44xx_sl2if_hwmod_class = {
 	.name	= "sl2if",
 };
 
+static struct omap_hwmod_rst_info omap44xx_sl2if_resets[] = {
+	{ .name = "logic", .rst_shift = 2 },
+};
+
 /* sl2if */
 static struct omap_hwmod omap44xx_sl2if_hwmod = {
 	.name		= "sl2if",
 	.class		= &omap44xx_sl2if_hwmod_class,
 	.clkdm_name	= "ivahd_clkdm",
+	.rst_lines	= omap44xx_sl2if_resets,
+	.rst_lines_cnt	= ARRAY_SIZE(omap44xx_sl2if_resets),
 	.prcm = {
 		.omap4 = {
 			.clkctrl_offs = OMAP4_CM_IVAHD_SL2_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_IVAHD_SL2_CONTEXT_OFFSET,
+			.rstctrl_offs = OMAP4_RM_IVAHD_RSTCTRL_OFFSET,
 			.modulemode   = MODULEMODE_HWCTRL,
 		},
 	},
