@@ -2102,6 +2102,12 @@ static struct omap_hwmod omap44xx_mcpdm_hwmod = {
 			.modulemode   = MODULEMODE_SWCTRL,
 		},
 	},
+	/*
+	 * It's suspected that the McPDM requires an off-chip
+	 * functional clock for the reset to complete, and we can't
+	 * ensure this early during kernel boot.
+	 */
+	.flags		= HWMOD_INIT_NO_RESET,
 };
 
 /*
