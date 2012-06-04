@@ -358,6 +358,52 @@ bool omap4_pwrdm_lost_context_rff(struct powerdomain *pwrdm)
 	return false;
 }
 
+/**
+ * omap4_device_set_next_state_off - setup device off state
+ * @pwrdm: struct powerdomain * to target powerdomain
+ * @enable: true if off-mode should be enabled
+ *
+ * When Device OFF is enabled, Device is allowed to perform
+ * transition to off mode as soon as all power domains in MPU, IVA
+ * and CORE voltage are in OFF or OSWR state (open switch retention)
+ */
+void omap4_device_set_next_state_off(struct powerdomain *pwrdm, bool enable)
+{
+	u8 val = enable ? 0x1 : 0x0;
+
+	if (!(pwrdm->flags & PWRDM_HAS_EXTRA_OFF_ENABLE))
+		return;
+
+	omap4_prminst_write_inst_reg(val << OMAP4430_DEVICE_OFF_ENABLE_SHIFT,
+				     OMAP4430_PRM_PARTITION,
+				     OMAP4430_PRM_DEVICE_INST,
+				     OMAP4_PRM_DEVICE_OFF_CTRL_OFFSET);
+}
+
+
+/**
+ * omap4_device_read_next_state_off - read device off state
+ * @pwrdm: struct powerdomain * to target powerdomain
+ *
+ * Checks if device off is enabled or not.
+ * Returns true if enabled, false otherwise.
+ */
+bool omap4_device_read_next_state_off(struct powerdomain *pwrdm)
+{
+	u32 val;
+
+	if (!(pwrdm->flags & PWRDM_HAS_EXTRA_OFF_ENABLE))
+		return false;
+
+	val = omap4_prminst_read_inst_reg(OMAP4430_PRM_PARTITION,
+					  OMAP4430_PRM_DEVICE_INST,
+					  OMAP4_PRM_DEVICE_OFF_CTRL_OFFSET);
+
+	val &= OMAP4430_DEVICE_OFF_ENABLE_MASK;
+
+	return val ? true : false;
+}
+
 struct pwrdm_ops omap4_pwrdm_operations = {
 	.pwrdm_func_to_pwrst	= omap2_pwrdm_func_to_pwrst,
 	.pwrdm_func_to_logic_pwrst	= omap2_pwrdm_func_to_logic_pwrst,
@@ -381,4 +427,6 @@ struct pwrdm_ops omap4_pwrdm_operations = {
 	.pwrdm_enable_hdwr_sar	= omap4_pwrdm_enable_hdwr_sar,
 	.pwrdm_disable_hdwr_sar	= omap4_pwrdm_disable_hdwr_sar,
 	.pwrdm_lost_context_rff = omap4_pwrdm_lost_context_rff,
+	.pwrdm_enable_off	= omap4_device_set_next_state_off,
+	.pwrdm_read_next_off	= omap4_device_read_next_state_off,
 };

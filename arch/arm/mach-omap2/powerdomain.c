@@ -677,6 +677,8 @@ int omap_set_pwrdm_state(struct powerdomain *pwrdm, u32 func_pwrst)
 	int sleep_switch = -1, ret = 0, hwsup = 0;
 	int new_func_pwrst, next_func_pwrst, pwrst, logic;
 	u8 curr_pwrst;
+	bool extra_off_enable = false;
+	bool has_extra_off = false;
 
 	if (!pwrdm || IS_ERR(pwrdm)) {
 		pr_debug("%s: invalid params: pwrdm=%p\n", __func__, pwrdm);
@@ -686,6 +688,13 @@ int omap_set_pwrdm_state(struct powerdomain *pwrdm, u32 func_pwrst)
 	pr_debug("%s(%s, func_pwrst=%0x)\n", __func__, pwrdm->name, func_pwrst);
 
 	mutex_lock(&pwrdm->lock);
+
+	/* Check if powerdomain has extra off mode handling */
+	if (pwrdm->flags & PWRDM_HAS_EXTRA_OFF_ENABLE) {
+		has_extra_off = true;
+		if (func_pwrst == PWRDM_FUNC_PWRST_OFF)
+			extra_off_enable = true;
+	}
 
 	new_func_pwrst = pwrdm_get_achievable_func_pwrst(pwrdm, func_pwrst);
 	pwrst = pwrdm_func_to_pwrst(pwrdm, new_func_pwrst);
@@ -740,6 +749,9 @@ int omap_set_pwrdm_state(struct powerdomain *pwrdm, u32 func_pwrst)
 		pwrdm_state_switch(pwrdm);
 		break;
 	}
+
+	if (has_extra_off && arch_pwrdm->pwrdm_enable_off)
+		arch_pwrdm->pwrdm_enable_off(pwrdm, extra_off_enable);
 
 out:
 	mutex_unlock(&pwrdm->lock);
@@ -809,6 +821,11 @@ int pwrdm_read_next_func_pwrst(struct powerdomain *pwrdm)
 {
 	int next_pwrst = pwrdm_read_next_pwrst(pwrdm);
 	int next_logic = pwrdm_read_logic_retst(pwrdm);
+
+	if (pwrdm->flags & PWRDM_HAS_EXTRA_OFF_ENABLE &&
+	    arch_pwrdm->pwrdm_read_next_off &&
+	    arch_pwrdm->pwrdm_read_next_off(pwrdm))
+		return PWRDM_FUNC_PWRST_OFF;
 
 	return pwrdm_pwrst_to_func(pwrdm, next_pwrst, next_logic);
 }

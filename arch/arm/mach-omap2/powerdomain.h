@@ -75,6 +75,13 @@
 						  * state without waking up the
 						  * powerdomain
 						  */
+/*
+ * OMAP4+ has device off feature, which must be enabled separately in
+ * addition to power domain next state setup. This feature is overloaded
+ * as EXTRA_OFF_ENABLE for core_pwrdm, and is implemented on top of
+ * functional power state
+ */
+#define PWRDM_HAS_EXTRA_OFF_ENABLE	(1 << 3)
 
 /*
  * Number of memory banks that are power-controllable.	On OMAP4430, the
@@ -173,7 +180,9 @@ struct powerdomain {
  * @pwrdm_disable_hdwr_sar: Disable Hardware Save-Restore feature for a pd
  * @pwrdm_set_lowpwrstchange: Enable pd transitions from a shallow to deep sleep
  * @pwrdm_wait_transition: Wait for a pd state transition to complete
- * @pwrdm_lost_context_rff: Check if pd has lost RFF context (entered off)
+ * @pwrdm_lost_context_rff: Check if pd has lost RFF context (omap4+ device off)
+ * @pwrdm_enable_off: Extra off mode enable for pd (omap4+ device off)
+ * @pwrdm_read_next_off: Check if pd next state is off (omap4+ device off)
  */
 struct pwrdm_ops {
 	int	(*pwrdm_func_to_pwrst)(struct powerdomain *pwrdm, u8 func_pwrst);
@@ -199,6 +208,8 @@ struct pwrdm_ops {
 	int	(*pwrdm_set_lowpwrstchange)(struct powerdomain *pwrdm);
 	int	(*pwrdm_wait_transition)(struct powerdomain *pwrdm);
 	bool	(*pwrdm_lost_context_rff)(struct powerdomain *pwrdm);
+	void	(*pwrdm_enable_off)(struct powerdomain *pwrdm, bool enable);
+	bool	(*pwrdm_read_next_off)(struct powerdomain *pwrdm);
 };
 
 int pwrdm_register_platform_funcs(struct pwrdm_ops *custom_funcs);
