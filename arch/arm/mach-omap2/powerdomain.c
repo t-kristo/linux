@@ -884,6 +884,10 @@ int pwrdm_read_prev_func_pwrst(struct powerdomain *pwrdm)
 	int prev_pwrst = pwrdm_read_prev_pwrst(pwrdm);
 	int prev_logic = pwrdm_read_prev_logic_pwrst(pwrdm);
 
+	if (arch_pwrdm && arch_pwrdm->pwrdm_lost_context_rff &&
+	    arch_pwrdm->pwrdm_lost_context_rff(pwrdm))
+		return PWRDM_FUNC_PWRST_OFF;
+
 	return pwrdm_pwrst_to_func(pwrdm, prev_pwrst, prev_logic);
 }
 
