@@ -72,7 +72,7 @@ struct omap4_cpu_pm_info {
 };
 
 static DEFINE_PER_CPU(struct omap4_cpu_pm_info, omap4_pm_info);
-static struct powerdomain *mpuss_pd;
+static struct powerdomain *mpuss_pd, *core_pd;
 static void __iomem *sar_base;
 
 /*
@@ -265,7 +265,9 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 	 * In MPUSS OSWR or device OFF, interrupt controller context is lost.
 	 */
 	mpuss_clear_prev_logic_pwrst();
-	if (pwrdm_read_next_func_pwrst(mpuss_pd) == PWRDM_FUNC_PWRST_OSWR)
+	if (pwrdm_read_next_func_pwrst(core_pd) == PWRDM_FUNC_PWRST_OFF)
+		save_state = 3;
+	else if (pwrdm_read_next_func_pwrst(mpuss_pd) == PWRDM_FUNC_PWRST_OSWR)
 		save_state = 2;
 
 	cpu_clear_prev_logic_pwrst(cpu);
@@ -384,6 +386,11 @@ int __init omap4_mpuss_init(void)
 	mpuss_pd = pwrdm_lookup("mpu_pwrdm");
 	if (!mpuss_pd) {
 		pr_err("Failed to lookup MPUSS power domain\n");
+		return -ENODEV;
+	}
+	core_pd = pwrdm_lookup("core_pwrdm");
+	if (!core_pd) {
+		pr_err("Failed to lookup CORE power domain\n");
 		return -ENODEV;
 	}
 	pwrdm_clear_all_prev_pwrst(mpuss_pd);
