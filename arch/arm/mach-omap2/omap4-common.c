@@ -39,7 +39,6 @@
 static void __iomem *l2cache_base;
 #endif
 
-static void __iomem *sar_ram_base;
 static void __iomem *gic_dist_base_addr;
 
 #ifdef CONFIG_OMAP4_ERRATA_I688
@@ -188,33 +187,6 @@ static int __init omap_l2_cache_init(void)
 }
 early_initcall(omap_l2_cache_init);
 #endif
-
-void __iomem *omap4_get_sar_ram_base(void)
-{
-	return sar_ram_base;
-}
-
-/*
- * SAR RAM used to save and restore the HW
- * context in low power modes
- */
-static int __init omap4_sar_ram_init(void)
-{
-	/*
-	 * To avoid code running on other OMAPs in
-	 * multi-omap builds
-	 */
-	if (!cpu_is_omap44xx())
-		return -ENOMEM;
-
-	/* Static mapping, never released */
-	sar_ram_base = ioremap(OMAP44XX_SAR_RAM_BASE, SZ_16K);
-	if (WARN_ON(!sar_ram_base))
-		return -ENOMEM;
-
-	return 0;
-}
-early_initcall(omap4_sar_ram_init);
 
 #if defined(CONFIG_MMC_OMAP_HS) || defined(CONFIG_MMC_OMAP_HS_MODULE)
 static int omap4_twl6030_hsmmc_late_init(struct device *dev)

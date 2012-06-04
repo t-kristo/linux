@@ -124,4 +124,12 @@ static inline int omap4_twl_init(void)
 }
 #endif
 
+#ifdef CONFIG_PM
+extern int omap_sar_save(void);
+#else
+static inline void omap_sar_save(void)
+{
+}
+#endif
+
 #endif
