@@ -32,6 +32,7 @@
 
 #include "omap4-sar-layout.h"
 #include "common.h"
+#include "pm.h"
 
 #define NR_REG_BANKS		4
 #define MAX_IRQS		128
@@ -45,6 +46,8 @@ static void __iomem *wakeupgen_base;
 static void __iomem *sar_base;
 static DEFINE_SPINLOCK(wakeupgen_lock);
 static unsigned int irq_target_cpu[NR_IRQS];
+
+static struct powerdomain *core_pd;
 
 /*
  * Static helper functions.
@@ -271,7 +274,7 @@ static void irq_sar_clear(void)
  * Save GIC and Wakeupgen interrupt context using secure API
  * for HS/EMU devices.
  */
-static void irq_save_secure_context(void)
+static void irq_save_secure_gic(void)
 {
 	u32 ret;
 	ret = omap_secure_dispatcher(OMAP4_HAL_SAVEGIC_INDEX,
@@ -281,6 +284,27 @@ static void irq_save_secure_context(void)
 		pr_err("GIC and Wakeupgen context save failed\n");
 }
 #endif
+
+static void save_secure_all(void)
+{
+	u32 ret;
+
+	ret = omap_secure_dispatcher(OMAP4_HAL_SAVEALL_INDEX,
+				FLAG_START_CRITICAL,
+				1, omap_secure_ram_mempool_base(),
+				0, 0, 0);
+	if (ret != API_HAL_RET_VALUE_OK)
+		pr_err("Secure all context save failed\n");
+}
+
+static void irq_save_secure_context(void)
+{
+	if (pwrdm_read_next_func_pwrst(core_pd) == PWRDM_FUNC_PWRST_OFF) {
+		save_secure_all();
+	} else {
+		irq_save_secure_gic();
+	}
+}
 
 #ifdef CONFIG_HOTPLUG_CPU
 static int __cpuinit irq_cpu_hotplug_notify(struct notifier_block *self,
@@ -387,6 +411,12 @@ int __init omap_wakeupgen_init(void)
 
 	irq_hotplug_init();
 	irq_pm_init();
+
+	core_pd = pwrdm_lookup("core_pwrdm");
+	if (!core_pd) {
+		pr_err("wakeupgen: unable to get core_pwrdm\n");
+		return -EINVAL;
+	}
 
 	return 0;
 }
