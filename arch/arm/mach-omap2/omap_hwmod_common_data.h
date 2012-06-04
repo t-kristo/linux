@@ -167,4 +167,6 @@ extern struct omap_hwmod_class omap2xxx_mcspi_class;
 
 extern struct omap_dss_dispc_dev_attr omap2_3_dss_dispc_dev_attr;
 
+extern int omap4_usb_host_fs_reset(struct omap_hwmod *oh);
+
 #endif

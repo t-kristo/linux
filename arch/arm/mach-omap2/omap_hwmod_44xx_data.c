@@ -3323,6 +3323,7 @@ static struct omap_hwmod_class_sysconfig omap44xx_usb_host_fs_sysc = {
 static struct omap_hwmod_class omap44xx_usb_host_fs_hwmod_class = {
 	.name	= "usb_host_fs",
 	.sysc	= &omap44xx_usb_host_fs_sysc,
+	.reset	= omap4_usb_host_fs_reset,
 };
 
 /* usb_host_fs */
@@ -6159,6 +6160,35 @@ static struct omap_hwmod_ocp_if *omap44xx_hwmod_ocp_ifs[] __initdata = {
 	&omap44xx_l4_abe__wd_timer3_dma,
 	NULL,
 };
+
+#define OMAP44XX_USB_FS_HOST_BASE	0x4a0a9000
+#define HCCOMMANDSTATUS			0x0008
+#define HCOCPSYS			0x0210
+
+int omap4_usb_host_fs_reset(struct omap_hwmod *oh)
+{
+	void __iomem *fsusb_base;
+
+	fsusb_base = ioremap(OMAP44XX_USB_FS_HOST_BASE, SZ_4K);
+	if (WARN_ON(!fsusb_base))
+		return -ENOMEM;
+
+	__raw_writel(0x2, fsusb_base + HCOCPSYS);
+
+	while (__raw_readl(fsusb_base + HCOCPSYS) & 0x2)
+		;
+
+	__raw_writel(0x28, fsusb_base + HCOCPSYS);
+
+	__raw_writel(0x1, fsusb_base + HCCOMMANDSTATUS);
+	
+	while (__raw_readl(fsusb_base + HCCOMMANDSTATUS) & 0x1)
+		;
+
+	iounmap(fsusb_base);
+
+	return 0;
+}
 
 int __init omap44xx_hwmod_init(void)
 {
