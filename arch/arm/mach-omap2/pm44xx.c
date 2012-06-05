@@ -114,7 +114,12 @@ static int __init pwrdms_setup(struct powerdomain *pwrdm, void *unused)
 	pwrst->pwrdm = pwrdm;
 	pwrst->next_state = pwrdm_get_achievable_func_pwrst(
 						pwrdm,
-						PWRDM_FUNC_PWRST_OSWR);
+						PWRDM_FUNC_PWRST_OFF);
+
+	if (pwrdm->flags & PWRDM_HAS_EXTRA_OFF_ENABLE)
+		pwrst->next_state = PWRDM_FUNC_PWRST_OFF;
+
+	pr_info("%s: next_state = %d\n", pwrdm->name, pwrst->next_state);
 	list_add(&pwrst->node, &pwrst_list);
 
 	return omap_set_pwrdm_state(pwrst->pwrdm, pwrst->next_state);
