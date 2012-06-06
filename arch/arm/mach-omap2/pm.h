@@ -16,6 +16,7 @@
 #include "powerdomain.h"
 
 extern void *omap3_secure_ram_storage;
+extern bool omap_is_suspending;
 extern void omap3_pm_off_mode_enable(int);
 extern void omap_sram_idle(void);
 extern int omap_set_pwrdm_state(struct powerdomain *pwrdm, u32 state);

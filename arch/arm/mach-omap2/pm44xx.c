@@ -69,7 +69,9 @@ static int omap4_pm_suspend(void)
 	 * domain CSWR is not supported by hardware.
 	 * More details can be found in OMAP4430 TRM section 4.3.4.2.
 	 */
+	omap_is_suspending = true;
 	omap4_enter_lowpower(cpu_id, PWRDM_FUNC_PWRST_OFF);
+	omap_is_suspending = false;
 
 	/* Restore next powerdomain state */
 	list_for_each_entry(pwrst, &pwrst_list, node) {

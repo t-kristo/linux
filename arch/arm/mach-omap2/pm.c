@@ -31,6 +31,7 @@
 #include "twl-common.h"
 
 static struct omap_device_pm_latency *pm_lats;
+bool omap_is_suspending;
 
 /*
  * omap_pm_suspend: points to a function that does the SoC-specific
