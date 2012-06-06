@@ -34,6 +34,7 @@
 #include <plat/dmtimer.h>
 #include <plat/omap-pm.h>
 
+#include "iomap.h"
 #include "cm2xxx_3xxx.h"
 #include "prcm44xx.h"
 #include "prcm_mpu44xx.h"
@@ -89,7 +90,8 @@ enum {
 	MOD_PRM_OMAP4,
 	MOD_PRCM_MPU_OMAP4,
 	MOD_CM1_OMAP4,
-	MOD_CM2_OMAP4
+	MOD_CM2_OMAP4,
+	MOD_SCRM,
 };
 
 static const struct pm_module_def pm_dbg_reg_modules[] = {
@@ -141,6 +143,8 @@ static const struct pm_module_def pm_dbg_reg_modules[] = {
 	{ "PRM", MOD_PRCM_MPU_OMAP4, OMAP4430_PRCM_MPU_DEVICE_PRM_INST, 0, 0x4c },
 	{ "CPU0", MOD_PRCM_MPU_OMAP4, OMAP4430_PRCM_MPU_CPU0_INST, 0, 0x4c },
 	{ "CPU1", MOD_PRCM_MPU_OMAP4, OMAP4430_PRCM_MPU_CPU1_INST, 0, 0x4c },
+
+	{ "SCRM", MOD_SCRM, 0, 0, 0x51c },
 	{ NULL, 0, 0, 0, 0 },
 };
 
@@ -212,6 +216,10 @@ void pm_dbg_print_regs(struct seq_file *s, int reg_set)
 		case MOD_PRM_OMAP4:
 			offset = OMAP4430_PRM_BASE;
 			type_name = "PRM";
+			break;
+		case MOD_SCRM:
+			offset = 0x4a30a000;
+			type_name = "SCRM";
 			break;
 		}
 
@@ -288,6 +296,10 @@ static void pm_dbg_regset_store(u32 *ptr)
 				val = omap4_prminst_read_inst_reg(
 					OMAP4430_PRCM_MPU_PARTITION,
 					mod->offset, i);
+				break;
+			case MOD_SCRM:
+				val = __raw_readl(OMAP2_L4_IO_ADDRESS(
+						0x4a30a000 + i));
 				break;
 			}
 			*(ptr++) = val;
