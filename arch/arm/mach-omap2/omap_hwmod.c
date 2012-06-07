@@ -1463,6 +1463,12 @@ static int _assert_hardreset(struct omap_hwmod *oh, const char *name)
 	if (IS_ERR_VALUE(ret))
 		return ret;
 
+	pr_info("%s: %s shift=%d, part=%04x, offs=%04x, coffs=%04x\n",
+		__func__, oh->name, ohri.rst_shift,
+		oh->clkdm->pwrdm.ptr->prcm_partition,
+		oh->clkdm->pwrdm.ptr->prcm_offs,
+		oh->prcm.omap4.rstctrl_offs);
+
 	if (cpu_is_omap24xx() || cpu_is_omap34xx())
 		return omap2_prm_assert_hardreset(oh->prcm.omap2.module_offs,
 						  ohri.rst_shift);
@@ -1794,6 +1800,12 @@ static void _omap4_update_context_lost(struct omap_hwmod *oh)
 
 	if (oh->prcm.omap4.context_offs == USHRT_MAX)
 		return;
+
+	if (!oh->prcm.omap4.context_offs) {
+		pr_info("WARNING: %s context_offs = 0!!\n",
+			oh->name);
+		return;
+	}
 
 	r = omap4_prminst_read_inst_reg(oh->clkdm->pwrdm.ptr->prcm_partition,
 					oh->clkdm->pwrdm.ptr->prcm_offs,
