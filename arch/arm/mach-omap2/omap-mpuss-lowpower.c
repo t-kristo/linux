@@ -50,6 +50,7 @@
 #include <asm/suspend.h>
 #include <asm/hardware/cache-l2x0.h>
 
+#include "iomap.h"
 #include "soc.h"
 #include "common.h"
 #include "omap44xx.h"
@@ -62,6 +63,8 @@
 #include "prm-regbits-44xx.h"
 
 #ifdef CONFIG_SMP
+
+extern void _reconfigure_io_chain(void);
 
 struct omap4_cpu_pm_info {
 	struct powerdomain *pwrdm;
@@ -225,6 +228,10 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 
 	if (omap_rev() == OMAP4430_REV_ES1_0)
 		return -ENXIO;
+
+	/* force enable uart3 rx wakeup */
+	__raw_writew(0x4100, OMAP2_L4_IO_ADDRESS(0x4a100144));
+	_reconfigure_io_chain();
 
 	switch (power_state) {
 	case PWRDM_POWER_ON:
