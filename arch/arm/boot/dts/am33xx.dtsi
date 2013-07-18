@@ -99,6 +99,8 @@
 		ranges;
 		ti,hwmods = "l3_main";
 
+		/include/ "am33xx-clocks.dtsi"
+
 		intc: interrupt-controller@48200000 {
 			compatible = "ti,omap2-intc";
 			interrupt-controller;
