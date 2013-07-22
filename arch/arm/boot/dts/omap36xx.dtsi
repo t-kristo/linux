@@ -35,4 +35,124 @@
 			clock-frequency = <48000000>;
 		};
 	};
+
+	clocks {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		/include/ "omap36xx-clocks.dtsi"
+		/include/ "omap34xx-omap36xx-clocks.dtsi"
+		/include/ "omap36xx-omap3430es2plus-clocks.dtsi"
+		/include/ "omap36xx-am35xx-omap3430es2plus-clocks.dtsi"
+	};
+
+	clockdomains {
+		usbhost_clkdm: usbhost_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&usbhost_48m_fck>, <&usbhost_ick>,
+				 <&usbhost_120m_fck>;
+		};
+
+		wkup_clkdm: wkup_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&wdt1_ick>, <&sr2_fck>, <&omap_32ksync_ick>,
+				 <&wdt2_fck>, <&gpt12_ick>, <&sr1_fck>,
+				 <&gpio1_ick>, <&gpt1_ick>, <&wdt2_ick>,
+				 <&usim_ick>, <&gpio1_dbck>;
+		};
+
+		cam_clkdm: cam_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&csi2_96m_fck>, <&cam_ick>;
+		};
+
+		dpll4_clkdm: dpll4_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&dpll4_ck>;
+		};
+
+		sgx_clkdm: sgx_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&sgx_ick>;
+		};
+
+		dpll3_clkdm: dpll3_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&dpll3_ck>;
+		};
+
+		iva2_clkdm: iva2_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&iva2_ck>;
+		};
+
+		dpll1_clkdm: dpll1_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&dpll1_ck>;
+		};
+
+		dpll5_clkdm: dpll5_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&dpll5_ck>;
+		};
+
+		dpll2_clkdm: dpll2_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&dpll2_ck>;
+		};
+
+		dss_clkdm: dss_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&dss_tv_fck>, <&dss1_alwon_fck_3430es2>,
+				 <&dss_96m_fck>, <&dss2_alwon_fck>,
+				 <&dss_ick_3430es2>;
+		};
+
+		core_l4_clkdm: core_l4_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&mmchs1_ick>, <&mspro_ick>, <&mmchs2_ick>,
+				 <&mcspi4_fck>, <&i2c3_fck>, <&mcspi2_ick>,
+				 <&uart2_ick>, <&mcspi3_ick>, <&i2c1_fck>,
+				 <&sha12_ick>, <&mcspi3_fck>, <&mailboxes_ick>,
+				 <&uart2_fck>, <&mmchs2_fck>, <&usbtll_fck>,
+				 <&mmchs3_ick>, <&des2_ick>, <&i2c2_ick>,
+				 <&i2c1_ick>, <&icr_ick>, <&hdq_fck>,
+				 <&uart1_ick>, <&ts_fck>, <&usbtll_ick>,
+				 <&hdq_ick>, <&mcbsp5_ick>, <&aes2_ick>,
+				 <&mcspi1_ick>, <&mmchs1_fck>, <&i2c3_ick>,
+				 <&mcspi1_fck>, <&mmchs3_fck>, <&mcspi4_ick>,
+				 <&omapctrl_ick>, <&mspro_fck>, <&mcbsp1_ick>,
+				 <&mcspi2_fck>, <&ssi_ick_3430es2>,
+				 <&gpt10_ick>, <&cpefuse_fck>, <&i2c2_fck>,
+				 <&gpt11_ick>, <&uart1_fck>;
+		};
+
+		core_l3_clkdm: core_l3_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&sdrc_ick>, <&hsotgusb_ick_3430es2>;
+		};
+
+		per_clkdm: per_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&gpt2_ick>, <&uart3_fck>, <&gpio3_ick>,
+				 <&mcbsp2_ick>, <&gpt6_ick>, <&gpio2_dbck>,
+				 <&mcbsp4_ick>, <&gpio4_dbck>, <&gpt4_ick>,
+				 <&gpio5_dbck>, <&mcbsp3_ick>, <&gpio3_dbck>,
+				 <&gpt8_ick>, <&gpt5_ick>, <&uart4_fck>,
+				 <&gpio6_dbck>, <&uart3_ick>, <&gpt7_ick>,
+				 <&gpio2_ick>, <&gpt9_ick>, <&gpio6_ick>,
+				 <&gpt3_ick>, <&gpio5_ick>, <&wdt3_fck>,
+				 <&gpio4_ick>, <&wdt3_ick>, <&uart4_ick>;
+		};
+
+		emu_clkdm: emu_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&emu_src_ck>;
+		};
+
+		d2d_clkdm: d2d_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&mad2d_ick>, <&sad2d_ick>, <&modem_fck>;
+		};
+	};
 };
