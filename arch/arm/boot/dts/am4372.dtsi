@@ -67,6 +67,8 @@
 		ranges;
 		ti,hwmods = "l3_main";
 
+		/include/ "am43xx-clocks.dtsi"
+
 		edma: edma@49000000 {
 			compatible = "ti,edma3";
 			ti,hwmods = "tpcc", "tptc0", "tptc1", "tptc2";
