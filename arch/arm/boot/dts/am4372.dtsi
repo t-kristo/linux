@@ -45,6 +45,8 @@
 		#size-cells = <1>;
 		ranges;
 
+		/include/ "am43xx-clocks.dtsi"
+
 		uart0: serial@44e09000 {
 			compatible = "ti,am4372-uart","ti,omap2-uart";
 			reg = <0x44e09000 0x2000>;
