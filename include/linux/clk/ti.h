@@ -214,12 +214,17 @@ int omap3_dpll4_set_rate(struct clk_hw *clk, unsigned long rate,
 int omap2_dflt_clk_enable(struct clk_hw *hw);
 void omap2_dflt_clk_disable(struct clk_hw *hw);
 int omap2_dflt_clk_is_enabled(struct clk_hw *hw);
+void omap3_clk_lock_dpll5(void);
 
 void ti_dt_clocks_register(struct ti_dt_clk *oclks);
 void of_ti_autoidle_setup(struct device_node *node);
 
 struct clk_div_table *ti_clk_get_div_table(struct device_node *node);
 
+int omap3430_dt_clk_init(void);
+int omap3630_dt_clk_init(void);
+int am35xx_dt_clk_init(void);
+int ti81xx_dt_clk_init(void);
 int omap4xxx_dt_clk_init(void);
 int omap5xxx_dt_clk_init(void);
 int dra7xx_dt_clk_init(void);
