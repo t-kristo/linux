@@ -204,6 +204,8 @@ struct clk_omap_reg {
 	u16 index;
 };
 
+#define to_clk_hw_omap(_hw) container_of(_hw, struct clk_hw_omap, hw)
+
 void omap2_init_clk_hw_omap_clocks(struct clk *clk);
 int omap3_noncore_dpll_enable(struct clk_hw *hw);
 void omap3_noncore_dpll_disable(struct clk_hw *hw);
@@ -232,6 +234,7 @@ int omap2_dflt_clk_is_enabled(struct clk_hw *hw);
 void __iomem *ti_clk_get_reg_addr(struct device_node *node, int index);
 void ti_dt_clocks_register(struct ti_dt_clk *oclks);
 void ti_dt_clk_init_provider(struct device_node *np, int index);
+void ti_dt_clockdomains_setup(void);
 int of_ti_clk_autoidle_setup(struct device_node *node);
 int ti_clk_add_component(struct device_node *node, struct clk_hw *hw, int type);
 
