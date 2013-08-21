@@ -190,6 +190,8 @@ struct ti_dt_clk {
 		.node_name = name,	\
 	}
 
+#define to_clk_hw_omap(_hw) container_of(_hw, struct clk_hw_omap, hw)
+
 void omap2_init_clk_hw_omap_clocks(struct clk *clk);
 int omap3_noncore_dpll_enable(struct clk_hw *hw);
 void omap3_noncore_dpll_disable(struct clk_hw *hw);
@@ -217,6 +219,7 @@ int omap2_dflt_clk_is_enabled(struct clk_hw *hw);
 
 void ti_dt_clocks_register(struct ti_dt_clk *oclks);
 void ti_dt_clk_init_provider(struct device_node *np, struct clk_reg_ops *ops);
+void ti_dt_clockdomains_setup(void);
 int of_ti_autoidle_setup(struct device_node *node, struct clk_reg_ops *ops);
 int ti_clk_add_component(struct device_node *node, struct clk_hw *hw, int type);
 
