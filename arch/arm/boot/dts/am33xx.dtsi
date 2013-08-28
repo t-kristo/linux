@@ -87,6 +87,8 @@
 		#size-cells = <1>;
 		ranges;
 		ti,hwmods = "l3_main";
+		clocks = <&l3_gclk>;
+		clock-names = "fck";
 
 		intc: interrupt-controller@48200000 {
 			compatible = "ti,omap2-intc";
@@ -99,6 +101,8 @@
 		gpio0: gpio@44e07000 {
 			compatible = "ti,omap4-gpio";
 			ti,hwmods = "gpio1";
+			clocks = <&dpll_core_m4_div2_ck>, <&gpio0_dbclk>;
+			clock-names = "fck", "dbclk";
 			gpio-controller;
 			#gpio-cells = <2>;
 			interrupt-controller;
@@ -110,6 +114,8 @@
 		gpio1: gpio@4804c000 {
 			compatible = "ti,omap4-gpio";
 			ti,hwmods = "gpio2";
+			clocks = <&l4ls_gclk>, <&gpio1_dbclk>;
+			clock-names = "fck", "dbclk";
 			gpio-controller;
 			#gpio-cells = <2>;
 			interrupt-controller;
@@ -121,6 +127,8 @@
 		gpio2: gpio@481ac000 {
 			compatible = "ti,omap4-gpio";
 			ti,hwmods = "gpio3";
+			clocks = <&l4ls_gclk>, <&gpio2_dbclk>;
+			clock-names = "fck", "dbclk";
 			gpio-controller;
 			#gpio-cells = <2>;
 			interrupt-controller;
@@ -132,6 +140,8 @@
 		gpio3: gpio@481ae000 {
 			compatible = "ti,omap4-gpio";
 			ti,hwmods = "gpio4";
+			clocks = <&l4ls_gclk>, <&gpio3_dbclk>;
+			clock-names = "fck", "dbclk";
 			gpio-controller;
 			#gpio-cells = <2>;
 			interrupt-controller;
@@ -143,6 +153,8 @@
 		uart0: serial@44e09000 {
 			compatible = "ti,omap3-uart";
 			ti,hwmods = "uart1";
+			clocks = <&dpll_per_m2_div4_wkupdm_ck>;
+			clock-names = "fck";
 			clock-frequency = <48000000>;
 			reg = <0x44e09000 0x2000>;
 			interrupts = <72>;
@@ -152,6 +164,8 @@
 		uart1: serial@48022000 {
 			compatible = "ti,omap3-uart";
 			ti,hwmods = "uart2";
+			clocks = <&dpll_per_m2_div4_ck>;
+			clock-names = "fck";
 			clock-frequency = <48000000>;
 			reg = <0x48022000 0x2000>;
 			interrupts = <73>;
@@ -161,6 +175,8 @@
 		uart2: serial@48024000 {
 			compatible = "ti,omap3-uart";
 			ti,hwmods = "uart3";
+			clocks = <&dpll_per_m2_div4_ck>;
+			clock-names = "fck";
 			clock-frequency = <48000000>;
 			reg = <0x48024000 0x2000>;
 			interrupts = <74>;
@@ -170,6 +186,8 @@
 		uart3: serial@481a6000 {
 			compatible = "ti,omap3-uart";
 			ti,hwmods = "uart4";
+			clocks = <&dpll_per_m2_div4_ck>;
+			clock-names = "fck";
 			clock-frequency = <48000000>;
 			reg = <0x481a6000 0x2000>;
 			interrupts = <44>;
@@ -179,6 +197,8 @@
 		uart4: serial@481a8000 {
 			compatible = "ti,omap3-uart";
 			ti,hwmods = "uart5";
+			clocks = <&dpll_per_m2_div4_ck>;
+			clock-names = "fck";
 			clock-frequency = <48000000>;
 			reg = <0x481a8000 0x2000>;
 			interrupts = <45>;
@@ -188,6 +208,8 @@
 		uart5: serial@481aa000 {
 			compatible = "ti,omap3-uart";
 			ti,hwmods = "uart6";
+			clocks = <&dpll_per_m2_div4_ck>;
+			clock-names = "fck";
 			clock-frequency = <48000000>;
 			reg = <0x481aa000 0x2000>;
 			interrupts = <46>;
@@ -199,6 +221,8 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			ti,hwmods = "i2c1";
+			clocks = <&dpll_per_m2_div4_wkupdm_ck>;
+			clock-names = "fck";
 			reg = <0x44e0b000 0x1000>;
 			interrupts = <70>;
 			status = "disabled";
@@ -209,6 +233,8 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			ti,hwmods = "i2c2";
+			clocks = <&dpll_per_m2_div4_ck>;
+			clock-names = "fck";
 			reg = <0x4802a000 0x1000>;
 			interrupts = <71>;
 			status = "disabled";
@@ -219,6 +245,8 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			ti,hwmods = "i2c3";
+			clocks = <&dpll_per_m2_div4_ck>;
+			clock-names = "fck";
 			reg = <0x4819c000 0x1000>;
 			interrupts = <30>;
 			status = "disabled";
@@ -227,6 +255,8 @@
 		wdt2: wdt@44e35000 {
 			compatible = "ti,omap3-wdt";
 			ti,hwmods = "wd_timer2";
+			clocks = <&wdt1_fck>;
+			clock-names = "fck";
 			reg = <0x44e35000 0x1000>;
 			interrupts = <91>;
 		};
@@ -234,6 +264,8 @@
 		dcan0: d_can@481cc000 {
 			compatible = "bosch,d_can";
 			ti,hwmods = "d_can0";
+			clocks = <&dcan0_fck>;
+			clock-names = "fck";
 			reg = <0x481cc000 0x2000
 				0x44e10644 0x4>;
 			interrupts = <52>;
@@ -243,6 +275,8 @@
 		dcan1: d_can@481d0000 {
 			compatible = "bosch,d_can";
 			ti,hwmods = "d_can1";
+			clocks = <&dcan1_fck>;
+			clock-names = "fck";
 			reg = <0x481d0000 0x2000
 				0x44e10644 0x4>;
 			interrupts = <55>;
@@ -254,6 +288,8 @@
 			reg = <0x44e31000 0x400>;
 			interrupts = <67>;
 			ti,hwmods = "timer1";
+			clocks = <&timer1_fck>;
+			clock-names = "fck";
 			ti,timer-alwon;
 		};
 
@@ -262,6 +298,8 @@
 			reg = <0x48040000 0x400>;
 			interrupts = <68>;
 			ti,hwmods = "timer2";
+			clocks = <&timer2_fck>;
+			clock-names = "fck";
 		};
 
 		timer3: timer@48042000 {
@@ -269,6 +307,8 @@
 			reg = <0x48042000 0x400>;
 			interrupts = <69>;
 			ti,hwmods = "timer3";
+			clocks = <&timer3_fck>;
+			clock-names = "fck";
 		};
 
 		timer4: timer@48044000 {
@@ -276,6 +316,8 @@
 			reg = <0x48044000 0x400>;
 			interrupts = <92>;
 			ti,hwmods = "timer4";
+			clocks = <&timer4_fck>;
+			clock-names = "fck";
 			ti,timer-pwm;
 		};
 
@@ -284,6 +326,8 @@
 			reg = <0x48046000 0x400>;
 			interrupts = <93>;
 			ti,hwmods = "timer5";
+			clocks = <&timer5_fck>;
+			clock-names = "fck";
 			ti,timer-pwm;
 		};
 
@@ -292,6 +336,8 @@
 			reg = <0x48048000 0x400>;
 			interrupts = <94>;
 			ti,hwmods = "timer6";
+			clocks = <&timer6_fck>;
+			clock-names = "fck";
 			ti,timer-pwm;
 		};
 
@@ -300,6 +346,8 @@
 			reg = <0x4804a000 0x400>;
 			interrupts = <95>;
 			ti,hwmods = "timer7";
+			clocks = <&timer7_fck>;
+			clock-names = "fck";
 			ti,timer-pwm;
 		};
 
@@ -309,6 +357,8 @@
 			interrupts = <75
 				      76>;
 			ti,hwmods = "rtc";
+			clocks = <&clk_32768_ck>;
+			clock-names = "fck";
 		};
 
 		spi0: spi@48030000 {
@@ -319,6 +369,8 @@
 			interrupts = <65>;
 			ti,spi-num-cs = <2>;
 			ti,hwmods = "spi0";
+			clocks = <&dpll_per_m2_div4_ck>;
+			clock-names = "fck";
 			status = "disabled";
 		};
 
@@ -330,6 +382,8 @@
 			interrupts = <125>;
 			ti,spi-num-cs = <2>;
 			ti,hwmods = "spi1";
+			clocks = <&dpll_per_m2_div4_ck>;
+			clock-names = "fck";
 			status = "disabled";
 		};
 
@@ -348,12 +402,16 @@
 			port1-mode = <3>;
 			power = <250>;
 			ti,hwmods = "usb_otg_hs";
+			clocks = <&usbotg_fck>;
+			clock-names = "fck";
 		};
 
 		epwmss0: epwmss@48300000 {
 			compatible = "ti,am33xx-pwmss";
 			reg = <0x48300000 0x10>;
 			ti,hwmods = "epwmss0";
+			clocks = <&l4ls_gclk>;
+			clock-names = "fck";
 			#address-cells = <1>;
 			#size-cells = <1>;
 			status = "disabled";
@@ -366,6 +424,8 @@
 				#pwm-cells = <3>;
 				reg = <0x48300100 0x80>;
 				ti,hwmods = "ecap0";
+			clocks = <&l4ls_gclk>;
+			clock-names = "fck";
 				status = "disabled";
 			};
 
@@ -374,6 +434,8 @@
 				#pwm-cells = <3>;
 				reg = <0x48300200 0x80>;
 				ti,hwmods = "ehrpwm0";
+			clocks = <&l4ls_gclk>;
+			clock-names = "fck";
 				status = "disabled";
 			};
 		};
@@ -382,6 +444,8 @@
 			compatible = "ti,am33xx-pwmss";
 			reg = <0x48302000 0x10>;
 			ti,hwmods = "epwmss1";
+			clocks = <&l4ls_gclk>;
+			clock-names = "fck";
 			#address-cells = <1>;
 			#size-cells = <1>;
 			status = "disabled";
@@ -394,6 +458,8 @@
 				#pwm-cells = <3>;
 				reg = <0x48302100 0x80>;
 				ti,hwmods = "ecap1";
+			clocks = <&l4ls_gclk>;
+			clock-names = "fck";
 				status = "disabled";
 			};
 
@@ -402,6 +468,8 @@
 				#pwm-cells = <3>;
 				reg = <0x48302200 0x80>;
 				ti,hwmods = "ehrpwm1";
+			clocks = <&l4ls_gclk>;
+			clock-names = "fck";
 				status = "disabled";
 			};
 		};
@@ -410,6 +478,8 @@
 			compatible = "ti,am33xx-pwmss";
 			reg = <0x48304000 0x10>;
 			ti,hwmods = "epwmss2";
+			clocks = <&l4ls_gclk>;
+			clock-names = "fck";
 			#address-cells = <1>;
 			#size-cells = <1>;
 			status = "disabled";
@@ -422,6 +492,8 @@
 				#pwm-cells = <3>;
 				reg = <0x48304100 0x80>;
 				ti,hwmods = "ecap2";
+			clocks = <&l4ls_gclk>;
+			clock-names = "fck";
 				status = "disabled";
 			};
 
@@ -430,6 +502,8 @@
 				#pwm-cells = <3>;
 				reg = <0x48304200 0x80>;
 				ti,hwmods = "ehrpwm2";
+			clocks = <&l4ls_gclk>;
+			clock-names = "fck";
 				status = "disabled";
 			};
 		};
@@ -437,6 +511,8 @@
 		mac: ethernet@4a100000 {
 			compatible = "ti,cpsw";
 			ti,hwmods = "cpgmac0";
+			clocks = <&cpsw_125mhz_gclk>;
+			clock-names = "fck";
 			cpdma_channels = <8>;
 			ale_entries = <1024>;
 			bd_ram_size = <0x2000>;
@@ -466,6 +542,8 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				ti,hwmods = "davinci_mdio";
+			clocks = <&cpsw_125mhz_gclk>;
+			clock-names = "fck";
 				bus_freq = <1000000>;
 				reg = <0x4a101000 0x100>;
 			};
@@ -485,6 +563,8 @@
 			compatible = "ti,am3352-ocmcram";
 			reg = <0x40300000 0x10000>;
 			ti,hwmods = "ocmcram";
+			clocks = <&l3_gclk>;
+			clock-names = "fck";
 		};
 
 		wkup_m3: wkup_m3@44d00000 {
@@ -492,6 +572,8 @@
 			reg = <0x44d00000 0x4000	/* M3 UMEM */
 			       0x44d80000 0x2000>;	/* M3 DMEM */
 			ti,hwmods = "wkup_m3";
+			clocks = <&dpll_core_m4_div2_ck>;
+			clock-names = "fck";
 		};
 
 		elm: elm@48080000 {
@@ -499,6 +581,8 @@
 			reg = <0x48080000 0x2000>;
 			interrupts = <4>;
 			ti,hwmods = "elm";
+			clocks = <&l4ls_gclk>;
+			clock-names = "fck";
 			status = "disabled";
 		};
 
@@ -508,6 +592,8 @@
 			interrupt-parent = <&intc>;
 			interrupts = <16>;
 			ti,hwmods = "adc_tsc";
+			clocks = <&adc_tsc_fck>;
+			clock-names = "fck";
 			status = "disabled";
 
 			tsc {
@@ -522,6 +608,8 @@
 		gpmc: gpmc@50000000 {
 			compatible = "ti,am3352-gpmc";
 			ti,hwmods = "gpmc";
+			clocks = <&l3s_gclk>;
+			clock-names = "fck";
 			reg = <0x50000000 0x2000>;
 			interrupts = <100>;
 			gpmc,num-cs = <7>;
