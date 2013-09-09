@@ -137,6 +137,14 @@ struct clk_hw_omap {
 /* DPLL Type and DCO Selection Flags */
 #define DPLL_J_TYPE		0x1
 
+/* Composite clock component types */
+enum {
+	CLK_COMPONENT_TYPE_GATE = 0,
+	CLK_COMPONENT_TYPE_DIVIDER,
+	CLK_COMPONENT_TYPE_MUX,
+	CLK_COMPONENT_TYPE_MAX,
+};
+
 /**
  * struct ti_dt_clk - OMAP DT clock alias declarations
  * @lk: clock lookup definition
@@ -175,10 +183,14 @@ unsigned long omap3_clkoutx2_recalc(struct clk_hw *hw,
 				    unsigned long parent_rate);
 int omap3_dpll4_set_rate(struct clk_hw *clk, unsigned long rate,
 			 unsigned long parent_rate);
+int omap2_dflt_clk_enable(struct clk_hw *hw);
+void omap2_dflt_clk_disable(struct clk_hw *hw);
+int omap2_dflt_clk_is_enabled(struct clk_hw *hw);
 
 void ti_dt_clocks_register(struct ti_dt_clk *oclks);
 void ti_dt_clk_init_provider(struct device_node *np, struct regmap *regmap);
 int of_ti_autoidle_setup(struct device_node *node);
+int ti_clk_add_component(struct device_node *node, struct clk_hw *hw, int type);
 
 #ifdef CONFIG_OF
 void of_ti_clk_allow_autoidle_all(void);
