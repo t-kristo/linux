@@ -8,22 +8,16 @@
  * published by the Free Software Foundation.
  */
 
-ssi_ssr_div_fck_3430es2: ssi_ssr_div_fck_3430es2@48004a40 {
-	#clock-cells = <0>;
-	compatible = "divider-clock";
-	clocks = <&corex2_fck>;
-	bit-shift = <8>;
-	reg = <0x48004a40 0x4>;
-	table = < 1 1 >, < 2 2 >, < 3 3 >, < 4 4 >, < 6 6 >, < 8 8 >;
-	bit-mask = <0xf>;
-};
-
 ssi_ssr_fck_3430es2: ssi_ssr_fck_3430es2@48004a00 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&ssi_ssr_div_fck_3430es2>;
-	bit-shift = <0>;
-	reg = <0x48004a00 0x4>;
+	compatible = "ti,no-wait-mux-gate-clock";
+	clocks = <&corex2_fck>;
+	ti,div-bit-mask = <0xf>;
+	table = < 1 1 >, < 2 2 >, < 3 3 >, < 4 4 >, < 6 6 >, < 8 8 >;
+	reg-names = "gate-reg", "div-reg";
+	reg = <0x48004a00 0x4>, <0x48004a40 0x4>;
+	ti,gate-bit-shift = <0>;
+	ti,div-bit-shift = <8>;
 };
 
 ssi_sst_fck_3430es2: ssi_sst_fck_3430es2 {
@@ -148,22 +142,15 @@ dpll5_m2_d16_ck: dpll5_m2_d16_ck {
 	clock-div = <16>;
 };
 
-usim_mux_fck: usim_mux_fck@48004c40 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
-	clocks = <&sys_ck>, <&dpll5_m2_d20_ck>, <&sys_d2_ck>, <&omap_96m_d2_fck>, <&omap_96m_d4_fck>, <&omap_96m_d8_fck>, <&omap_96m_d10_fck>, <&dpll5_m2_d4_ck>, <&dpll5_m2_d8_ck>, <&dpll5_m2_d16_ck>;
-	bit-shift = <3>;
-	reg = <0x48004c40 0x4>;
-	table = <&sys_ck 1>, <&dpll5_m2_d20_ck 10>, <&sys_d2_ck 2>, <&omap_96m_d2_fck 3>, <&omap_96m_d4_fck 4>, <&omap_96m_d8_fck 5>, <&omap_96m_d10_fck 6>, <&dpll5_m2_d4_ck 7>, <&dpll5_m2_d8_ck 8>, <&dpll5_m2_d16_ck 9>;
-	bit-mask = <0xf>;
-};
-
 usim_fck: usim_fck@48004c00 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&usim_mux_fck>;
-	bit-shift = <9>;
-	reg = <0x48004c00 0x4>;
+	compatible = "ti,mux-gate-clock";
+	clocks = <&sys_ck>, <&dpll5_m2_d20_ck>, <&sys_d2_ck>, <&omap_96m_d2_fck>, <&omap_96m_d4_fck>, <&omap_96m_d8_fck>, <&omap_96m_d10_fck>, <&dpll5_m2_d4_ck>, <&dpll5_m2_d8_ck>, <&dpll5_m2_d16_ck>;
+	ti,mux-bit-shift = <3>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48004c00 0x4>, <0x48004c40 0x4>;
+	ti,mux-bit-mask = <0xf>;
+	ti,gate-bit-shift = <9>;
 };
 
 usim_ick: usim_ick@48004c10 {

@@ -423,20 +423,14 @@ emu_per_alwon_ck: emu_per_alwon_ck {
 	clock-div = <1>;
 };
 
-clkout2_src_mux_ck: clkout2_src_mux_ck@48004d70 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
-	clocks = <&core_ck>, <&sys_ck>, <&cm_96m_fck>, <&omap_54m_fck>;
-	reg = <0x48004d70 0x4>;
-	bit-mask = <0x3>;
-};
-
 clkout2_src_ck: clkout2_src_ck@48004d70 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&clkout2_src_mux_ck>;
-	bit-shift = <7>;
-	reg = <0x48004d70 0x4>;
+	compatible = "ti,no-wait-mux-gate-clock";
+	clocks = <&core_ck>, <&sys_ck>, <&cm_96m_fck>, <&omap_54m_fck>;
+	reg = <0x48004d70 0x4>, <0x48004d70 0x4>;
+	ti,mux-bit-mask = <0x3>;
+	reg-names = "gate-reg", "mux-reg";
+	ti,gate-bit-shift = <7>;
 };
 
 sys_clkout2: sys_clkout2@48004d70 {
@@ -510,38 +504,26 @@ rm_ick: rm_ick@48004c40 {
 	index-starts-at-one;
 };
 
-gpt10_mux_fck: gpt10_mux_fck@48004a40 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
-	clocks = <&omap_32k_fck>, <&sys_ck>;
-	bit-shift = <6>;
-	reg = <0x48004a40 0x4>;
-	bit-mask = <0x1>;
-};
-
 gpt10_fck: gpt10_fck@48004a00 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&gpt10_mux_fck>;
-	bit-shift = <11>;
-	reg = <0x48004a00 0x4>;
-};
-
-gpt11_mux_fck: gpt11_mux_fck@48004a40 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
+	compatible = "ti,mux-gate-clock";
 	clocks = <&omap_32k_fck>, <&sys_ck>;
-	bit-shift = <7>;
-	reg = <0x48004a40 0x4>;
-	bit-mask = <0x1>;
+	ti,mux-bit-shift = <6>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48004a00 0x4>, <0x48004a40 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	ti,gate-bit-shift = <11>;
 };
 
 gpt11_fck: gpt11_fck@48004a00 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&gpt11_mux_fck>;
-	bit-shift = <12>;
-	reg = <0x48004a00 0x4>;
+	compatible = "ti,mux-gate-clock";
+	clocks = <&omap_32k_fck>, <&sys_ck>;
+	ti,mux-bit-shift = <7>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48004a00 0x4>, <0x48004a40 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	ti,gate-bit-shift = <12>;
 };
 
 core_96m_fck: core_96m_fck {
@@ -592,38 +574,26 @@ i2c1_fck: i2c1_fck@48004a00 {
 	ti,enable-bit = <15>;
 };
 
-mcbsp5_mux_fck: mcbsp5_mux_fck@480022d8 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
-	clocks = <&core_96m_fck>, <&mcbsp_clks>;
-	bit-shift = <4>;
-	reg = <0x480022d8 0x4>;
-	bit-mask = <0x1>;
-};
-
 mcbsp5_fck: mcbsp5_fck@48004a00 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&mcbsp5_mux_fck>;
-	bit-shift = <10>;
-	reg = <0x48004a00 0x4>;
-};
-
-mcbsp1_mux_fck: mcbsp1_mux_fck@48002274 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
+	compatible = "ti,mux-gate-clock";
 	clocks = <&core_96m_fck>, <&mcbsp_clks>;
-	bit-shift = <2>;
-	reg = <0x48002274 0x4>;
-	bit-mask = <0x1>;
+	ti,mux-bit-shift = <4>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48004a00 0x4>, <0x480022d8 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	ti,gate-bit-shift = <10>;
 };
 
 mcbsp1_fck: mcbsp1_fck@48004a00 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&mcbsp1_mux_fck>;
-	bit-shift = <9>;
-	reg = <0x48004a00 0x4>;
+	compatible = "ti,mux-gate-clock";
+	clocks = <&core_96m_fck>, <&mcbsp_clks>;
+	ti,mux-bit-shift = <2>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48004a00 0x4>, <0x48002274 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	ti,gate-bit-shift = <9>;
 };
 
 core_48m_fck: core_48m_fck {
@@ -890,20 +860,14 @@ dss2_alwon_fck: dss2_alwon_fck@48004e00 {
 	bit-shift = <1>;
 };
 
-gpt1_mux_fck: gpt1_mux_fck@48004c40 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
-	clocks = <&omap_32k_fck>, <&sys_ck>;
-	reg = <0x48004c40 0x4>;
-	bit-mask = <0x1>;
-};
-
 gpt1_fck: gpt1_fck@48004c00 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&gpt1_mux_fck>;
-	bit-shift = <0>;
-	reg = <0x48004c00 0x4>;
+	compatible = "ti,mux-gate-clock";
+	clocks = <&omap_32k_fck>, <&sys_ck>;
+	reg = <0x48004c00 0x4>, <0x48004c40 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	reg-names = "gate-reg", "mux-reg";
+	ti,gate-bit-shift = <0>;
 };
 
 aes2_ick: aes2_ick@48004a10 {
@@ -1026,139 +990,91 @@ uart3_fck: uart3_fck@48005000 {
 	ti,enable-bit = <11>;
 };
 
-gpt2_mux_fck: gpt2_mux_fck@48005040 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
-	clocks = <&omap_32k_fck>, <&sys_ck>;
-	reg = <0x48005040 0x4>;
-	bit-mask = <0x1>;
-};
-
 gpt2_fck: gpt2_fck@48005000 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&gpt2_mux_fck>;
-	bit-shift = <3>;
-	reg = <0x48005000 0x4>;
-};
-
-gpt3_mux_fck: gpt3_mux_fck@48005040 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
+	compatible = "ti,mux-gate-clock";
 	clocks = <&omap_32k_fck>, <&sys_ck>;
-	bit-shift = <1>;
-	reg = <0x48005040 0x4>;
-	bit-mask = <0x1>;
+	reg = <0x48005000 0x4>, <0x48005040 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	reg-names = "gate-reg", "mux-reg";
+	ti,gate-bit-shift = <3>;
 };
 
 gpt3_fck: gpt3_fck@48005000 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&gpt3_mux_fck>;
-	bit-shift = <4>;
-	reg = <0x48005000 0x4>;
-};
-
-gpt4_mux_fck: gpt4_mux_fck@48005040 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
+	compatible = "ti,mux-gate-clock";
 	clocks = <&omap_32k_fck>, <&sys_ck>;
-	bit-shift = <2>;
-	reg = <0x48005040 0x4>;
-	bit-mask = <0x1>;
+	ti,mux-bit-shift = <1>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48005000 0x4>, <0x48005040 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	ti,gate-bit-shift = <4>;
 };
 
 gpt4_fck: gpt4_fck@48005000 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&gpt4_mux_fck>;
-	bit-shift = <5>;
-	reg = <0x48005000 0x4>;
-};
-
-gpt5_mux_fck: gpt5_mux_fck@48005040 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
+	compatible = "ti,mux-gate-clock";
 	clocks = <&omap_32k_fck>, <&sys_ck>;
-	bit-shift = <3>;
-	reg = <0x48005040 0x4>;
-	bit-mask = <0x1>;
+	ti,mux-bit-shift = <2>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48005000 0x4>, <0x48005040 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	ti,gate-bit-shift = <5>;
 };
 
 gpt5_fck: gpt5_fck@48005000 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&gpt5_mux_fck>;
-	bit-shift = <6>;
-	reg = <0x48005000 0x4>;
-};
-
-gpt6_mux_fck: gpt6_mux_fck@48005040 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
+	compatible = "ti,mux-gate-clock";
 	clocks = <&omap_32k_fck>, <&sys_ck>;
-	bit-shift = <4>;
-	reg = <0x48005040 0x4>;
-	bit-mask = <0x1>;
+	ti,mux-bit-shift = <3>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48005000 0x4>, <0x48005040 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	ti,gate-bit-shift = <6>;
 };
 
 gpt6_fck: gpt6_fck@48005000 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&gpt6_mux_fck>;
-	bit-shift = <7>;
-	reg = <0x48005000 0x4>;
-};
-
-gpt7_mux_fck: gpt7_mux_fck@48005040 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
+	compatible = "ti,mux-gate-clock";
 	clocks = <&omap_32k_fck>, <&sys_ck>;
-	bit-shift = <5>;
-	reg = <0x48005040 0x4>;
-	bit-mask = <0x1>;
+	ti,mux-bit-shift = <4>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48005000 0x4>, <0x48005040 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	ti,gate-bit-shift = <7>;
 };
 
 gpt7_fck: gpt7_fck@48005000 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&gpt7_mux_fck>;
-	bit-shift = <8>;
-	reg = <0x48005000 0x4>;
-};
-
-gpt8_mux_fck: gpt8_mux_fck@48005040 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
+	compatible = "ti,mux-gate-clock";
 	clocks = <&omap_32k_fck>, <&sys_ck>;
-	bit-shift = <6>;
-	reg = <0x48005040 0x4>;
-	bit-mask = <0x1>;
+	ti,mux-bit-shift = <5>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48005000 0x4>, <0x48005040 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	ti,gate-bit-shift = <8>;
 };
 
 gpt8_fck: gpt8_fck@48005000 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&gpt8_mux_fck>;
-	bit-shift = <9>;
-	reg = <0x48005000 0x4>;
-};
-
-gpt9_mux_fck: gpt9_mux_fck@48005040 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
+	compatible = "ti,mux-gate-clock";
 	clocks = <&omap_32k_fck>, <&sys_ck>;
-	bit-shift = <7>;
-	reg = <0x48005040 0x4>;
-	bit-mask = <0x1>;
+	ti,mux-bit-shift = <6>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48005000 0x4>, <0x48005040 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	ti,gate-bit-shift = <9>;
 };
 
 gpt9_fck: gpt9_fck@48005000 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&gpt9_mux_fck>;
-	bit-shift = <10>;
-	reg = <0x48005000 0x4>;
+	compatible = "ti,mux-gate-clock";
+	clocks = <&omap_32k_fck>, <&sys_ck>;
+	ti,mux-bit-shift = <7>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48005000 0x4>, <0x48005040 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	ti,gate-bit-shift = <10>;
 };
 
 per_32k_alwon_fck: per_32k_alwon_fck {
@@ -1377,54 +1293,36 @@ mcbsp4_ick: mcbsp4_ick@48005010 {
 	ti,enable-bit = <2>;
 };
 
-mcbsp2_mux_fck: mcbsp2_mux_fck@48002274 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
-	clocks = <&per_96m_fck>, <&mcbsp_clks>;
-	bit-shift = <6>;
-	reg = <0x48002274 0x4>;
-	bit-mask = <0x1>;
-};
-
 mcbsp2_fck: mcbsp2_fck@48005000 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&mcbsp2_mux_fck>;
-	bit-shift = <0>;
-	reg = <0x48005000 0x4>;
-};
-
-mcbsp3_mux_fck: mcbsp3_mux_fck@480022d8 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
+	compatible = "ti,mux-gate-clock";
 	clocks = <&per_96m_fck>, <&mcbsp_clks>;
-	reg = <0x480022d8 0x4>;
-	bit-mask = <0x1>;
+	ti,mux-bit-shift = <6>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48005000 0x4>, <0x48002274 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	ti,gate-bit-shift = <0>;
 };
 
 mcbsp3_fck: mcbsp3_fck@48005000 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&mcbsp3_mux_fck>;
-	bit-shift = <1>;
-	reg = <0x48005000 0x4>;
-};
-
-mcbsp4_mux_fck: mcbsp4_mux_fck@480022d8 {
-	#clock-cells = <0>;
-	compatible = "mux-clock";
+	compatible = "ti,mux-gate-clock";
 	clocks = <&per_96m_fck>, <&mcbsp_clks>;
-	bit-shift = <2>;
-	reg = <0x480022d8 0x4>;
-	bit-mask = <0x1>;
+	reg = <0x48005000 0x4>, <0x480022d8 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	reg-names = "gate-reg", "mux-reg";
+	ti,gate-bit-shift = <1>;
 };
 
 mcbsp4_fck: mcbsp4_fck@48005000 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&mcbsp4_mux_fck>;
-	bit-shift = <2>;
-	reg = <0x48005000 0x4>;
+	compatible = "ti,mux-gate-clock";
+	clocks = <&per_96m_fck>, <&mcbsp_clks>;
+	ti,mux-bit-shift = <2>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48005000 0x4>, <0x480022d8 0x4>;
+	ti,mux-bit-mask = <0x1>;
+	ti,gate-bit-shift = <2>;
 };
 
 emu_src_mux_ck: emu_src_mux_ck@48005140 {

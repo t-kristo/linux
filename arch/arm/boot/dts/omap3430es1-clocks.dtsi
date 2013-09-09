@@ -65,22 +65,16 @@ fshostusb_fck: fshostusb_fck@48004a00 {
 	ti,enable-bit = <5>;
 };
 
-ssi_ssr_div_fck_3430es1: ssi_ssr_div_fck_3430es1@48004a40 {
-	#clock-cells = <0>;
-	compatible = "divider-clock";
-	clocks = <&corex2_fck>;
-	bit-shift = <8>;
-	reg = <0x48004a40 0x4>;
-	table = < 1 1 >, < 2 2 >, < 3 3 >, < 4 4 >, < 6 6 >, < 8 8 >;
-	bit-mask = <0xf>;
-};
-
 ssi_ssr_fck_3430es1: ssi_ssr_fck_3430es1@48004a00 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&ssi_ssr_div_fck_3430es1>;
-	bit-shift = <0>;
-	reg = <0x48004a00 0x4>;
+	compatible = "ti,no-wait-mux-gate-clock";
+	clocks = <&corex2_fck>;
+	ti,div-bit-mask = <0xf>;
+	table = < 1 1 >, < 2 2 >, < 3 3 >, < 4 4 >, < 6 6 >, < 8 8 >;
+	reg-names = "gate-reg", "div-reg";
+	reg = <0x48004a00 0x4>, <0x48004a40 0x4>;
+	ti,gate-bit-shift = <0>;
+	ti,div-bit-shift = <8>;
 };
 
 ssi_sst_fck_3430es1: ssi_sst_fck_3430es1 {
@@ -123,22 +117,16 @@ ssi_ick_3430es1: ssi_ick_3430es1@48004a10 {
 	ti,enable-bit = <0>;
 };
 
-usb_l4_div_ick: usb_l4_div_ick@48004a40 {
-	#clock-cells = <0>;
-	compatible = "divider-clock";
-	clocks = <&l4_ick>;
-	bit-shift = <4>;
-	reg = <0x48004a40 0x4>;
-	bit-mask = <0x3>;
-	index-starts-at-one;
-};
-
 usb_l4_ick: usb_l4_ick@48004a10 {
 	#clock-cells = <0>;
-	compatible = "gate-clock";
-	clocks = <&usb_l4_div_ick>;
-	bit-shift = <5>;
-	reg = <0x48004a10 0x4>;
+	compatible = "ti,interface-mux-gate-clock";
+	clocks = <&l4_ick>;
+	ti,div-bit-mask = <0x3>;
+	reg-names = "gate-reg", "div-reg";
+	reg = <0x48004a10 0x4>, <0x48004a40 0x4>;
+	ti,gate-bit-shift = <5>;
+	ti,div-bit-shift = <4>;
+	ti,div-index-starts-at-one;
 };
 
 dss1_alwon_fck_3430es1: dss1_alwon_fck_3430es1@48004e00 {
