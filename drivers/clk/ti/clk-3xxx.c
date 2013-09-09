@@ -308,6 +308,12 @@ static struct omap_dt_clk am35xx_clks[] = {
 	{ .node_name = NULL },
 };
 
+static struct omap_dt_clk omap36xx_clks[] = {
+	DT_CLK(NULL, "omap_192m_alwon_fck", "omap_192m_alwon_fck"),
+	DT_CLK(NULL, "uart4_fck", "uart4_fck"),
+	{ .node_name = NULL },
+};
+
 static const char *enable_init_clks[] = {
 	"sdrc_ick",
 	"gpmc_fck",
@@ -349,6 +355,9 @@ static int __init omap3xxx_clk_init(int soc_type)
 	    soc_type == OMAP3_SOC_OMAP3430_ES2_PLUS ||
 	    soc_type == OMAP3_SOC_OMAP3630)
 		omap_dt_clocks_register(omap34xx_omap36xx_clks);
+
+	if (soc_type == OMAP3_SOC_OMAP3630)
+		omap_dt_clocks_register(omap36xx_clks);
 
 	omap2_clk_disable_autoidle_all();
 
