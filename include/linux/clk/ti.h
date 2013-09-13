@@ -182,6 +182,8 @@ int omap3_dpll4_set_rate(struct clk_hw *clk, unsigned long rate,
 void ti_dt_clocks_register(struct ti_dt_clk *oclks);
 void of_ti_autoidle_setup(struct device_node *node);
 
+struct clk_div_table *ti_clk_get_div_table(struct device_node *node);
+
 #ifdef CONFIG_OF
 void of_ti_clk_allow_autoidle_all(void);
 void of_ti_clk_deny_autoidle_all(void);
