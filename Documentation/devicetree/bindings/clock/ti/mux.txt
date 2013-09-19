@@ -26,10 +26,10 @@ register value		selected clock parent
 2			bar_clock
 3			baz_clock
 
-The binding must provide the register to control the mux and the mask
-for the corresponding control bits.  Optionally the number of bits to
-shift that mask if necessary.  If the shift value is missing it is the
-same as supplying a zero shift.
+The binding must provide the register to control the mux. Optionally
+the number of bits to shift the control field in the register can be
+supplied. If the shift value is missing it is the same as supplying
+a zero shift.
 
 [1] Documentation/devicetree/bindings/clock/clock-bindings.txt
 
@@ -38,11 +38,10 @@ Required properties:
 - #clock-cells : from common clock binding; shall be set to 0.
 - clocks : link phandles of parent clocks
 - reg : base address for register controlling adjustable mux
-- ti,bit-mask : arbitrary bitmask for programming the adjustable mux
 
 Optional properties:
 - ti,bit-shift : number of bits to shift the bit-mask, defaults to
-  (ffs(mask) - 1) if not present
+  0 if not present
 - ti,index-starts-at-one : valid input select programming starts at 1, not
   zero
 - ti,set-rate-parent : clk_set_rate is propagated to parent clock
@@ -54,7 +53,6 @@ sys_clkin_ck: sys_clkin_ck@4a306110 {
 	compatible = "ti,mux-clock";
 	clocks = <&virt_12000000_ck>, <&virt_13000000_ck>, <&virt_16800000_ck>, <&virt_19200000_ck>, <&virt_26000000_ck>, <&virt_27000000_ck>, <&virt_38400000_ck>;
 	reg = <0x4a306110 0x4>;
-	ti,bit-mask = <0x7>;
 	ti,index-starts-at-one;
 };
 
@@ -64,5 +62,4 @@ abe_dpll_bypass_clk_mux_ck: abe_dpll_bypass_clk_mux_ck@4a306108 {
 	clocks = <&sys_clkin_ck>, <&sys_32k_ck>;
 	ti,bit-shift = <24>;
 	reg = <0x4a306108 0x4>;
-	ti,bit-mask = <0x1>;
 };

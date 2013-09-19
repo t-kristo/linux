@@ -37,6 +37,7 @@ static void of_mux_clk_setup(struct device_node *node)
 	u32 mask = 0;
 	u32 shift = 0;
 	u32 flags = 0;
+	u32 tmp;
 
 	num_parents = of_clk_get_parent_count(node);
 	if (num_parents < 1) {
@@ -55,7 +56,7 @@ static void of_mux_clk_setup(struct device_node *node)
 		return;
 	}
 
-	if (of_property_read_u32(node, "ti,bit-mask", &mask)) {
+	if (of_property_read_u32(node, "ti,bit-mask", &tmp)) {
 		pr_err("%s: missing bit-mask property for %s\n", __func__, node->name);
 		return;
 	}
@@ -71,6 +72,19 @@ static void of_mux_clk_setup(struct device_node *node)
 
 	if (of_property_read_bool(node, "ti,set-rate-parent"))
 		flags |= CLK_SET_RATE_PARENT;
+
+	/* Generate bit-mask based on parent info */
+#if 1
+	mask = num_parents;
+	if (!(clk_mux_flags & CLK_MUX_INDEX_ONE))
+		mask--;
+
+	mask = (1 << fls(mask)) - 1;
+#endif
+
+	if (tmp != mask)
+		pr_info("WARN: %s: %s: expected mask %x but had %x\n",
+			__func__, clk_name, mask, tmp);
 
 	clk = clk_register_mux_table(NULL, clk_name, parent_names, num_parents,
 				     flags, reg, shift, mask, clk_mux_flags,
