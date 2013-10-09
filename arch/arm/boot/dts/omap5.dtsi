@@ -604,7 +604,7 @@
 			ti,hwmods = "wd_timer2";
 		};
 
-		emif1: emif@0x4c000000 {
+		emif1: emif@4c000000 {
 			compatible	= "ti,emif-4d5";
 			ti,hwmods	= "emif1";
 			phy-type	= <2>; /* DDR PHY type: Intelli PHY */
@@ -615,7 +615,7 @@
 			hw-caps-temp-alert;
 		};
 
-		emif2: emif@0x4d000000 {
+		emif2: emif@4d000000 {
 			compatible	= "ti,emif-4d5";
 			ti,hwmods	= "emif2";
 			phy-type	= <2>; /* DDR PHY type: Intelli PHY */
@@ -634,7 +634,7 @@
 			ti,type = <2>;
 		};
 
-		omap_dwc3@4a020000 {
+		usb3: omap_dwc3@4a020000 {
 			compatible = "ti,dwc3";
 			ti,hwmods = "usb_otg_ss";
 			reg = <0x4a020000 0x10000>;
@@ -712,6 +712,20 @@
 			       0x4a0023C0 0x3c>;
 			interrupts = <GIC_SPI 126 IRQ_TYPE_LEVEL_HIGH>;
 			compatible = "ti,omap5430-bandgap";
+		};
+	};
+
+	clocks {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		/include/ "omap54xx-clocks.dtsi"
+	};
+
+	clockdomains {
+		l3init_clkdm: l3init_clkdm {
+			compatible = "ti,clockdomain";
+			clocks = <&dpll_usb_ck>;
 		};
 	};
 };
