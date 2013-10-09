@@ -1,0 +1,100 @@
+Binding for TI mux-gate clock.
+
+Binding status: Unstable - ABI compatibility may be broken in the future
+
+This binding uses the common clock binding[1]. It assumes a
+register-mapped composite clock with multiple different sub-types;
+
+a multiplexer clock with multiple input clock signals or parents, one
+of which can be selected as output, this behaves exactly as [2]
+
+an adjustable clock rate divider, this behaves exactly as [3]
+
+a gating function which can be used to enable and disable the output
+clock, this behaves exactly as [4]
+
+The binding must provide the register mapping to control the mux-gate.
+"reg-names" property is used to specify which sub-function are used
+for this composite clock, and to specify the corresponding control
+register addresses. Optional parameters are specified according to
+the sub-types used.
+
+[1] Documentation/devicetree/bindings/clock/clock-bindings.txt
+[2] Documentation/devicetree/bindings/clock/ti/mux.txt
+[3] Documentation/devicetree/bindings/clock/ti/divider.txt
+[4] Documentation/devicetree/bindings/clock/ti/gate.txt
+
+Required properties:
+- compatible : shall be one of:
+  "ti,mux-gate-clock" : mux-gate clock which waits until clock is active
+			before returning from clk_enable()
+  "ti,no-wait-mux-gate-clock" : mux-gate clock which does not wait for
+				clock activity
+  "ti,interface-mux-gate-clock" : mux-gate interface clock which waits until
+				  clock is active before returning from
+				  clk_enable()
+- #clock-cells : from common clock binding; shall be set to 0.
+- clocks : link phandles of parent clocks
+- reg : base address array for registers controlling the mux-gate
+  sub-functions. Ordered according to "reg-names" property.
+- reg-names : register names property, can have following values:
+	"gate-reg" : base address for gate function control register
+	"mux-reg" : base address for mux function control register
+	"div-reg" : base address for divider function control register
+  Any of these values can be left out, and the corresponding function
+  will not be present in the composite clock either.
+
+Optional properties:
+- ti,gate-bit-shift : number of bits to shift the enable bit for gating
+  function, defaults to 0 if not present
+- ti,mux-bit-shift : number of bits to shift the bit-field for mux
+  function, defaults to 0 if not present
+- ti,div-index-starts-at-one : min-div is mapped to bit-value 1, default 0
+- ti,max-div : maximum divider value for the divider function
+- ti,min-div : minimum divider value for the divider function, defaults to
+  1 if not present
+- ti,dividers : array of valid divider values for the clock
+
+Examples:
+
+dpll_core_m3x2_ck: dpll_core_m3x2_ck@4a004134 {
+	#clock-cells = <0>;
+	compatible = "ti,no-wait-mux-gate-clock";
+	clocks = <&dpll_core_x2_ck>;
+	ti,max-div = <31>;
+	reg-names = "gate-reg", "div-reg";
+	reg = <0x4a004134 0x4>, <0x4a004134 0x4>;
+	ti,gate-bit-shift = <8>;
+	ti,div-index-starts-at-one;
+};
+
+auxclk2_src_ck: auxclk2_src_ck@4a30a318 {
+	#clock-cells = <0>;
+	compatible = "ti,no-wait-mux-gate-clock";
+	clocks = <&sys_clkin_ck>, <&dpll_core_m3x2_ck>, <&dpll_per_m3x2_ck>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x4a30a318 0x4>, <0x4a30a318 0x4>;
+	ti,gate-bit-shift = <8>;
+	ti,mux-bit-shift = <1>;
+};
+
+gpt10_fck: gpt10_fck@48004a00 {
+	#clock-cells = <0>;
+	compatible = "ti,mux-gate-clock";
+	clocks = <&omap_32k_fck>, <&sys_ck>;
+	reg-names = "gate-reg", "mux-reg";
+	reg = <0x48004a00 0x4>, <0x48004a40 0x4>;
+	ti,gate-bit-shift = <11>;
+	ti,mux-bit-shift = <6>;
+};
+
+ssi_ssr_fck_3430es1: ssi_ssr_fck_3430es1@48004a00 {
+	#clock-cells = <0>;
+	compatible = "ti,no-wait-mux-gate-clock";
+	clocks = <&corex2_fck>;
+	ti,div-bit-shift = <8>;
+	ti,dividers = <0>, <1>, <2>, <3>, <4>, <0>, <6>, <0>, <8>;
+	reg-names = "gate-reg", "div-reg";
+	reg = <0x48004a00 0x4>, <0x48004a40 0x4>;
+	ti,gate-bit-shift = <0>;
+};
