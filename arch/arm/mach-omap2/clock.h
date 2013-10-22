@@ -286,6 +286,8 @@ struct dpll_data {
  * @dpll_data: for DPLLs, pointer to struct dpll_data for this clock
  * @clkdm_name: clockdomain name that this clock is contained in
  * @clkdm: pointer to struct clockdomain, resolved from @clkdm_name at runtime
+ * @ops: clock ops for the OMAP clock
+ * @reg_ops: register ops for the OMAP clock
  * @rate_offset: bitshift for rate selection bitfield (OMAP1 only)
  * @src_offset: bitshift for source selection bitfield (OMAP1 only)
  *
@@ -311,6 +313,7 @@ struct clk_hw_omap {
 	const char		*clkdm_name;
 	struct clockdomain	*clkdm;
 	const struct clk_hw_omap_ops	*ops;
+	const struct clk_reg_ops	*reg_ops;
 };
 
 struct clk_hw_omap_ops {
@@ -416,6 +419,9 @@ int omap2_clk_switch_mpurate_at_boot(const char *mpurate_ck_name);
 void omap2_clk_print_new_rates(const char *hfclkin_ck_name,
 			       const char *core_ck_name,
 			       const char *mpu_ck_name);
+
+u32 omap2_clk_readl(struct clk_hw_omap *clk, void __iomem *reg);
+void omap2_clk_writel(u32 val, struct clk_hw_omap *clk, void __iomem *reg);
 
 extern u16 cpu_mask;
 

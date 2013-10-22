@@ -57,6 +57,26 @@ static bool clkdm_control = true;
 
 static LIST_HEAD(clk_hw_omap_clocks);
 
+void omap2_clk_writel(u32 val, struct clk_hw_omap *clk, void __iomem *reg)
+{
+	if (clk->reg_ops)
+		clk->reg_ops->clk_writel(val, (u32)reg);
+	else
+		__raw_writel(val, reg);
+}
+
+u32 omap2_clk_readl(struct clk_hw_omap *clk, void __iomem *reg)
+{
+	u32 val;
+
+	if (clk->reg_ops)
+		val = clk->reg_ops->clk_readl((u32)reg);
+	else
+		val = __raw_readl(reg);
+
+	return val;
+}
+
 /*
  * Used for clocks that have the same value as the parent clock,
  * divided by some factor
