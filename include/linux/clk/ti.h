@@ -36,7 +36,21 @@ struct ti_dt_clk {
 		.node_name = name,	\
 	}
 
+/* Maximum number of clock regmaps */
+#define CLK_MAX_REGMAPS			4
 
+/**
+ * struct clk_omap_reg - OMAP register declaration
+ * @offset: offset from the master IP module base address
+ * @index: index of the master IP module
+ */
+struct clk_omap_reg {
+	u16 offset;
+	u16 index;
+};
+
+void *ti_clk_get_reg_addr(struct device_node *node, int index);
 void ti_dt_clocks_register(struct ti_dt_clk *oclks);
+void ti_dt_clk_init_provider(struct device_node *np, int index);
 
 #endif
