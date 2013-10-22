@@ -23,6 +23,10 @@
 #include <linux/irq.h>
 #include <linux/interrupt.h>
 #include <linux/slab.h>
+#include <linux/of.h>
+#include <linux/of_address.h>
+#include <linux/clk-provider.h>
+#include <linux/clk/ti.h>
 
 #include "prm2xxx_3xxx.h"
 #include "prm2xxx.h"
@@ -450,6 +454,128 @@ int prm_unregister(struct prm_ll_data *pld)
 		return -EINVAL;
 
 	prm_ll_data = &null_prm_ll_data;
+
+	return 0;
+}
+
+struct ti_clk_provider {
+	struct clk_reg_ops ops;
+	void __iomem *mem;
+};
+
+static struct ti_clk_provider ti_prcm_clk_provider;
+static struct ti_clk_provider ti_prm_clk_provider;
+static struct ti_clk_provider ti_cm1_clk_provider;
+static struct ti_clk_provider ti_cm2_clk_provider;
+static struct ti_clk_provider ti_scrm_clk_provider;
+
+static void prcm_clk_writel(u32 val, u16 offset)
+{
+	__raw_writel(val, ti_prcm_clk_provider.mem + offset);
+}
+
+static u32 prcm_clk_readl(u16 offset)
+{
+	return __raw_readl(ti_prcm_clk_provider.mem + offset);
+}
+
+static void prm_clk_writel(u32 val, u16 offset)
+{
+	__raw_writel(val, ti_prm_clk_provider.mem + offset);
+}
+
+static u32 prm_clk_readl(u16 offset)
+{
+	return __raw_readl(ti_prm_clk_provider.mem + offset);
+}
+
+static void cm1_clk_writel(u32 val, u16 offset)
+{
+	__raw_writel(val, ti_cm1_clk_provider.mem + offset);
+}
+
+static u32 cm1_clk_readl(u16 offset)
+{
+	return __raw_readl(ti_cm1_clk_provider.mem + offset);
+}
+
+static void cm2_clk_writel(u32 val, u16 offset)
+{
+	__raw_writel(val, ti_cm2_clk_provider.mem + offset);
+}
+
+static u32 cm2_clk_readl(u16 offset)
+{
+	return __raw_readl(ti_cm2_clk_provider.mem + offset);
+}
+
+static void scrm_clk_writel(u32 val, u16 offset)
+{
+	__raw_writel(val, ti_scrm_clk_provider.mem + offset);
+}
+
+static u32 scrm_clk_readl(u16 offset)
+{
+	return __raw_readl(ti_scrm_clk_provider.mem + offset);
+}
+
+static struct ti_clk_provider ti_prcm_clk_provider = {
+	.ops = {
+		.clk_writel = prcm_clk_writel,
+		.clk_readl = prcm_clk_readl,
+	},
+};
+
+static struct ti_clk_provider ti_prm_clk_provider = {
+	.ops = {
+		.clk_writel = prm_clk_writel,
+		.clk_readl = prm_clk_readl,
+	},
+};
+
+static struct ti_clk_provider ti_cm1_clk_provider = {
+	.ops = {
+		.clk_writel = cm1_clk_writel,
+		.clk_readl = cm1_clk_readl,
+	},
+};
+
+static struct ti_clk_provider ti_cm2_clk_provider = {
+	.ops = {
+		.clk_writel = cm2_clk_writel,
+		.clk_readl = cm2_clk_readl,
+	},
+};
+
+static struct ti_clk_provider ti_scrm_clk_provider = {
+	.ops = {
+		.clk_writel = scrm_clk_writel,
+		.clk_readl = scrm_clk_readl,
+	},
+};
+
+static struct of_device_id omap_prcm_dt_match_table[] __initdata = {
+	{ .compatible = "ti,prcm", .data = &ti_prcm_clk_provider },
+	{ .compatible = "ti,prm", .data = &ti_prm_clk_provider },
+	{ .compatible = "ti,cm", .data = &ti_cm1_clk_provider },
+	{ .compatible = "ti,cm2", .data = &ti_cm2_clk_provider },
+	{ .compatible = "ti,scrm", .data = &ti_scrm_clk_provider },
+	{ }
+};
+
+int __init of_prcm_init(void)
+{
+	struct device_node *np;
+	struct ti_clk_provider *module;
+	const struct of_device_id *match;
+
+	for_each_matching_node_and_match(np, omap_prcm_dt_match_table, &match) {
+		module = (struct ti_clk_provider*)match->data;
+		module->mem = of_iomap(np, 0);
+		ti_dt_clk_init_provider(np, &module->ops);
+	}
+
+	ti_dt_clockdomains_setup();
 
 	return 0;
 }
