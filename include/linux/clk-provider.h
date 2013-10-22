@@ -356,6 +356,8 @@ struct clk *clk_register_divider_table_reg_ops(struct device *dev,
  *   register, and mask of mux bits are in higher 16-bit of this register.
  *   While setting the mux bits, higher 16-bit should also be updated to
  *   indicate changing mux bits.
+ * CLK_MUX_REG_OPS - Mux uses register ops wrapper for reading/writing the
+ *   control register, instead of direct memory access.
  */
 struct clk_mux {
 	struct clk_hw	hw;
@@ -371,6 +373,7 @@ struct clk_mux {
 #define CLK_MUX_INDEX_BIT		BIT(1)
 #define CLK_MUX_HIWORD_MASK		BIT(2)
 #define CLK_MUX_READ_ONLY	BIT(3) /* mux setting cannot be changed */
+#define CLK_MUX_REG_OPS			BIT(4)
 
 extern const struct clk_ops clk_mux_ops;
 extern const struct clk_ops clk_mux_ro_ops;
@@ -384,6 +387,13 @@ struct clk *clk_register_mux_table(struct device *dev, const char *name,
 		const char **parent_names, u8 num_parents, unsigned long flags,
 		void __iomem *reg, u8 shift, u32 mask,
 		u8 clk_mux_flags, u32 *table, spinlock_t *lock);
+
+struct clk *clk_register_mux_table_reg_ops(struct device *dev, const char *name,
+                const char **parent_names, u8 num_parents, unsigned long flags,
+                void __iomem *reg, u8 shift, u32 mask,
+                u8 clk_mux_flags, u32 *table, spinlock_t *lock,
+		struct clk_reg_ops *reg_ops);
+
 
 void of_fixed_factor_clk_setup(struct device_node *node);
 
