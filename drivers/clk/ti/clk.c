@@ -19,9 +19,12 @@
 #include <linux/clkdev.h>
 #include <linux/clk/ti.h>
 #include <linux/of.h>
+#include <linux/list.h>
 
 #undef pr_fmt
 #define pr_fmt(fmt) "%s: " fmt, __func__
+
+extern struct of_device_id __clk_of_table[];
 
 /**
  * ti_dt_clocks_register - register DT alias clocks during boot
@@ -50,6 +53,71 @@ void __init ti_dt_clocks_register(struct ti_dt_clk oclks[])
 		} else {
 			pr_warn("failed to lookup clock node %s\n",
 				c->node_name);
+		}
+	}
+}
+
+typedef int (*ti_of_clk_init_cb_t)(struct device_node *, struct regmap *);
+
+struct clk_init_item {
+	struct regmap *regmap;
+	struct device_node *np;
+	ti_of_clk_init_cb_t init_cb;
+	struct list_head node;
+};
+
+static LIST_HEAD(retry_list);
+
+/**
+ * ti_dt_clk_init_provider - init master clock provider
+ * @parent: master node
+ * @regmap: regmap for the IP block
+ *
+ * Initializes a master clock IP block and its child clock nodes.
+ * Regmap is provided for accessing the register space for the
+ * IP block and all the clocks under it.
+ */
+void __init ti_dt_clk_init_provider(struct device_node *parent,
+				    struct regmap *regmap)
+{
+	const struct of_device_id *match;
+	struct device_node *np;
+	ti_of_clk_init_cb_t clk_init_cb;
+	struct clk_init_item *retry;
+	struct clk_init_item *tmp;
+	int ret;
+
+	for_each_child_of_node(parent, np) {
+		match = of_match_node(__clk_of_table, np);
+		if (!match)
+			continue;
+		clk_init_cb = match->data;
+		pr_debug("%s: initializing: %s\n", __func__, np->name);
+		ret = clk_init_cb(np, regmap);
+		if (ret == -EAGAIN) {
+			pr_debug("%s: adding to again list...\n", np->name);
+			retry = kzalloc(sizeof(*retry), GFP_KERNEL);
+			retry->np = np;
+			retry->regmap = regmap;
+			retry->init_cb = clk_init_cb;
+			list_add(&retry->node, &retry_list);
+		} else if (ret) {
+			pr_err("%s: clock init failed for %s (%d)!\n", __func__,
+			       np->name, ret);
+		}
+	}
+
+	list_for_each_entry_safe(retry, tmp, &retry_list, node) {
+		pr_debug("%s: retry-init: %s\n", __func__, retry->np->name);
+		ret = retry->init_cb(retry->np, retry->regmap);
+		if (ret == -EAGAIN) {
+			pr_debug("%s failed again?\n", retry->np->name);
+		} else {
+			if (ret)
+				pr_err("%s: clock init failed for %s (%d)!\n",
+				       __func__, retry->np->name, ret);
+			list_del(&retry->node);
+			kfree(retry);
 		}
 	}
 }
