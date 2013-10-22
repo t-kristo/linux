@@ -19,6 +19,9 @@
 #include <linux/clkdev.h>
 #include <linux/clk/ti.h>
 #include <linux/of.h>
+#include <linux/list.h>
+
+extern struct of_device_id __clk_of_table[];
 
 /**
  * ti_dt_clocks_register - register DT duplicate clocks during boot
@@ -47,6 +50,63 @@ void __init ti_dt_clocks_register(struct ti_dt_clk oclks[])
 		} else {
 			pr_warn("%s: failed to lookup clock node %s\n",
 				__func__, c->node_name);
+		}
+	}
+}
+
+typedef int (*ti_of_clk_init_cb_t)(struct device_node *,
+				   struct clk_reg_ops *);
+
+struct clk_init_item {
+	struct clk_reg_ops *ops;
+	struct device_node *np;
+	ti_of_clk_init_cb_t init_cb;
+	struct list_head node;
+};
+
+static LIST_HEAD(retry_list);
+
+void __init ti_dt_clk_init_provider(struct device_node *parent,
+				    struct clk_reg_ops *ops)
+{
+	const struct of_device_id *match;
+	struct device_node *np;
+	ti_of_clk_init_cb_t clk_init_cb;
+	struct clk_init_item *retry;
+	struct clk_init_item *tmp;
+	int ret;
+
+	for_each_child_of_node(parent, np) {
+		match = of_match_node(__clk_of_table, np);
+		if (!match)
+			continue;
+		clk_init_cb = match->data;
+		pr_debug("%s: initializing: %s\n", __func__, np->name);
+		ret = clk_init_cb(np, ops);
+		if (ret == -EAGAIN) {
+			pr_debug("%s: adding to again list...\n", np->name);
+			retry = kzalloc(sizeof(*retry), GFP_KERNEL);
+			retry->np = np;
+			retry->ops = ops;
+			retry->init_cb = clk_init_cb;
+			list_add(&retry->node, &retry_list);
+		} else if (ret) {
+			pr_err("%s: clock init failed for %s (%d)!\n", __func__,
+			       np->name, ret);
+		}
+	}
+
+	list_for_each_entry_safe(retry, tmp, &retry_list, node) {
+		pr_debug("%s: retry-init: %s\n", __func__, retry->np->name);
+		ret = retry->init_cb(retry->np, retry->ops);
+		if (ret == -EAGAIN) {
+			pr_debug("%s failed again?\n", retry->np->name);
+		} else {
+			if (ret)
+				pr_err("%s: clock init failed for %s (%d)!\n",
+				       __func__, retry->np->name, ret);
+			list_del(&retry->node);
+			kfree(retry);
 		}
 	}
 }
