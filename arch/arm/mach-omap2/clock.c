@@ -25,7 +25,7 @@
 #include <linux/bitops.h>
 #include <linux/clk-private.h>
 #include <asm/cpu.h>
-
+#include <linux/regmap.h>
 
 #include <trace/events/power.h>
 
@@ -56,6 +56,31 @@ u16 cpu_mask;
 static bool clkdm_control = true;
 
 static LIST_HEAD(clk_hw_omap_clocks);
+struct regmap *clk_regmaps[CLK_MAX_REGMAPS];
+
+void omap2_clk_writel(u32 val, struct clk_hw_omap *clk, void __iomem *reg)
+{
+	if (clk->flags & REGMAP_ADDRESSING) {
+		struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
+		regmap_write(clk_regmaps[r->index], r->offset, val);
+	} else {
+		__raw_writel(val, reg);
+	}
+}
+
+u32 omap2_clk_readl(struct clk_hw_omap *clk, void __iomem *reg)
+{
+	u32 val;
+
+	if (clk->flags & REGMAP_ADDRESSING) {
+		struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
+		regmap_read(clk_regmaps[r->index], r->offset, &val);
+	} else {
+		val = __raw_readl(reg);
+	}
+
+	return val;
+}
 
 /*
  * Used for clocks that have the same value as the parent clock,
