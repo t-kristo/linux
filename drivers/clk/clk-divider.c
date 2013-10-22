@@ -32,6 +32,30 @@
 
 #define div_mask(d)	((1 << ((d)->width)) - 1)
 
+static inline void _divider_writel(u32 val, struct clk_divider *divider)
+{
+	if (divider->flags & CLK_DIVIDER_REG_OPS) {
+		struct clk_reg_def *reg = divider->reg;
+		reg->ops->clk_writel(val, reg->offset);
+	} else {
+		clk_writel(val, divider->reg);
+	}
+}
+
+static inline u32 _divider_readl(struct clk_divider *divider)
+{
+	u32 val;
+
+	if (divider->flags & CLK_DIVIDER_REG_OPS) {
+		struct clk_reg_def *reg = divider->reg;
+		val = reg->ops->clk_readl(reg->offset);
+	} else {
+		val = clk_readl(divider->reg);
+	}
+
+	return val;
+}
+
 static unsigned int _get_table_maxdiv(const struct clk_div_table *table)
 {
 	unsigned int maxdiv = 0;
@@ -104,7 +128,8 @@ static unsigned long clk_divider_recalc_rate(struct clk_hw *hw,
 	struct clk_divider *divider = to_clk_divider(hw);
 	unsigned int div, val;
 
-	val = clk_readl(divider->reg) >> divider->shift;
+	val = _divider_readl(divider);
+	val >>= divider->shift;
 	val &= div_mask(divider);
 
 	div = _get_div(divider, val);
@@ -230,11 +255,11 @@ static int clk_divider_set_rate(struct clk_hw *hw, unsigned long rate,
 	if (divider->flags & CLK_DIVIDER_HIWORD_MASK) {
 		val = div_mask(divider) << (divider->shift + 16);
 	} else {
-		val = clk_readl(divider->reg);
+		val = _divider_readl(divider);
 		val &= ~(div_mask(divider) << divider->shift);
 	}
 	val |= value << divider->shift;
-	clk_writel(val, divider->reg);
+	_divider_writel(val, divider);
 
 	if (divider->lock)
 		spin_unlock_irqrestore(divider->lock, flags);
@@ -253,7 +278,7 @@ static struct clk *_register_divider(struct device *dev, const char *name,
 		const char *parent_name, unsigned long flags,
 		void __iomem *reg, u8 shift, u8 width,
 		u8 clk_divider_flags, const struct clk_div_table *table,
-		spinlock_t *lock)
+		spinlock_t *lock, struct clk_reg_ops *ops)
 {
 	struct clk_divider *div;
 	struct clk *clk;
@@ -280,7 +305,16 @@ static struct clk *_register_divider(struct device *dev, const char *name,
 	init.num_parents = (parent_name ? 1 : 0);
 
 	/* struct clk_divider assignments */
-	div->reg = reg;
+	if (ops) {
+		struct clk_reg_def *reg_def;
+		reg_def = kzalloc(sizeof(*reg_def), GFP_KERNEL);
+		reg_def->offset = (u32)reg;
+		reg_def->ops = ops;
+		div->reg = reg_def;
+		clk_divider_flags |= CLK_DIVIDER_REG_OPS;
+	} else {
+		div->reg = reg;
+	}
 	div->shift = shift;
 	div->width = width;
 	div->flags = clk_divider_flags;
@@ -315,7 +349,7 @@ struct clk *clk_register_divider(struct device *dev, const char *name,
 		u8 clk_divider_flags, spinlock_t *lock)
 {
 	return _register_divider(dev, name, parent_name, flags, reg, shift,
-			width, clk_divider_flags, NULL, lock);
+			width, clk_divider_flags, NULL, lock, NULL);
 }
 EXPORT_SYMBOL_GPL(clk_register_divider);
 
@@ -340,6 +374,16 @@ struct clk *clk_register_divider_table(struct device *dev, const char *name,
 		spinlock_t *lock)
 {
 	return _register_divider(dev, name, parent_name, flags, reg, shift,
-			width, clk_divider_flags, table, lock);
+			width, clk_divider_flags, table, lock, NULL);
 }
 EXPORT_SYMBOL_GPL(clk_register_divider_table);
+
+struct clk *clk_register_divider_table_reg_ops(struct device *dev,
+		const char *name, const char *parent_name, unsigned long flags,
+		void __iomem *reg, u8 shift, u8 width,
+		u8 clk_divider_flags, const struct clk_div_table *table,
+		spinlock_t *lock, struct clk_reg_ops *ops)
+{
+	return _register_divider(dev, name, parent_name, flags, reg, shift,
+			width, clk_divider_flags, table, lock, ops);
+}

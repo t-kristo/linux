@@ -143,6 +143,31 @@ struct clk_ops {
 };
 
 /**
+ * struct clk_reg_ops - operations for reading/writing hardware clock
+ * registers. This allows some exotic hardware registers to be accessed
+ * via common clock framework, like clock registers residing behind I2C
+ * or other drivers.
+ *
+ * @readl: read a clock register at specified offset
+ * @writel: write a clock register at specified offset
+ */
+struct clk_reg_ops {
+	u32		(*clk_readl)(u16 offset);
+	void		(*clk_writel)(u32 val, u16 offset);
+};
+
+/**
+ * struct clk_reg_def - clock register definition using clk_reg_ops.
+ *
+ * @ops: ops for accessing the register
+ * @offset: offset value to provide for the register ops
+ */
+struct clk_reg_def {
+	struct clk_reg_ops	*ops;
+	u32			offset;
+};
+
+/**
  * struct clk_init_data - holds init data that's common to all clocks and is
  * shared between the clock provider and the common clock framework.
  *
@@ -251,6 +276,7 @@ struct clk_div_table {
  *
  * @hw:		handle between common and hardware-specific interfaces
  * @reg:	register containing the divider
+ * @ops:	register access ops (if any)
  * @shift:	shift to the divider bit field
  * @width:	width of the divider bit field
  * @table:	array of value/divider pairs, last entry should have div = 0
@@ -275,6 +301,8 @@ struct clk_div_table {
  *   of this register, and mask of divider bits are in higher 16-bit of this
  *   register.  While setting the divider bits, higher 16-bit should also be
  *   updated to indicate changing divider bits.
+ * CLK_DIVIDER_REG_OPS - The divider uses register ops for accessing the
+ *      clock register, instead of direct memory read/write.
  */
 struct clk_divider {
 	struct clk_hw	hw;
@@ -290,6 +318,7 @@ struct clk_divider {
 #define CLK_DIVIDER_POWER_OF_TWO	BIT(1)
 #define CLK_DIVIDER_ALLOW_ZERO		BIT(2)
 #define CLK_DIVIDER_HIWORD_MASK		BIT(3)
+#define CLK_DIVIDER_REG_OPS		BIT(4)
 
 extern const struct clk_ops clk_divider_ops;
 struct clk *clk_register_divider(struct device *dev, const char *name,
@@ -301,6 +330,11 @@ struct clk *clk_register_divider_table(struct device *dev, const char *name,
 		void __iomem *reg, u8 shift, u8 width,
 		u8 clk_divider_flags, const struct clk_div_table *table,
 		spinlock_t *lock);
+struct clk *clk_register_divider_table_reg_ops(struct device *dev,
+		const char *name, const char *parent_name, unsigned long flags,
+		void __iomem *reg, u8 shift, u8 width,
+		u8 clk_divider_flags, const struct clk_div_table *table,
+		spinlock_t *lock, struct clk_reg_ops *ops);
 
 /**
  * struct clk_mux - multiplexer clock
