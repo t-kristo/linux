@@ -251,7 +251,7 @@ EXPORT_SYMBOL_GPL(clk_divider_ops);
 
 static struct clk *_register_divider(struct device *dev, const char *name,
 		const char *parent_name, unsigned long flags,
-		void __iomem *reg, u8 shift, u8 width,
+		void __iomem *reg, struct regmap *regmap, u8 shift, u8 width,
 		u8 clk_divider_flags, const struct clk_div_table *table,
 		spinlock_t *lock)
 {
@@ -281,6 +281,7 @@ static struct clk *_register_divider(struct device *dev, const char *name,
 
 	/* struct clk_divider assignments */
 	div->reg = reg;
+	div->regmap = regmap;
 	div->shift = shift;
 	div->width = width;
 	div->flags = clk_divider_flags;
@@ -314,8 +315,8 @@ struct clk *clk_register_divider(struct device *dev, const char *name,
 		void __iomem *reg, u8 shift, u8 width,
 		u8 clk_divider_flags, spinlock_t *lock)
 {
-	return _register_divider(dev, name, parent_name, flags, reg, shift,
-			width, clk_divider_flags, NULL, lock);
+	return _register_divider(dev, name, parent_name, flags, reg, NULL,
+			shift, width, clk_divider_flags, NULL, lock);
 }
 EXPORT_SYMBOL_GPL(clk_register_divider);
 
@@ -339,7 +340,33 @@ struct clk *clk_register_divider_table(struct device *dev, const char *name,
 		u8 clk_divider_flags, const struct clk_div_table *table,
 		spinlock_t *lock)
 {
-	return _register_divider(dev, name, parent_name, flags, reg, shift,
-			width, clk_divider_flags, table, lock);
+	return _register_divider(dev, name, parent_name, flags, reg, NULL,
+			shift, width, clk_divider_flags, table, lock);
 }
 EXPORT_SYMBOL_GPL(clk_register_divider_table);
+
+/**
+ * clk_register_divider_table_regmap - register a table based divider clock
+ * with the clock framework
+ * @dev: device registering this clock
+ * @name: name of this clock
+ * @parent_name: name of clock's parent
+ * @flags: framework-specific flags
+ * @reg: register address to adjust divider
+ * @regmap: regmap for accessing the divider register (if any)
+ * @shift: number of bits to shift the bitfield
+ * @width: width of the bitfield
+ * @clk_divider_flags: divider-specific flags for this clock
+ * @table: array of divider/value pairs ending with a div set to 0
+ * @lock: shared register lock for this clock
+ */
+struct clk *clk_register_divider_table_regmap(struct device *dev,
+		const char *name, const char *parent_name, unsigned long flags,
+		void __iomem *reg, struct regmap *regmap, u8 shift, u8 width,
+		u8 clk_divider_flags, const struct clk_div_table *table,
+		spinlock_t *lock)
+{
+	return _register_divider(dev, name, parent_name, flags, reg, regmap,
+			shift, width, clk_divider_flags, table, lock);
+}
+EXPORT_SYMBOL_GPL(clk_register_divider_table_regmap);
