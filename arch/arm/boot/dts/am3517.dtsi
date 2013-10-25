@@ -1,5 +1,5 @@
 /*
- * Device Tree Source for OMAP34xx/OMAP35xx SoC
+ * Device Tree Source for AM3517 SoC
  *
  * Copyright (C) 2013 Texas Instruments Incorporated - http://www.ti.com/
  *
@@ -27,6 +27,5 @@
 	};
 };
 
-/include/ "omap34xx-omap36xx-clocks.dtsi"
-/include/ "omap36xx-omap3430es2plus-clocks.dtsi"
+/include/ "am35xx-clocks.dtsi"
 /include/ "omap36xx-am35xx-omap3430es2plus-clocks.dtsi"
