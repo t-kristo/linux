@@ -13,6 +13,7 @@
 
 #include <linux/clk.h>
 #include <linux/io.h>
+#include <linux/regmap.h>
 
 #ifdef CONFIG_COMMON_CLK
 
@@ -209,6 +210,7 @@ void of_fixed_clk_setup(struct device_node *np);
  *
  * @hw:		handle between common and hardware-specific interfaces
  * @reg:	register controlling gate
+ * @regmap:	regmap for accessing the gate register (if any)
  * @bit_idx:	single bit controlling gate
  * @flags:	hardware-specific flags
  * @lock:	register lock
@@ -227,6 +229,7 @@ void of_fixed_clk_setup(struct device_node *np);
 struct clk_gate {
 	struct clk_hw hw;
 	void __iomem	*reg;
+	struct regmap	*regmap;
 	u8		bit_idx;
 	u8		flags;
 	spinlock_t	*lock;
@@ -251,6 +254,7 @@ struct clk_div_table {
  *
  * @hw:		handle between common and hardware-specific interfaces
  * @reg:	register containing the divider
+ * @regmap:	regmap for accessing the divider register (if any)
  * @shift:	shift to the divider bit field
  * @width:	width of the divider bit field
  * @table:	array of value/divider pairs, last entry should have div = 0
@@ -279,6 +283,7 @@ struct clk_div_table {
 struct clk_divider {
 	struct clk_hw	hw;
 	void __iomem	*reg;
+	struct regmap	*regmap;
 	u8		shift;
 	u8		width;
 	u8		flags;
@@ -301,12 +306,18 @@ struct clk *clk_register_divider_table(struct device *dev, const char *name,
 		void __iomem *reg, u8 shift, u8 width,
 		u8 clk_divider_flags, const struct clk_div_table *table,
 		spinlock_t *lock);
+struct clk *clk_register_divider_table_regmap(struct device *dev,
+		const char *name, const char *parent_name, unsigned long flags,
+		void __iomem *reg, struct regmap *regmap, u8 shift, u8 width,
+		u8 clk_divider_flags, const struct clk_div_table *table,
+		spinlock_t *lock);
 
 /**
  * struct clk_mux - multiplexer clock
  *
  * @hw:		handle between common and hardware-specific interfaces
  * @reg:	register controlling multiplexer
+ * @regmap:	regmap for accessing the mux register (if any)
  * @shift:	shift to multiplexer bit field
  * @width:	width of mutliplexer bit field
  * @flags:	hardware-specific flags
@@ -326,6 +337,7 @@ struct clk *clk_register_divider_table(struct device *dev, const char *name,
 struct clk_mux {
 	struct clk_hw	hw;
 	void __iomem	*reg;
+	struct regmap	*regmap;
 	u32		*table;
 	u32		mask;
 	u8		shift;
@@ -349,6 +361,10 @@ struct clk *clk_register_mux(struct device *dev, const char *name,
 struct clk *clk_register_mux_table(struct device *dev, const char *name,
 		const char **parent_names, u8 num_parents, unsigned long flags,
 		void __iomem *reg, u8 shift, u32 mask,
+		u8 clk_mux_flags, u32 *table, spinlock_t *lock);
+struct clk *clk_register_mux_table_regmap(struct device *dev, const char *name,
+		const char **parent_names, u8 num_parents, unsigned long flags,
+		void __iomem *reg, struct regmap *regmap, u8 shift, u32 mask,
 		u8 clk_mux_flags, u32 *table, spinlock_t *lock);
 
 void of_fixed_factor_clk_setup(struct device_node *node);
@@ -512,14 +528,23 @@ static inline const char *of_clk_get_parent_name(struct device_node *np,
  * for improved portability across platforms
  */
 
-static inline u32 clk_readl(u32 __iomem *reg)
+static inline u32 clk_readl(u32 __iomem *reg, struct regmap *regmap)
 {
-	return readl(reg);
+	u32 val;
+
+	if (regmap)
+		regmap_read(regmap, (u32)reg, &val);
+	else
+		val = readl(reg);
+	return val;
 }
 
-static inline void clk_writel(u32 val, u32 __iomem *reg)
+static inline void clk_writel(u32 val, u32 __iomem *reg, struct regmap *regmap)
 {
-	writel(val, reg);
+	if (regmap)
+		regmap_write(regmap, (u32)reg, val);
+	else
+		writel(val, reg);
 }
 
 #endif /* CONFIG_COMMON_CLK */

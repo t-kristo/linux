@@ -42,7 +42,7 @@ static u8 clk_mux_get_parent(struct clk_hw *hw)
 	 * OTOH, pmd_trace_clk_mux_ck uses a separate bit for each clock, so
 	 * val = 0x4 really means "bit 2, index starts at bit 0"
 	 */
-	val = clk_readl(mux->reg) >> mux->shift;
+	val = clk_readl(mux->reg, mux->regmap) >> mux->shift;
 	val &= mux->mask;
 
 	if (mux->table) {
@@ -89,11 +89,11 @@ static int clk_mux_set_parent(struct clk_hw *hw, u8 index)
 	if (mux->flags & CLK_MUX_HIWORD_MASK) {
 		val = mux->mask << (mux->shift + 16);
 	} else {
-		val = clk_readl(mux->reg);
+		val = clk_readl(mux->reg, mux->regmap);
 		val &= ~(mux->mask << mux->shift);
 	}
 	val |= index << mux->shift;
-	clk_writel(val, mux->reg);
+	clk_writel(val, mux->reg, mux->regmap);
 
 	if (mux->lock)
 		spin_unlock_irqrestore(mux->lock, flags);
@@ -113,9 +113,9 @@ const struct clk_ops clk_mux_ro_ops = {
 };
 EXPORT_SYMBOL_GPL(clk_mux_ro_ops);
 
-struct clk *clk_register_mux_table(struct device *dev, const char *name,
+struct clk *clk_register_mux_table_regmap(struct device *dev, const char *name,
 		const char **parent_names, u8 num_parents, unsigned long flags,
-		void __iomem *reg, u8 shift, u32 mask,
+		void __iomem *reg, struct regmap *regmap, u8 shift, u32 mask,
 		u8 clk_mux_flags, u32 *table, spinlock_t *lock)
 {
 	struct clk_mux *mux;
@@ -149,6 +149,7 @@ struct clk *clk_register_mux_table(struct device *dev, const char *name,
 
 	/* struct clk_mux assignments */
 	mux->reg = reg;
+	mux->regmap = regmap;
 	mux->shift = shift;
 	mux->mask = mask;
 	mux->flags = clk_mux_flags;
@@ -162,6 +163,18 @@ struct clk *clk_register_mux_table(struct device *dev, const char *name,
 		kfree(mux);
 
 	return clk;
+}
+EXPORT_SYMBOL_GPL(clk_register_mux_table_regmap);
+
+struct clk *clk_register_mux_table(struct device *dev, const char *name,
+		const char **parent_names, u8 num_parents, unsigned long flags,
+		void __iomem *reg, u8 shift, u32 mask,
+		u8 clk_mux_flags, u32 *table, spinlock_t *lock)
+{
+	return clk_register_mux_table_regmap(dev, name, parent_names,
+					     num_parents, flags, reg, NULL,
+					     shift, mask, clk_mux_flags, table,
+					     lock);
 }
 EXPORT_SYMBOL_GPL(clk_register_mux_table);
 
