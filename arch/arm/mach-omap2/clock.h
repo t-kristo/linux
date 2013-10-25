@@ -285,6 +285,8 @@ extern const struct clksel_rate div_1_3_rates[];
 extern const struct clksel_rate div_1_4_rates[];
 extern const struct clksel_rate div31_1to31_rates[];
 
+extern struct regmap *clk_regmaps[];
+
 extern int am33xx_clk_init(void);
 
 extern void omap_clocks_register(struct omap_clk *oclks, int cnt);
