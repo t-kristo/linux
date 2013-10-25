@@ -113,9 +113,9 @@ const struct clk_ops clk_mux_ro_ops = {
 };
 EXPORT_SYMBOL_GPL(clk_mux_ro_ops);
 
-struct clk *clk_register_mux_table(struct device *dev, const char *name,
+struct clk *clk_register_mux_table_regmap(struct device *dev, const char *name,
 		const char **parent_names, u8 num_parents, unsigned long flags,
-		void __iomem *reg, u8 shift, u32 mask,
+		void __iomem *reg, struct regmap *regmap, u8 shift, u32 mask,
 		u8 clk_mux_flags, u32 *table, spinlock_t *lock)
 {
 	struct clk_mux *mux;
@@ -149,6 +149,7 @@ struct clk *clk_register_mux_table(struct device *dev, const char *name,
 
 	/* struct clk_mux assignments */
 	mux->reg = reg;
+	mux->regmap = regmap;
 	mux->shift = shift;
 	mux->mask = mask;
 	mux->flags = clk_mux_flags;
@@ -162,6 +163,18 @@ struct clk *clk_register_mux_table(struct device *dev, const char *name,
 		kfree(mux);
 
 	return clk;
+}
+EXPORT_SYMBOL_GPL(clk_register_mux_table_regmap);
+
+struct clk *clk_register_mux_table(struct device *dev, const char *name,
+		const char **parent_names, u8 num_parents, unsigned long flags,
+		void __iomem *reg, u8 shift, u32 mask,
+		u8 clk_mux_flags, u32 *table, spinlock_t *lock)
+{
+	return clk_register_mux_table_regmap(dev, name, parent_names,
+					     num_parents, flags, reg, NULL,
+					     shift, mask, clk_mux_flags, table,
+					     lock);
 }
 EXPORT_SYMBOL_GPL(clk_register_mux_table);
 
