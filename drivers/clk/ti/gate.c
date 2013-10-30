@@ -73,15 +73,15 @@ static int omap36xx_gate_clk_enable_with_hsdiv_restore(struct clk_hw *clk)
 
 	/* Restore the dividers */
 	if (!ret) {
-		orig_v = __raw_readl(parent->reg);
+		regmap_read(parent->regmap, (u32)parent->reg, &orig_v);
 		dummy_v = orig_v;
 
 		/* Write any other value different from the Read value */
 		dummy_v ^= (1 << parent->shift);
-		__raw_writel(dummy_v, parent->reg);
+		regmap_write(parent->regmap, (u32)parent->reg, dummy_v);
 
 		/* Write the original divider */
-		__raw_writel(orig_v, parent->reg);
+		regmap_write(parent->regmap, (u32)parent->reg, orig_v);
 	}
 
 	return ret;
