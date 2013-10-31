@@ -30,6 +30,8 @@
 		compatible = "ti,omap3-dpll-clock";
 		clocks = <&sys_ck>, <&sys_ck>;
 		reg = <0x0d04>, <0x0d24>, <0x0d34>, <0x0d4c>;
+		ti,low-power-stop;
+		ti,lock;
 	};
 
 	dpll5_m2_ck: dpll5_m2_ck {

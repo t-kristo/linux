@@ -335,8 +335,6 @@ cm: cm@48004000 {
 		compatible = "ti,omap3-dpll-clock";
 		clocks = <&sys_ck>, <&dpll1_fck>;
 		reg = <0x0904>, <0x0924>, <0x0934>, <0x0940>;
-		ti,lock;
-		ti,low-power-bypass;
 	};
 
 	dpll1_x2_ck: dpll1_x2_ck {
