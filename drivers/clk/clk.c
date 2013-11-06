@@ -34,6 +34,75 @@ static HLIST_HEAD(clk_root_list);
 static HLIST_HEAD(clk_orphan_list);
 static LIST_HEAD(clk_notifier_list);
 
+/**
+ * clk_readl_default - default clock register read support function
+ * @reg: register to read
+ *
+ * Default implementation for reading a clock register.
+ */
+static u32 clk_readl_default(u32 __iomem *reg)
+{
+	return readl(reg);
+}
+
+/**
+ * clk_writel_default - default clock register write support function
+ * @val: value to write
+ * @reg: register to write to
+ *
+ * Default implementation for writing a clock register.
+ */
+static void clk_writel_default(u32 val, u32 __iomem *reg)
+{
+	writel(val, reg);
+}
+
+struct clk_reg_ops clk_reg_ops_default =
+{
+	.clk_readl = clk_readl_default,
+	.clk_writel = clk_writel_default
+};
+
+struct clk_reg_ops *clk_reg_ops = &clk_reg_ops_default;
+
+/**
+ * clk_register_reg_ops - register access functions for clock registers
+ * @ops: register level ops
+ *
+ * Registers platform or SoC specific operations for reading / writing
+ * clock registers.
+ */
+int clk_register_reg_ops(struct clk_reg_ops *ops)
+{
+	if (!ops)
+		return -EINVAL;
+	clk_reg_ops = ops;
+	return 0;
+}
+
+/**
+ * clk_readl - read a clock register value from hardware
+ * @reg: register to read
+ *
+ * Uses the registered clk_reg_ops to read a hardware clock register value.
+ */
+u32 clk_readl(u32 __iomem *reg)
+{
+	return clk_reg_ops->clk_readl(reg);
+}
+
+/**
+ * clk_writel - write a clock register value to hardware
+ * @val: value to write
+ * @reg: register to write
+ *
+ * Uses the registered clk_reg_ops to write a hardware clock register value.
+ */
+void clk_writel(u32 val, u32 __iomem *reg)
+{
+	clk_reg_ops->clk_writel(val, reg);
+}
+
 /***           locking             ***/
 static void clk_prepare_lock(void)
 {
