@@ -512,15 +512,14 @@ static inline const char *of_clk_get_parent_name(struct device_node *np,
  * for improved portability across platforms
  */
 
-static inline u32 clk_readl(u32 __iomem *reg)
-{
-	return readl(reg);
-}
+struct clk_reg_ops {
+	u32 (*clk_readl)(u32 __iomem *reg);
+	void (*clk_writel)(u32 val, u32 __iomem *reg);
+};
 
-static inline void clk_writel(u32 val, u32 __iomem *reg)
-{
-	writel(val, reg);
-}
+u32 clk_readl(u32 __iomem *reg);
+void clk_writel(u32 val, u32 __iomem *reg);
+int clk_register_reg_ops(struct clk_reg_ops *ops);
 
 #endif /* CONFIG_COMMON_CLK */
 #endif /* CLK_PROVIDER_H */
