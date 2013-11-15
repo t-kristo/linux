@@ -109,7 +109,6 @@ struct clk_hw_omap_ops;
  * @clkdm_name: clockdomain name that this clock is contained in
  * @clkdm: pointer to struct clockdomain, resolved from @clkdm_name at runtime
  * @ops: clock ops for this clock
- * @regmap: register map for accessing the clock registers for this clock
  */
 struct clk_hw_omap {
 	struct clk_hw		hw;
@@ -126,7 +125,6 @@ struct clk_hw_omap {
 	const char		*clkdm_name;
 	struct clockdomain	*clkdm;
 	const struct clk_hw_omap_ops	*ops;
-	struct regmap		*regmap;
 };
 
 /*
@@ -148,6 +146,7 @@ struct clk_hw_omap {
  *     should be used.  This is a temporary solution - a better approach
  *     would be to associate clock type-specific data with the clock,
  *     similar to the struct dpll_data approach.
+ * REGMAP_ADDRESSING: Use regmap addressing to access clock registers.
  */
 #define ENABLE_REG_32BIT        (1 << 0)        /* Use 32-bit access */
 #define CLOCK_IDLE_CONTROL      (1 << 1)
@@ -155,6 +154,10 @@ struct clk_hw_omap {
 #define ENABLE_ON_INIT          (1 << 3)        /* Enable upon framework init */
 #define INVERT_ENABLE           (1 << 4)        /* 0 enables, 1 disables */
 #define CLOCK_CLKOUTX2          (1 << 5)
+#define REGMAP_ADDRESSING	(1 << 6)
+
+/* Maximum number of clock regmaps */
+#define CLK_MAX_REGMAPS		4
 
 /* CM_CLKEN_PLL*.EN* bit values - not all are available for every DPLL */
 #define DPLL_LOW_POWER_STOP	0x1
@@ -170,6 +173,16 @@ enum {
 	CLK_COMPONENT_TYPE_DIVIDER,
 	CLK_COMPONENT_TYPE_MUX,
 	CLK_COMPONENT_TYPE_MAX,
+};
+
+/**
+ * struct clk_omap_reg - OMAP register declaration
+ * @index: index of the master IP module
+ * @offset: offset from the master IP module base address
+ */
+struct clk_omap_reg {
+	u16 index;
+	u16 offset;
 };
 
 /**
@@ -221,8 +234,10 @@ void omap2_dflt_clk_disable(struct clk_hw *hw);
 int omap2_dflt_clk_is_enabled(struct clk_hw *hw);
 void omap3_clk_lock_dpll5(void);
 
+void *ti_clk_get_reg_addr(struct device_node *node, int index);
 void ti_dt_clocks_register(struct ti_dt_clk *oclks);
-void ti_dt_clk_init_provider(struct device_node *np, struct regmap *regmap);
+void ti_dt_clk_init_provider(struct device_node *np, struct clk_reg_ops *ops,
+			     int index);
 void ti_dt_clockdomains_setup(void);
 int of_ti_autoidle_setup(struct device_node *node);
 int ti_clk_add_component(struct device_node *node, struct clk_hw *hw, int type);
