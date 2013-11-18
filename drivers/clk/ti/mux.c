@@ -42,7 +42,6 @@ static int of_mux_clk_setup(struct device_node *node)
 	u32 mask = 0;
 	u32 shift = 0;
 	u32 flags = 0;
-	u32 val;
 	int ret;
 
 	num_parents = of_clk_get_parent_count(node);
@@ -57,12 +56,12 @@ static int of_mux_clk_setup(struct device_node *node)
 	for (i = 0; i < num_parents; i++)
 		parent_names[i] = of_clk_get_parent_name(node, i);
 
-	if (of_property_read_u32(node, "reg", &val)) {
-		pr_err("%s must have reg\n", node->name);
+	reg = ti_clk_get_reg_addr(node, 0);
+
+	if (!reg) {
 		ret = -EINVAL;
 		goto cleanup;
 	}
-	reg = (void *)val;
 
 	of_property_read_u32(node, "ti,bit-shift", &shift);
 
@@ -106,13 +105,12 @@ static int __init of_ti_composite_mux_clk_setup(struct device_node *node)
 	if (!mux)
 		return -ENOMEM;
 
-	if (of_property_read_u32(node, "reg", &val)) {
-		pr_err("%s must have reg\n", node->name);
+	mux->reg = ti_clk_get_reg_addr(node, 0);
+
+	if (!mux->reg) {
 		ret = -EINVAL;
 		goto cleanup;
 	}
-
-	mux->reg = (void *)val;
 
 	if (!of_property_read_u32(node, "ti,bit-shift", &val)) {
 		mux->shift = val;
