@@ -209,22 +209,13 @@ static int __init of_dra7_apll_setup(struct device_node *node)
 		goto cleanup;
 	}
 
-	
-	if (of_property_read_u32_index(node, "reg", 0, &val)) {
-		pr_err("%s must have reg[0]\n", clk_name);
+	ad->control_reg = ti_clk_get_reg_addr(node, 0);
+	ad->idlest_reg = ti_clk_get_reg_addr(node, 1);
+
+	if (!ad->control_reg || !ad->idlest_reg) {
 		ret = -EINVAL;
 		goto cleanup;
 	}
-
-	ad->control_reg = (u32 *)val;
-	
-	if (of_property_read_u32_index(node, "reg", 1, &val)) {
-		pr_err("%s must have reg[1]\n", clk_name);
-		ret = -EINVAL;
-		goto cleanup;
-	}
-
-	ad->idlest_reg = (u32 *)val;
 
 	ad->idlest_mask = idlest_mask;
 	ad->enable_mask = autoidle_mask;
