@@ -111,17 +111,17 @@ static int __init _of_ti_gate_clk_setup(struct device_node *node,
 	init.ops = ops;
 
 	if (ops != &omap_gate_clkdm_clk_ops) {
-		if (of_property_read_u32(node, "reg", &val)) {
-			pr_err("%s must have reg\n", clk_name);
+		clk_hw->enable_reg = ti_clk_get_reg_addr(node, 0);
+		if (!clk_hw->enable_reg)
 			return -EINVAL;
-		}
-		clk_hw->enable_reg = (void *)val;
 
 		if (!of_property_read_u32(node, "ti,bit-shift", &val))
 			clk_hw->enable_bit = val;
 	}
 
 	clk_hw->ops = hw_ops;
+
+	clk_hw->flags = REGMAP_ADDRESSING;
 
 	if (of_clk_get_parent_count(node) != 1) {
 		pr_err("%s must have 1 parent\n", clk_name);
@@ -160,17 +160,15 @@ static int __init _of_ti_composite_gate_clk_setup(struct device_node *node,
 	if (!gate)
 		return -ENOMEM;
 
-	if (of_property_read_u32(node, "reg", &val)) {
-		pr_err("%s must have reg\n", node->name);
+	gate->enable_reg = ti_clk_get_reg_addr(node, 0);
+	if (!gate->enable_reg)
 		return -EINVAL;
-	}
-
-	gate->enable_reg = (void *)val;
 
 	of_property_read_u32(node, "ti,bit-shift", &val);
 
 	gate->enable_bit = val;
 	gate->ops = hw_ops;
+	gate->flags = REGMAP_ADDRESSING;
 
 	ret = ti_clk_add_component(node, &gate->hw, CLK_COMPONENT_TYPE_GATE);
 	if (!ret)
