@@ -147,6 +147,7 @@ static struct clk *omap_clk_register_apll(struct device *dev, const char *name,
 
 	clk_hw->dpll_data = dpll_data;
 	clk_hw->hw.init = &init;
+	clk_hw->flags = REGMAP_ADDRESSING;
 
 	init.name = name;
 	init.ops = ops;
@@ -173,7 +174,6 @@ static int __init of_dra7_apll_setup(struct device_node *node)
 	u32 autoidle_mask = 0x3;
 	int i;
 	int ret;
-	u32 val;
 
 	ops = &apll_ck_ops;
 	ad = kzalloc(sizeof(*ad), GFP_KERNEL);
