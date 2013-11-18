@@ -510,6 +510,8 @@ int __init of_prcm_init(void)
 	struct prcm_early_dev *edev;
 	int regmap_index = 0;
 
+	clk_register_reg_ops(&omap_clk_reg_ops);
+
 	for_each_matching_node(np, omap_prcm_dt_match_table) {
 		pdev = platform_device_alloc(np->name, 0);
 		dev_set_name(&pdev->dev, "%s", pdev->name);
@@ -522,7 +524,7 @@ int __init of_prcm_init(void)
 		regmap = regmap_init_mmio(&pdev->dev, mem,
 					  &ti_clk_regmap_config);
 		clk_regmaps[regmap_index] = regmap;
-		ti_dt_clk_init_provider(np, &omap_clk_reg_ops, regmap_index);
+		ti_dt_clk_init_provider(np, regmap_index);
 		regmap_index++;
 	}
 
