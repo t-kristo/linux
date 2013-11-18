@@ -177,12 +177,12 @@ enum {
 
 /**
  * struct clk_omap_reg - OMAP register declaration
- * @index: index of the master IP module
  * @offset: offset from the master IP module base address
+ * @index: index of the master IP module
  */
 struct clk_omap_reg {
-	u16 index;
 	u16 offset;
+	u16 index;
 };
 
 /**
