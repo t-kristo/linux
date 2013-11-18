@@ -106,7 +106,6 @@ int __init of_ti_autoidle_setup(struct device_node *node)
 {
 	u32 shift;
 	struct clk_ti_autoidle *clk;
-	u32 val;
 
 	/* Check if this clock has autoidle support or not */
 	if (of_property_read_u32(node, "ti,autoidle-shift", &shift))
@@ -119,14 +118,12 @@ int __init of_ti_autoidle_setup(struct device_node *node)
 
 	clk->shift = shift;
 	clk->name = node->name;
-	if (of_property_read_u32(node, "reg", &val)) {
-		pr_err("%s: missing reg property for %s!\n", __func__,
-		       node->name);
+	clk->reg = ti_clk_get_reg_addr(node, 0);
+
+	if (!clk->reg) {
 		kfree(clk);
 		return -EINVAL;
 	}
-
-	clk->reg = (void *)val;
 
 	if (of_property_read_bool(node, "ti,invert-autoidle-bit"))
 		clk->flags |= AUTOIDLE_LOW;
