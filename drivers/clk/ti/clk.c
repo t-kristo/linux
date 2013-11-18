@@ -100,7 +100,6 @@ void *ti_clk_get_reg_addr(struct device_node *node, int index)
 /**
  * ti_dt_clk_init_provider - init master clock provider
  * @parent: master node
- * @ops: struct clk_reg_ops * for accessing the clock registers
  * @index: internal index for clk_reg_ops
  *
  * Initializes a master clock IP block and its child clock nodes.
@@ -108,7 +107,6 @@ void *ti_clk_get_reg_addr(struct device_node *node, int index)
  * IP block and all the clocks under it.
  */
 void __init ti_dt_clk_init_provider(struct device_node *parent,
-				    struct clk_reg_ops *ops,
 				    int index)
 {
 	const struct of_device_id *match;

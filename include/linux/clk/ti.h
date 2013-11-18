@@ -236,8 +236,7 @@ void omap3_clk_lock_dpll5(void);
 
 void *ti_clk_get_reg_addr(struct device_node *node, int index);
 void ti_dt_clocks_register(struct ti_dt_clk *oclks);
-void ti_dt_clk_init_provider(struct device_node *np, struct clk_reg_ops *ops,
-			     int index);
+void ti_dt_clk_init_provider(struct device_node *np, int index);
 void ti_dt_clockdomains_setup(void);
 int of_ti_autoidle_setup(struct device_node *node);
 int ti_clk_add_component(struct device_node *node, struct clk_hw *hw, int type);
