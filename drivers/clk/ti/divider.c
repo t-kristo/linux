@@ -120,18 +120,14 @@ static int _get_divider_width(struct device_node *node,
 }
 
 static int __init ti_clk_divider_populate(struct device_node *node,
-	void __iomem **reg, struct clk_div_table **table, u32 *flags,
+	void __iomem **reg, const struct clk_div_table **table, u32 *flags,
 	u8 *div_flags, u8 *width, u8 *shift)
 {
 	u32 val;
-	int ret;
 
-	if (of_property_read_u32(node, "reg", &val)) {
-		pr_err("%s must have reg\n", node->name);
+	*reg = ti_clk_get_reg_addr(node, 0);
+	if (!*reg)
 		return -EINVAL;
-	}
-
-	*reg = (void *)val;
 
 	if (!of_property_read_u32(node, "ti,bit-shift", &val))
 		*shift = val;
@@ -155,14 +151,12 @@ static int __init ti_clk_divider_populate(struct device_node *node,
 	if (IS_ERR(*table))
 		return PTR_ERR(*table);
 
-	ret = _get_divider_width(node, *table, *div_flags);
-	if (!ret)
-		return 0;
+	*width = _get_divider_width(node, *table, *div_flags);
 
 	kfree(*table);
 	*table = NULL;
 
-	return ret;
+	return 0;
 }
 
 /**
@@ -177,8 +171,7 @@ static int __init of_ti_divider_clk_setup(struct device_node *node)
 	u8 clk_divider_flags = 0;
 	u8 width = 0;
 	u8 shift = 0;
-	struct clk_div_table *table = NULL;
-	u32 val = 0;
+	const struct clk_div_table *table = NULL;
 	u32 flags = 0;
 	int ret = 0;
 
@@ -214,8 +207,8 @@ static int __init of_ti_composite_divider_clk_setup(struct device_node *node)
 	if (!div)
 		return -ENOMEM;
 
-	ret = ti_clk_divider_populate(node, &div->reg, &div->table, &div->flags,
-				      &val, &div->width, &div->shift);
+	ret = ti_clk_divider_populate(node, &div->reg, &div->table, &val,
+				      &div->flags, &div->width, &div->shift);
 	if (ret < 0)
 		goto cleanup;
 
