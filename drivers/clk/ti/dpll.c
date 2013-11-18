@@ -119,6 +119,7 @@ static struct clk *ti_clk_register_dpll(const char *name,
 	clk_hw->dpll_data = dpll_data;
 	clk_hw->ops = &clkhwops_omap3_dpll;
 	clk_hw->hw.init = &init;
+	clk_hw->flags = REGMAP_ADDRESSING;
 
 	init.name = name;
 	init.ops = ops;
@@ -169,11 +170,6 @@ static struct clk *ti_clk_register_dpll_x2(struct device_node *node,
 		return ERR_PTR(-ENOMEM);
 
 	clk_hw->ops = hw_ops;
-	if (of_property_read_u32(node, "reg", (u32 *)&clk_hw->clksel_reg)) {
-		pr_err("%s must have reg\n", node->name);
-		kfree(clk_hw);
-		return ERR_PTR(-EINVAL);
-	}
 	clk_hw->hw.init = &init;
 
 	init.name = name;
