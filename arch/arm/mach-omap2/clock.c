@@ -62,6 +62,8 @@ void omap2_clk_writel(u32 val, struct clk_hw_omap *clk, void __iomem *reg)
 {
 	if (clk->flags & REGMAP_ADDRESSING) {
 		struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
+		/*pr_info("%s: r=%d, offset=%04x\n", __func__,
+			r->index, r->offset);*/
 		regmap_write(clk_regmaps[r->index], r->offset, val);
 	} else {
 		__raw_writel(val, reg);
@@ -74,7 +76,10 @@ u32 omap2_clk_readl(struct clk_hw_omap *clk, void __iomem *reg)
 
 	if (clk->flags & REGMAP_ADDRESSING) {
 		struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
+		/*pr_info("%s: r=%d, offset=%04x\n", __func__,
+			r->index, r->offset);*/
 		regmap_read(clk_regmaps[r->index], r->offset, &val);
+		/*pr_info("val=%08x\n", val);*/
 	} else {
 		val = __raw_readl(reg);
 	}
