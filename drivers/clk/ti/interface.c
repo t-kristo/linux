@@ -47,14 +47,13 @@ static int __init _of_ti_interface_clk_setup(struct device_node *node,
 
 	clk_hw->hw.init = &init;
 	clk_hw->ops = ops;
+	clk_hw->flags = REGMAP_ADDRESSING;
 
-	if (of_property_read_u32(node, "reg", &val)) {
-		pr_err("%s must have reg\n", node->name);
+	clk_hw->enable_reg = ti_clk_get_reg_addr(node, 0);
+	if (!clk_hw->enable_reg) {
 		ret = -EINVAL;
 		goto cleanup;
 	}
-
-	clk_hw->enable_reg = (void *)val;
 
 	if (!of_property_read_u32(node, "ti,bit-shift", &val))
 		clk_hw->enable_bit = val;
