@@ -412,6 +412,7 @@ struct clk *clk_register_divider_table(struct device *dev, const char *name,
  *
  * @hw:		handle between common and hardware-specific interfaces
  * @reg:	register controlling multiplexer
+ * @ll_ops:	low-level ops for accessing the register
  * @shift:	shift to multiplexer bit field
  * @width:	width of mutliplexer bit field
  * @flags:	hardware-specific flags
@@ -431,6 +432,7 @@ struct clk *clk_register_divider_table(struct device *dev, const char *name,
 struct clk_mux {
 	struct clk_hw	hw;
 	void __iomem	*reg;
+	struct clk_ll_ops	*ll_ops;
 	u32		*table;
 	u32		mask;
 	u8		shift;
@@ -443,6 +445,7 @@ struct clk_mux {
  *
  * @desc:	handle between common and hardware-specific interfaces
  * @reg:	register controlling multiplexer
+ * @ll_ops:	low-level ops for accesing the register
  * @shift:	shift to multiplexer bit field
  * @width:	width of multiplexer bit field
  * @flags:	hardware-specific flags
@@ -451,6 +454,7 @@ struct clk_mux {
 struct clk_mux_desc {
 	struct clk_desc	desc;
 	void __iomem	*reg;
+	struct clk_ll_ops	*ll_ops;
 	u32		*table;
 	u32		mask;
 	u8		shift;
