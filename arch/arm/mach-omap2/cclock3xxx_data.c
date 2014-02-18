@@ -623,9 +623,13 @@ static const struct clk_ops clkout2_src_ck_ops = {
 };
 
 DEFINE_CLK_OMAP_MUX_GATE(clkout2_src_ck, "core_clkdm",
-			 clkout2_src_clksel, OMAP3430_CM_CLKOUT_CTRL,
+			 clkout2_src_clksel,
+			 OMAP_CM_REGADDR(OMAP3430_CCR_MOD,
+					 OMAP3_CM_CLKOUT_CTRL_OFFSET),
 			 OMAP3430_CLKOUT2SOURCE_MASK,
-			 OMAP3430_CM_CLKOUT_CTRL, OMAP3430_CLKOUT2_EN_SHIFT,
+			 OMAP_CM_REGADDR(OMAP3430_CCR_MOD,
+					 OMAP3_CM_CLKOUT_CTRL_OFFSET),
+			 OMAP3430_CLKOUT2_EN_SHIFT,
 			 NULL, clkout2_src_ck_parent_names, clkout2_src_ck_ops);
 
 static const struct clksel_rate omap_48m_cm96m_rates[] = {
@@ -2827,7 +2831,9 @@ static struct clk_hw_omap sys_clkout1_hw = {
 DEFINE_STRUCT_CLK(sys_clkout1, sys_clkout1_parent_names, aes1_ick_ops);
 
 DEFINE_CLK_DIVIDER(sys_clkout2, "clkout2_src_ck", &clkout2_src_ck, 0x0,
-		   OMAP3430_CM_CLKOUT_CTRL, OMAP3430_CLKOUT2_DIV_SHIFT,
+		   OMAP_CM_REGADDR(OMAP3430_CCR_MOD,
+				   OMAP3_CM_CLKOUT_CTRL_OFFSET),
+		   OMAP3430_CLKOUT2_DIV_SHIFT,
 		   OMAP3430_CLKOUT2_DIV_WIDTH, CLK_DIVIDER_POWER_OF_TWO, NULL);
 
 DEFINE_CLK_MUX(traceclk_src_fck, emu_src_ck_parent_names, NULL, 0x0,
