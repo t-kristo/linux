@@ -144,7 +144,6 @@ static struct ti_dt_clk omap2xxx_clks[] = {
 	DT_CLK(NULL, "timer_32k_ck", "func_32k_ck"),
 	DT_CLK(NULL, "timer_sys_ck", "sys_ck"),
 	DT_CLK(NULL, "timer_ext_ck", "alt_ck"),
-	DT_CLK(NULL, "cpufreq_ck", "virt_prcm_set"),
 	{ .node_name = NULL },
 };
 

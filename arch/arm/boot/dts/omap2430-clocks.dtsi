@@ -621,12 +621,6 @@
 		reg = <0x0214>;
 	};
 
-	virt_prcm_set: virt_prcm_set {
-		#clock-cells = <0>;
-		compatible = "ti,omap2-mpu-dvfs-clock";
-		clocks = <&mpu_ck>;
-	};
-
 	gpt1_ick: gpt1_ick {
 		#clock-cells = <0>;
 		compatible = "ti,omap3-interface-clock";
