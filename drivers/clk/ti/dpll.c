@@ -255,6 +255,7 @@ static void __init of_ti_dpll_setup(struct device_node *node,
 	if (!dd->idlest_mask) {
 		dd->mult_div1_reg = ti_clk_get_reg_addr(node, 1);
 		clk_hw->ops = &clkhwops_omap2xxx_dpll;
+		omap2xxx_clkt_dpllcore_init(&clk_hw->hw);
 	} else {
 		dd->idlest_reg = ti_clk_get_reg_addr(node, 1);
 		if (!dd->idlest_reg)
