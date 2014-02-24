@@ -170,18 +170,22 @@
 
 	apll96_ck: apll96_ck {
 		#clock-cells = <0>;
-		compatible = "ti,omap2-apll96-clock";
+		compatible = "ti,omap2-apll-clock";
 		clocks = <&sys_ck>;
 		ti,bit-shift = <2>;
-		reg = <0x0500>;
+		ti,idlest-shift = <8>;
+		ti,clock-frequency = <96000000>;
+		reg = <0x0500>, <0x0530>, <0x0520>;
 	};
 
 	apll54_ck: apll54_ck {
 		#clock-cells = <0>;
-		compatible = "ti,omap2-apll54-clock";
+		compatible = "ti,omap2-apll-clock";
 		clocks = <&sys_ck>;
 		ti,bit-shift = <6>;
-		reg = <0x0500>;
+		ti,idlest-shift = <9>;
+		ti,clock-frequency = <54000000>;
+		reg = <0x0500>, <0x0530>, <0x0520>;
 	};
 
 	func_54m_ck: func_54m_ck {
