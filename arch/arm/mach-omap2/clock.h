@@ -178,17 +178,6 @@ struct clksel {
 	const struct clksel_rate *rates;
 };
 
-struct clk_hw_omap_ops {
-	void			(*find_idlest)(struct clk_hw_omap *oclk,
-					void __iomem **idlest_reg,
-					u8 *idlest_bit, u8 *idlest_val);
-	void			(*find_companion)(struct clk_hw_omap *oclk,
-					void __iomem **other_reg,
-					u8 *other_bit);
-	void			(*allow_idle)(struct clk_hw_omap *oclk);
-	void			(*deny_idle)(struct clk_hw_omap *oclk);
-};
-
 /* CM_CLKSEL2_PLL.CORE_CLK_SRC bits (2XXX) */
 #define CORE_CLK_SRC_32K		0x0
 #define CORE_CLK_SRC_DPLL		0x1
