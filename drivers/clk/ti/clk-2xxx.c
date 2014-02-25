@@ -58,7 +58,6 @@ static struct ti_dt_clk omap2xxx_clks[] = {
 	DT_CLK(NULL, "usb_l4_ick", "usb_l4_ick"),
 	DT_CLK(NULL, "l4_ck", "l4_ck"),
 	DT_CLK(NULL, "ssi_l4_ick", "ssi_l4_ick"),
-	DT_CLK(NULL, "virt_prcm_set", "virt_prcm_set"),
 	DT_CLK(NULL, "gpt1_ick", "gpt1_ick"),
 	DT_CLK(NULL, "gpt1_fck", "gpt1_fck"),
 	DT_CLK(NULL, "gpt2_ick", "gpt2_ick"),
