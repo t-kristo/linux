@@ -48,54 +48,6 @@
 
 #ifndef __ASSEMBLER__
 
-#include <linux/io.h>
-
-static inline u32 omap2_cm_read_mod_reg(s16 module, u16 idx)
-{
-	return __raw_readl(cm_base + module + idx);
-}
-
-static inline void omap2_cm_write_mod_reg(u32 val, s16 module, u16 idx)
-{
-	__raw_writel(val, cm_base + module + idx);
-}
-
-/* Read-modify-write a register in a CM module. Caller must lock */
-static inline u32 omap2_cm_rmw_mod_reg_bits(u32 mask, u32 bits, s16 module,
-					    s16 idx)
-{
-	u32 v;
-
-	v = omap2_cm_read_mod_reg(module, idx);
-	v &= ~mask;
-	v |= bits;
-	omap2_cm_write_mod_reg(v, module, idx);
-
-	return v;
-}
-
-/* Read a CM register, AND it, and shift the result down to bit 0 */
-static inline u32 omap2_cm_read_mod_bits_shift(s16 domain, s16 idx, u32 mask)
-{
-	u32 v;
-
-	v = omap2_cm_read_mod_reg(domain, idx);
-	v &= mask;
-	v >>= __ffs(mask);
-
-	return v;
-}
-
-static inline u32 omap2_cm_set_mod_reg_bits(u32 bits, s16 module, s16 idx)
-{
-	return omap2_cm_rmw_mod_reg_bits(bits, bits, module, idx);
-}
-
-static inline u32 omap2_cm_clear_mod_reg_bits(u32 bits, s16 module, s16 idx)
-{
-	return omap2_cm_rmw_mod_reg_bits(bits, 0x0, module, idx);
-}
-
 extern int omap2xxx_cm_apll54_enable(void);
 extern void omap2xxx_cm_apll54_disable(void);
 extern int omap2xxx_cm_apll96_enable(void);
