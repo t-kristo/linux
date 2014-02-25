@@ -154,7 +154,7 @@ void ti_dt_clk_init_provider(struct device_node *parent, int index)
 		if (!match)
 			continue;
 		clk_init_cb = (of_clk_init_cb_t)match->data;
-		pr_debug("%s: initializing: %s\n", __func__, np->name);
+		pr_info("initializing: %s\n", np->name);
 		clk_init_cb(np);
 	}
 
