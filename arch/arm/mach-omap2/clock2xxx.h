@@ -33,18 +33,6 @@ void omap2xxx_clk_prepare_for_reboot(void);
 void omap2xxx_clkt_vps_check_bootloader_rates(void);
 void omap2xxx_clkt_vps_late_init(void);
 
-#ifdef CONFIG_SOC_OMAP2420
-int omap2420_clk_init(void);
-#else
-#define omap2420_clk_init()	do { } while(0)
-#endif
-
-#ifdef CONFIG_SOC_OMAP2430
-int omap2430_clk_init(void);
-#else
-#define omap2430_clk_init()	do { } while(0)
-#endif
-
 extern struct clk_hw *dclk_hw;
 int omap2_enable_osc_ck(struct clk_hw *hw);
 void omap2_disable_osc_ck(struct clk_hw *hw);
