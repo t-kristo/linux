@@ -194,13 +194,6 @@ static void __init prcm_setup_regs(void)
 	struct powerdomain *pwrdm;
 
 	/*
-	 * Enable autoidle
-	 * XXX This should be handled by hwmod code or PRCM init code
-	 */
-	omap2_prm_write_mod_reg(OMAP24XX_AUTOIDLE_MASK, OCP_MOD,
-			  OMAP2_PRCM_SYSCONFIG_OFFSET);
-
-	/*
 	 * Set CORE powerdomain memory banks to retain their contents
 	 * during RETENTION
 	 */
@@ -228,37 +221,12 @@ static void __init prcm_setup_regs(void)
 	omap_pm_suspend = omap2_enter_full_retention;
 #endif
 
-	/* REVISIT: Configure number of 32 kHz clock cycles for sys_clk
-	 * stabilisation */
-	omap2_prm_write_mod_reg(15 << OMAP_SETUP_TIME_SHIFT, OMAP24XX_GR_MOD,
-				OMAP2_PRCM_CLKSSETUP_OFFSET);
-
-	/* Configure automatic voltage transition */
-	omap2_prm_write_mod_reg(2 << OMAP_SETUP_TIME_SHIFT, OMAP24XX_GR_MOD,
-				OMAP2_PRCM_VOLTSETUP_OFFSET);
-	omap2_prm_write_mod_reg(OMAP24XX_AUTO_EXTVOLT_MASK |
-				(0x1 << OMAP24XX_SETOFF_LEVEL_SHIFT) |
-				OMAP24XX_MEMRETCTRL_MASK |
-				(0x1 << OMAP24XX_SETRET_LEVEL_SHIFT) |
-				(0x0 << OMAP24XX_VOLT_LEVEL_SHIFT),
-				OMAP24XX_GR_MOD, OMAP2_PRCM_VOLTCTRL_OFFSET);
-
-	/* Enable wake-up events */
-	omap2_prm_write_mod_reg(OMAP24XX_EN_GPIOS_MASK | OMAP24XX_EN_GPT1_MASK,
-				WKUP_MOD, PM_WKEN);
-
-	/* Enable SYS_CLKEN control when all domains idle */
-	omap2_prm_set_mod_reg_bits(OMAP_AUTOEXTCLKMODE_MASK, OMAP24XX_GR_MOD,
-				   OMAP2_PRCM_CLKSRC_CTRL_OFFSET);
+	omap2xxx_prm_init_pm();
 }
 
 int __init omap2_pm_init(void)
 {
-	u32 l;
-
 	printk(KERN_INFO "Power Management for OMAP2 initializing\n");
-	l = omap2_prm_read_mod_reg(OCP_MOD, OMAP2_PRCM_REVISION_OFFSET);
-	printk(KERN_INFO "PRCM revision %d.%d\n", (l >> 4) & 0x0f, l & 0x0f);
 
 	/* Look up important powerdomains */
 
