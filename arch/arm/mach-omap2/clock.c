@@ -544,8 +544,11 @@ int omap2_clk_disable_autoidle_all(void)
 	struct clk_hw_omap *c;
 
 	list_for_each_entry(c, &clk_hw_omap_clocks, node)
-		if (c->ops && c->ops->deny_idle)
+		if (c->ops && c->ops->deny_idle) {
+			pr_info("%s: %s\n", __func__,
+				__clk_get_name(c->hw.clk));
 			c->ops->deny_idle(c);
+		}
 
 	of_ti_clk_deny_autoidle_all();
 

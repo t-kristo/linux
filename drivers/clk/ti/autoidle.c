@@ -52,6 +52,8 @@ static void ti_deny_autoidle(struct clk_ti_autoidle *clk)
 {
 	u32 val;
 
+	pr_info("%s: %s\n", __func__, clk->name);
+
 	val = ti_clk_ll_ops->clk_readl(clk->reg);
 
 	if (clk->flags & AUTOIDLE_LOW)

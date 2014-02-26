@@ -229,10 +229,13 @@ static int __init omap2xxx_dt_clk_init(int soc_type)
 	else
 		ti_dt_clocks_register(omap2430_clks);
 
+	pr_info("omap2xxx_clkt_vps_init\n");
 	omap2xxx_clkt_vps_init();
 
+	pr_info("omap2_clk_disable_autoidle_all\n");
 	omap2_clk_disable_autoidle_all();
 
+	pr_info("omap2_clk_enable_init_clocks\n");
 	omap2_clk_enable_init_clocks(enable_init_clks,
 				     ARRAY_SIZE(enable_init_clks));
 
