@@ -164,6 +164,7 @@ extern int __init omap3xxx_prm_init(void);
 extern u32 omap3xxx_prm_get_reset_sources(void);
 int omap3xxx_prm_clear_mod_irqs(s16 module, u8 regs, u32 ignore_bits);
 void omap3xxx_prm_iva_idle(void);
+int omap3xxx_prm_clear_global_cold_reset(void);
 
 #endif /* __ASSEMBLER */
 
