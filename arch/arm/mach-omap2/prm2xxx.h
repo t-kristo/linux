@@ -126,6 +126,7 @@ extern int omap2xxx_clkdm_wakeup(struct clockdomain *clkdm);
 
 extern void omap2xxx_prm_dpll_reset(void);
 void omap2xxx_prm_clear_mod_irqs(s16 module, u8 regs, u32 wkst_mask);
+void omap2xxx_prm_init_pm(void);
 
 extern int __init omap2xxx_prm_init(void);
 
