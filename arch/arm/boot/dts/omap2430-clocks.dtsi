@@ -1346,7 +1346,7 @@
 		clocks = <&core_l3_ck>;
 		ti,clock-div = <1>;
 		ti,autoidle-shift = <1>;
-		reg = <0x0218>;
+		reg = <0x0238>;
 		ti,clock-mult = <1>;
 	};
 
@@ -1364,7 +1364,7 @@
 		clocks = <&core_l3_ck>;
 		ti,clock-div = <1>;
 		ti,autoidle-shift = <0>;
-		reg = <0x0218>;
+		reg = <0x0238>;
 		ti,clock-mult = <1>;
 	};
 
@@ -1374,7 +1374,7 @@
 		clocks = <&core_l3_ck>;
 		ti,clock-div = <1>;
 		ti,autoidle-shift = <2>;
-		reg = <0x0218>;
+		reg = <0x0238>;
 		ti,clock-mult = <1>;
 	};
 
