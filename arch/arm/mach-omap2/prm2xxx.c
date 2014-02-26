@@ -23,7 +23,7 @@
 #include "vp.h"
 #include "powerdomain.h"
 #include "clockdomain.h"
-#include "prm2xxx.h"
+#include "prm2xxx_3xxx_private.h"
 #include "cm2xxx_3xxx.h"
 #include "prm-regbits-24xx.h"
 
