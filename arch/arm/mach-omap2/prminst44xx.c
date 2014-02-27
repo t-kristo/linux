@@ -191,3 +191,15 @@ void omap4_prminst_global_warm_sw_reset(void)
 				    OMAP4430_PRM_DEVICE_INST,
 				    OMAP4_PRM_RSTCTRL_OFFSET);
 }
+
+void omap4_prminst_mpuss_clear_prev_logic_pwrst(void)
+{
+	u32 reg;
+
+	reg = omap4_prminst_read_inst_reg(OMAP4430_PRM_PARTITION,
+					  OMAP4430_PRM_MPU_INST,
+					  OMAP4_RM_MPU_MPU_CONTEXT_OFFSET);
+	omap4_prminst_write_inst_reg(reg, OMAP4430_PRM_PARTITION,
+				     OMAP4430_PRM_MPU_INST,
+				     OMAP4_RM_MPU_MPU_CONTEXT_OFFSET);
+}

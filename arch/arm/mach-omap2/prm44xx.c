@@ -26,7 +26,7 @@
 #include "prm44xx.h"
 #include "prm-regbits-44xx.h"
 #include "prcm44xx.h"
-#include "prminst44xx.h"
+#include "prminst44xx_private.h"
 #include "powerdomain.h"
 
 /* Static data */
