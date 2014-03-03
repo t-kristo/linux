@@ -390,6 +390,12 @@
 		clock-div = <6>;
 	};
 
+	dummy_ck: dummy_ck {
+		#clock-cells = <0>;
+		compatible = "fixed-clock";
+		clock-frequency = <0>;
+	};
+
 	core_d8_ck: core_d8_ck {
 		#clock-cells = <0>;
 		compatible = "fixed-factor-clock";
