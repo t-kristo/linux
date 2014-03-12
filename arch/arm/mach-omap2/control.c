@@ -25,6 +25,7 @@
 #include "sdrc.h"
 #include "pm.h"
 #include "control.h"
+#include "clock.h"
 
 /* Used by omap3_ctrl_save_padconf() */
 #define START_PADCONF_SAVE		0x2
@@ -611,3 +612,22 @@ void __init omap3_ctrl_init(void)
 	omap3_ctrl_setup_d2d_padconf();
 }
 #endif /* CONFIG_ARCH_OMAP3 && CONFIG_PM */
+
+static struct of_device_id omap_scrm_dt_match_table[] = {
+	{ .compatible = "ti,am3-scrm" },
+	{ .compatible = "ti,am4-scrm" },
+	{ .compatible = "ti,omap2-scrm" },
+	{ .compatible = "ti,omap3-scrm" },
+	{ }
+};
+
+/**
+ * omap_control_init - low level init for the control driver
+ *
+ * Initializes the low level clock infrastructure for control driver.
+ * Returns 0 in success, negative error value in failure.
+ */
+int __init omap_control_init(void)
+{
+	return omap2_clk_provider_init(omap_scrm_dt_match_table);
+}
