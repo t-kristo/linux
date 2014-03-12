@@ -517,6 +517,8 @@ struct omap_prcm_irq_setup {
 	.priority = _priority				\
 	}
 
+struct of_device_id;
+
 extern void omap_prcm_irq_cleanup(void);
 extern int omap_prcm_register_chain_handler(
 	struct omap_prcm_irq_setup *irq_setup);
@@ -524,6 +526,8 @@ extern int omap_prcm_event_to_irq(const char *event);
 extern void omap_prcm_irq_prepare(void);
 extern void omap_prcm_irq_complete(void);
 void omap_pcs_legacy_init(int irq, void (*rearm)(void));
+int of_prcm_module_init(struct of_device_id *match_table);
+int of_cm_init(void);
 
 # endif
 
