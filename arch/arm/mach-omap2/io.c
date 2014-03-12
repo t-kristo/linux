@@ -742,6 +742,10 @@ int __init omap_clk_init(void)
 
 	ti_clk_init_features();
 
+	ret = of_scrm_init();
+	if (ret)
+		return ret;
+
 	ret = of_prcm_init();
 	if (ret)
 		return ret;
