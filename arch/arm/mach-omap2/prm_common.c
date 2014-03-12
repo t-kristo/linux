@@ -35,6 +35,7 @@
 #include "prm44xx.h"
 #include "common.h"
 #include "clock.h"
+#include "cm.h"
 
 /*
  * OMAP_PRCM_MAX_NR_PENDING_REG: maximum number of PRM_IRQ*_MPU regs
@@ -568,25 +569,14 @@ int prm_unregister(struct prm_ll_data *pld)
 
 static const struct of_device_id omap_prcm_dt_match_table[] = {
 	{ .compatible = "ti,am3-prcm" },
-	{ .compatible = "ti,am3-scrm" },
 	{ .compatible = "ti,am4-prcm" },
-	{ .compatible = "ti,am4-scrm" },
 	{ .compatible = "ti,omap2-prcm" },
-	{ .compatible = "ti,omap2-scrm" },
 	{ .compatible = "ti,omap3-prm" },
-	{ .compatible = "ti,omap3-cm" },
-	{ .compatible = "ti,omap3-scrm" },
-	{ .compatible = "ti,omap4-cm1" },
 	{ .compatible = "ti,omap4-prm" },
-	{ .compatible = "ti,omap4-cm2" },
 	{ .compatible = "ti,omap4-scrm" },
 	{ .compatible = "ti,omap5-prm" },
-	{ .compatible = "ti,omap5-cm-core-aon" },
 	{ .compatible = "ti,omap5-scrm" },
-	{ .compatible = "ti,omap5-cm-core" },
 	{ .compatible = "ti,dra7-prm" },
-	{ .compatible = "ti,dra7-cm-core-aon" },
-	{ .compatible = "ti,dra7-cm-core" },
 	{ }
 };
 
@@ -598,7 +588,13 @@ static const struct of_device_id omap_prcm_dt_match_table[] = {
  */
 int __init omap_prcm_init(void)
 {
-	return omap2_clk_provider_init(omap_prcm_dt_match_table);
+	int ret;
+
+	ret = omap2_clk_provider_init(omap_prcm_dt_match_table);
+	if (ret)
+		return ret;
+
+	return omap_cm_init();
 }
 
 static int __init prm_late_init(void)
