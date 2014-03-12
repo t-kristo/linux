@@ -611,3 +611,18 @@ void __init omap3_ctrl_init(void)
 	omap3_ctrl_setup_d2d_padconf();
 }
 #endif /* CONFIG_ARCH_OMAP3 && CONFIG_PM */
+
+static struct of_device_id omap_scrm_dt_match_table[] = {
+	{ .compatible = "ti,am3-scrm" },
+	{ .compatible = "ti,am4-scrm" },
+	{ .compatible = "ti,omap2-scrm" },
+	{ .compatible = "ti,omap3-scrm" },
+	{ .compatible = "ti,omap4-scrm" },
+	{ .compatible = "ti,omap5-scrm" },
+	{ }
+};
+
+int __init of_scrm_init(void)
+{
+	return of_prcm_module_init(omap_scrm_dt_match_table);
+}
