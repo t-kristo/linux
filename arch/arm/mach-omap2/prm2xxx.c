@@ -20,7 +20,7 @@
 
 #include "powerdomain.h"
 #include "clockdomain.h"
-#include "prm2xxx.h"
+#include <linux/power/omap/prm2xxx.h>
 #include "prm2xxx_3xxx_private.h"
 #include <linux/power/omap/cm2xxx_3xxx.h>
 

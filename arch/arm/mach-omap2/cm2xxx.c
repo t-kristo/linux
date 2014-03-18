@@ -18,11 +18,13 @@
 #include <linux/err.h>
 #include <linux/io.h>
 
-#include "prm2xxx.h"
+#include <linux/power/omap/prm2xxx.h>
 #include <linux/power/omap/cm.h>
 #include "cm2xxx_3xxx_private.h"
 #include <linux/power/omap/cm2xxx.h>
 #include "clockdomain.h"
+#include "prcm-common.h"
+#include "prm2xxx_3xxx.h"
 
 /* CM_AUTOIDLE_PLL.AUTO_* bit values for DPLLs */
 #define DPLL_AUTOIDLE_DISABLE				0x0

@@ -29,7 +29,7 @@
 #include <linux/clk/ti.h>
 
 #include "prm2xxx_3xxx.h"
-#include "prm2xxx.h"
+#include <linux/power/omap/prm2xxx.h>
 #include "prm3xxx.h"
 #include "prm44xx.h"
 
