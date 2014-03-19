@@ -18,9 +18,10 @@
 #include <linux/errno.h>
 #include <linux/err.h>
 #include <linux/io.h>
+#include <linux/power/omap/prm33xx.h>
 
 #include "powerdomain.h"
-#include "prm33xx.h"
+#include "prm.h"
 
 #define AM33XX_LASTPOWERSTATEENTERED_SHIFT	24
 #define AM33XX_LASTPOWERSTATEENTERED_MASK	(0x3 << 24)

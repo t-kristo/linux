@@ -10,7 +10,7 @@
 
 #include "common.h"
 #include "prm-regbits-33xx.h"
-#include "prm33xx.h"
+#include <linux/power/omap/prm33xx.h>
 
 /**
  * am3xx_restart - trigger a software restart of the SoC
