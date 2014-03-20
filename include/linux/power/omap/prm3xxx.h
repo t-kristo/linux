@@ -18,6 +18,9 @@
 
 #include <linux/power/omap/prm2xxx_3xxx.h>
 
+#define OMAP3_VP_VDD_MPU_ID	0
+#define OMAP3_VP_VDD_CORE_ID	1
+
 /*
  * OMAP3-specific global PRM registers
  * Use __raw_{read,write}l() with these registers.

@@ -19,7 +19,6 @@
 #include <linux/io.h>
 
 
-#include "vp.h"
 #include <linux/power/omap/prm44xx.h>
 #include <linux/power/omap/prm54xx.h>
 #include <linux/power/omap/prm7xx.h>
