@@ -21,7 +21,13 @@
 
 #include "powerdomain.h"
 #include "prm33xx.h"
-#include "prm-regbits-33xx.h"
+
+#define AM33XX_LASTPOWERSTATEENTERED_SHIFT	24
+#define AM33XX_LASTPOWERSTATEENTERED_MASK	(0x3 << 24)
+#define AM33XX_LOGICSTATEST_SHIFT		2
+#define AM33XX_LOGICSTATEST_MASK		(1 << 2)
+#define AM33XX_LOWPOWERSTATECHANGE_SHIFT	4
+#define AM33XX_LOWPOWERSTATECHANGE_MASK		(1 << 4)
 
 /* Read a register in a PRM instance */
 u32 am33xx_prm_read_reg(s16 inst, u16 idx)
