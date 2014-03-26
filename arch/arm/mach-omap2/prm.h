@@ -30,6 +30,17 @@ int of_prcm_init(void);
  */
 #define PRM_HAS_IO_WAKEUP	(1 << 0)
 
+#ifndef __ASSEMBLER__
+enum {
+	PRM_OMAP3430 = 0,
+	PRM_OMAP3630,
+	PRM_OMAP3_OTHER,
+	PRM_OMAP4,
+	PRM_OMAP5,
+	PRM_DRA7,
+};
+#endif
+
 /*
  * MAX_MODULE_SOFTRESET_WAIT: Maximum microseconds to wait for OMAP
  * module to softreset

@@ -458,6 +458,15 @@ void __init omap2430_init_late(void)
  * same machine_id for 34xx and 36xx beagle.. Will get fixed with DT.
  */
 #ifdef CONFIG_ARCH_OMAP3
+static inline u16 omap3_prm_type(void)
+{
+	if (cpu_is_omap3430())
+		return PRM_OMAP3430;
+	if (cpu_is_omap3630())
+		return PRM_OMAP3630;
+	return PRM_OMAP3_OTHER;
+}
+
 void __init omap3_init_early(void)
 {
 	omap2_set_globals_tap(OMAP343X_CLASS, OMAP2_L4_IO_ADDRESS(0x4830A000));
@@ -469,7 +478,7 @@ void __init omap3_init_early(void)
 	omap2_set_globals_cm(OMAP2_L4_IO_ADDRESS(OMAP3430_CM_BASE), NULL);
 	omap3xxx_check_revision();
 	omap3xxx_check_features();
-	omap3xxx_prm_init();
+	omap3xxx_prm_init(omap3_prm_type());
 	omap3xxx_cm_init();
 	omap3xxx_voltagedomains_init();
 	omap3xxx_powerdomains_init();
@@ -636,7 +645,7 @@ void __init omap4430_init_early(void)
 	omap4xxx_check_revision();
 	omap4xxx_check_features();
 	omap4_pm_init_early();
-	omap44xx_prm_init();
+	omap44xx_prm_init(PRM_OMAP4);
 	omap44xx_voltagedomains_init();
 	omap44xx_powerdomains_init();
 	omap44xx_clockdomains_init();
@@ -666,7 +675,7 @@ void __init omap5_init_early(void)
 	omap2_set_globals_prcm_mpu(OMAP2_L4_IO_ADDRESS(OMAP54XX_PRCM_MPU_BASE));
 	omap_prm_base_init();
 	omap_cm_base_init();
-	omap44xx_prm_init();
+	omap44xx_prm_init(PRM_OMAP5);
 	omap5xxx_check_revision();
 	omap54xx_voltagedomains_init();
 	omap54xx_powerdomains_init();
@@ -694,7 +703,7 @@ void __init dra7xx_init_early(void)
 	omap2_set_globals_prcm_mpu(OMAP2_L4_IO_ADDRESS(OMAP54XX_PRCM_MPU_BASE));
 	omap_prm_base_init();
 	omap_cm_base_init();
-	omap44xx_prm_init();
+	omap44xx_prm_init(PRM_DRA7);
 	dra7xx_powerdomains_init();
 	dra7xx_clockdomains_init();
 	dra7xx_hwmod_init();
