@@ -523,6 +523,7 @@ extern int omap_prcm_register_chain_handler(
 extern int omap_prcm_event_to_irq(const char *event);
 extern void omap_prcm_irq_prepare(void);
 extern void omap_prcm_irq_complete(void);
+void omap_pcs_legacy_init(int irq, void (*rearm)(void));
 
 # endif
 

@@ -19,9 +19,6 @@
 #include <linux/io.h>
 
 
-#include "soc.h"
-#include "iomap.h"
-#include "common.h"
 #include "vp.h"
 #include "prm44xx.h"
 #include "prm54xx.h"
@@ -32,6 +29,8 @@
 #include "powerdomain.h"
 
 /* Static data */
+
+#define OMAP44XX_IRQ_GIC_START	32
 
 static const struct omap_prcm_irq omap4_prcm_irqs[] = {
 	OMAP_PRCM_IRQ("wkup",   0,      0),
