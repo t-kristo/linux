@@ -641,9 +641,9 @@ static struct prm_ll_data omap3xxx_prm_ll_data = {
 	.late_init = &omap3xxx_prm_late_init,
 };
 
-int __init omap3xxx_prm_init(void)
+int __init omap3xxx_prm_init(u16 cpu_type)
 {
-	if (omap3_has_io_wakeup())
+	if (cpu_type == PRM_OMAP3430 || cpu_type == PRM_OMAP3630)
 		prm_features |= PRM_HAS_IO_WAKEUP;
 
 	return prm_register(&omap3xxx_prm_ll_data);
