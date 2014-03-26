@@ -29,6 +29,7 @@ int of_prcm_init(void);
  * PRM_HAS_VOLTAGE: has voltage domains
  */
 #define PRM_HAS_IO_WAKEUP	(1 << 0)
+#define PRM_HAS_VOLTAGE		(1 << 1)
 
 #ifndef __ASSEMBLER__
 enum {
