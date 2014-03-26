@@ -26,8 +26,15 @@
 #include "cm.h"
 #include "cm33xx.h"
 #include "cm-regbits-34xx.h"
-#include "cm-regbits-33xx.h"
 #include "prm33xx.h"
+
+#define AM33XX_MODULEMODE_SHIFT			0
+#define AM33XX_MODULEMODE_MASK			(0x3 << 0)
+
+#define AM33XX_CLKTRCTRL_SHIFT			0
+#define AM33XX_CLKTRCTRL_MASK			(0x3 << 0)
+#define AM33XX_IDLEST_SHIFT			16
+#define AM33XX_IDLEST_MASK			(0x3 << 16)
 
 /*
  * CLKCTRL_IDLEST_*: possible values for the CM_*_CLKCTRL.IDLEST bitfield:

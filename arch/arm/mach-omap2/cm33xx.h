@@ -18,7 +18,6 @@
 #define __ARCH_ARM_MACH_OMAP2_CM_33XX_H
 
 #include "cm.h"
-#include "cm-regbits-33xx.h"
 
 /* CM base address */
 #define AM33XX_CM_BASE		0x44e00000
