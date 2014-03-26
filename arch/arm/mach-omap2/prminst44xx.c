@@ -21,9 +21,10 @@
 #include "prm54xx.h"
 #include "prm7xx.h"
 #include "prminst44xx.h"
-#include "prm-regbits-44xx.h"
 #include "prcm44xx.h"
 #include "prcm_mpu44xx.h"
+
+#define OMAP4430_RST_GLOBAL_WARM_SW_MASK		(1 << 0)
 
 static void __iomem *_prm_bases[OMAP4_MAX_PRCM_PARTITIONS];
 
