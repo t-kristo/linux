@@ -24,8 +24,11 @@
 #include "common.h"
 #include "vp.h"
 #include "prm44xx.h"
+#include "prm54xx.h"
+#include "prm7xx.h"
 #include "prm-regbits-44xx.h"
 #include "prcm44xx.h"
+#include "prcm43xx.h"
 #include "prminst44xx.h"
 #include "powerdomain.h"
 
@@ -155,20 +158,20 @@ void omap4_prm_vp_clear_txdone(u8 vp_id)
 u32 omap4_prm_vcvp_read(u8 offset)
 {
 	return omap4_prminst_read_inst_reg(OMAP4430_PRM_PARTITION,
-					   OMAP4430_PRM_DEVICE_INST, offset);
+					   prm_dev_inst, offset);
 }
 
 void omap4_prm_vcvp_write(u32 val, u8 offset)
 {
 	omap4_prminst_write_inst_reg(val, OMAP4430_PRM_PARTITION,
-				     OMAP4430_PRM_DEVICE_INST, offset);
+				     prm_dev_inst, offset);
 }
 
 u32 omap4_prm_vcvp_rmw(u32 mask, u32 bits, u8 offset)
 {
 	return omap4_prminst_rmw_inst_reg_bits(mask, bits,
 					       OMAP4430_PRM_PARTITION,
-					       OMAP4430_PRM_DEVICE_INST,
+					       prm_dev_inst,
 					       offset);
 }
 
@@ -279,10 +282,10 @@ void omap44xx_prm_reconfigure_io_chain(void)
 	/* Trigger WUCLKIN enable */
 	omap4_prm_rmw_inst_reg_bits(OMAP4430_WUCLK_CTRL_MASK,
 				    OMAP4430_WUCLK_CTRL_MASK,
-				    OMAP4430_PRM_DEVICE_INST,
+				    prm_dev_inst,
 				    OMAP4_PRM_IO_PMCTRL_OFFSET);
 	omap_test_timeout(
-		(((omap4_prm_read_inst_reg(OMAP4430_PRM_DEVICE_INST,
+		(((omap4_prm_read_inst_reg(prm_dev_inst,
 					   OMAP4_PRM_IO_PMCTRL_OFFSET) &
 		   OMAP4430_WUCLK_STATUS_MASK) >>
 		  OMAP4430_WUCLK_STATUS_SHIFT) == 1),
@@ -292,10 +295,10 @@ void omap44xx_prm_reconfigure_io_chain(void)
 
 	/* Trigger WUCLKIN disable */
 	omap4_prm_rmw_inst_reg_bits(OMAP4430_WUCLK_CTRL_MASK, 0x0,
-				    OMAP4430_PRM_DEVICE_INST,
+				    prm_dev_inst,
 				    OMAP4_PRM_IO_PMCTRL_OFFSET);
 	omap_test_timeout(
-		(((omap4_prm_read_inst_reg(OMAP4430_PRM_DEVICE_INST,
+		(((omap4_prm_read_inst_reg(prm_dev_inst,
 					   OMAP4_PRM_IO_PMCTRL_OFFSET) &
 		   OMAP4430_WUCLK_STATUS_MASK) >>
 		  OMAP4430_WUCLK_STATUS_SHIFT) == 0),
@@ -318,7 +321,7 @@ static void __init omap44xx_prm_enable_io_wakeup(void)
 {
 	omap4_prm_rmw_inst_reg_bits(OMAP4430_GLOBAL_WUEN_MASK,
 				    OMAP4430_GLOBAL_WUEN_MASK,
-				    OMAP4430_PRM_DEVICE_INST,
+				    prm_dev_inst,
 				    OMAP4_PRM_IO_PMCTRL_OFFSET);
 }
 
@@ -334,7 +337,7 @@ static u32 omap44xx_prm_read_reset_sources(void)
 	u32 r = 0;
 	u32 v;
 
-	v = omap4_prm_read_inst_reg(OMAP4430_PRM_DEVICE_INST,
+	v = omap4_prm_read_inst_reg(prm_dev_inst,
 				    OMAP4_RM_RSTST);
 
 	p = omap44xx_prm_reset_src_map;
@@ -664,12 +667,25 @@ static struct prm_ll_data omap44xx_prm_ll_data = {
 
 int __init omap44xx_prm_init(u16 cpu_type)
 {
-	if (cpu_type == PRM_AM43XX)
-		return 0;
-	if (cpu_type != PRM_DRA7)
+	switch (cpu_type) {
+	case PRM_OMAP4:
+		prm_features |= PRM_HAS_IO_WAKEUP | PRM_HAS_VOLTAGE;
+		prm_dev_inst = OMAP4430_PRM_DEVICE_INST;
+		break;
+	case PRM_OMAP5:
 		prm_features |= PRM_HAS_VOLTAGE;
-	if (cpu_type == PRM_OMAP4)
-		prm_features |= PRM_HAS_IO_WAKEUP;
+		prm_dev_inst = OMAP54XX_PRM_DEVICE_INST;
+		break;
+	case PRM_DRA7:
+		prm_dev_inst = DRA7XX_PRM_DEVICE_INST;
+		break;
+	case PRM_AM43XX:
+		prm_dev_inst = AM43XX_PRM_DEVICE_INST;
+		return 0;
+	default:
+		pr_err("%s: unsupported cpu type: %d\n", __func__, cpu_type);
+		return -EINVAL;
+	}
 
 	return prm_register(&omap44xx_prm_ll_data);
 }

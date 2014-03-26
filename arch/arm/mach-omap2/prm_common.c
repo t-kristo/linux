@@ -63,6 +63,7 @@ static struct omap_prcm_irq_setup *prcm_irq_setup;
 void __iomem *prm_base;
 
 u16 prm_features;
+u16 prm_dev_inst;
 
 /*
  * prm_ll_data: function pointers to SoC-specific implementations of
