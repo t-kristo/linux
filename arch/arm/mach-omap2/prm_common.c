@@ -28,12 +28,10 @@
 #include <linux/clk-provider.h>
 #include <linux/clk/ti.h>
 
-#include "soc.h"
 #include "prm2xxx_3xxx.h"
 #include "prm2xxx.h"
 #include "prm3xxx.h"
 #include "prm44xx.h"
-#include "common.h"
 #include "clock.h"
 
 /*
