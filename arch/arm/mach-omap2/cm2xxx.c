@@ -22,7 +22,6 @@
 #include "cm.h"
 #include "cm2xxx_3xxx_private.h"
 #include "cm2xxx.h"
-#include "cm-regbits-24xx.h"
 #include "clockdomain.h"
 
 /* CM_AUTOIDLE_PLL.AUTO_* bit values for DPLLs */
@@ -35,6 +34,24 @@
 
 /* CM_IDLEST_PLL bit value offset for APLLs (OMAP2xxx only) */
 #define EN_APLL_LOCKED					3
+
+#define OMAP24XX_CLKSTCTRL_DISABLE_AUTO			0x0
+#define OMAP24XX_CLKSTCTRL_ENABLE_AUTO			0x1
+
+#define OMAP24XX_CORE_CLK_SRC_MASK			(0x3 << 0)
+
+#define OMAP24XX_EN_54M_PLL_SHIFT			6
+#define OMAP24XX_EN_96M_PLL_SHIFT			2
+#define OMAP24XX_ST_54M_APLL_SHIFT			9
+#define OMAP24XX_ST_96M_APLL_SHIFT			8
+#define OMAP24XX_AUTO_54M_MASK				(0x3 << 6)
+#define OMAP24XX_AUTO_96M_MASK				(0x3 << 2)
+#define OMAP24XX_AUTO_DPLL_SHIFT			0
+#define OMAP24XX_AUTO_DPLL_MASK				(0x3 << 0)
+
+#define OMAP24XX_EN_DSS1_MASK				(1 << 0)
+
+#define OMAP24XX_CLKSEL_DSS2_MASK			(0x1 << 13)
 
 static const u8 omap2xxx_cm_idlest_offs[] = {
 	CM_IDLEST1, CM_IDLEST2, OMAP2430_CM_IDLEST3, OMAP24XX_CM_IDLEST4
