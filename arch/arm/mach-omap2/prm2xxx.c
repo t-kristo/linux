@@ -20,9 +20,23 @@
 
 #include "powerdomain.h"
 #include "clockdomain.h"
+#include "prm2xxx.h"
 #include "prm2xxx_3xxx_private.h"
 #include "cm2xxx_3xxx.h"
-#include "prm-regbits-24xx.h"
+
+#define OMAP24XX_FORCESTATE_MASK		(1 << 18)
+#define OMAP24XX_AUTOIDLE_MASK			(1 << 0)
+#define OMAP24XX_AUTO_EXTVOLT_MASK		(1 << 15)
+
+#define OMAP24XX_SETOFF_LEVEL_SHIFT		12
+#define OMAP24XX_MEMRETCTRL_MASK		(1 << 8)
+#define OMAP24XX_SETRET_LEVEL_SHIFT		6
+#define OMAP24XX_VOLT_LEVEL_SHIFT		0
+
+#define OMAP24XX_EXTWMPU_RST_SHIFT		6
+#define OMAP24XX_SECU_WD_RST_SHIFT		5
+#define OMAP24XX_MPU_WD_RST_SHIFT		4
+#define OMAP24XX_SECU_VIOL_RST_SHIFT		3
 
 /*
  * OMAP24xx PM_PWSTCTRL_*.POWERSTATE and PM_PWSTST_*.LASTSTATEENTERED bits -
