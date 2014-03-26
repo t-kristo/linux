@@ -24,6 +24,8 @@
 #include "common.h"
 #include "vp.h"
 #include "prm44xx.h"
+#include "prm54xx.h"
+#include "prm7xx.h"
 #include "prm-regbits-44xx.h"
 #include "prcm44xx.h"
 #include "prminst44xx_private.h"
@@ -664,10 +666,22 @@ static struct prm_ll_data omap44xx_prm_ll_data = {
 
 int __init omap44xx_prm_init(u16 cpu_type)
 {
-	if (cpu_type != PRM_DRA7)
+	switch (cpu_type) {
+	case PRM_OMAP4:
+		prm_features |= PRM_HAS_IO_WAKEUP | PRM_HAS_VOLTAGE;
+		prm_dev_inst = OMAP4430_PRM_DEVICE_INST;
+		break;
+	case PRM_OMAP5:
 		prm_features |= PRM_HAS_VOLTAGE;
-	if (cpu_type == PRM_OMAP4)
-		prm_features |= PRM_HAS_IO_WAKEUP;
+		prm_dev_inst = OMAP54XX_PRM_DEVICE_INST;
+		break;
+	case PRM_DRA7:
+		prm_dev_inst = DRA7XX_PRM_DEVICE_INST;
+		break;
+	default:
+		pr_err("%s: unsupported cpu type: %d\n", __func__, cpu_type);
+		return -EINVAL;
+	}
 
 	return prm_register(&omap44xx_prm_ll_data);
 }
