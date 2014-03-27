@@ -24,7 +24,7 @@
 
 #include "clockdomain.h"
 #include "cm.h"
-#include "cm33xx.h"
+#include <linux/power/omap/cm33xx.h>
 #include "prm33xx.h"
 
 #define AM33XX_MODULEMODE_SHIFT			0
