@@ -21,7 +21,6 @@
 #include "cm2xxx.h"
 #include "cm3xxx.h"
 #include "cm44xx.h"
-#include "clock.h"
 
 /*
  * cm_ll_data: function pointers to SoC-specific implementations of

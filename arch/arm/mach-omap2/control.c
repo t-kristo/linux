@@ -27,7 +27,6 @@
 #include "sdrc.h"
 #include "pm.h"
 #include "control.h"
-#include "clock.h"
 
 /* Used by omap3_ctrl_save_padconf() */
 #define START_PADCONF_SAVE		0x2

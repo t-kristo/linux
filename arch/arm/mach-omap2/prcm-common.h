@@ -534,6 +534,8 @@ enum {
 	PRCM_CLK_MEMMAP_INDEX_SCRM,
 };
 
+extern void __iomem *clk_memmaps[];
+
 extern void omap_prcm_irq_cleanup(void);
 extern int omap_prcm_register_chain_handler(
 	struct omap_prcm_irq_setup *irq_setup);
