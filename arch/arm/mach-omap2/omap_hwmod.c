@@ -153,7 +153,7 @@
 #include "powerdomain.h"
 #include "cm2xxx.h"
 #include "cm3xxx.h"
-#include "cminst44xx.h"
+#include <linux/power/omap/cm44xx.h>
 #include "cm33xx.h"
 #include "prm.h"
 #include "prm3xxx.h"
