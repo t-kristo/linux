@@ -25,7 +25,6 @@
 #include "clockdomain.h"
 #include "cm.h"
 #include "cm33xx.h"
-#include "cm-regbits-34xx.h"
 #include "prm33xx.h"
 
 #define AM33XX_MODULEMODE_SHIFT			0
@@ -35,6 +34,11 @@
 #define AM33XX_CLKTRCTRL_MASK			(0x3 << 0)
 #define AM33XX_IDLEST_SHIFT			16
 #define AM33XX_IDLEST_MASK			(0x3 << 16)
+
+#define OMAP34XX_CLKSTCTRL_DISABLE_AUTO		0x0
+#define OMAP34XX_CLKSTCTRL_FORCE_SLEEP		0x1
+#define OMAP34XX_CLKSTCTRL_FORCE_WAKEUP		0x2
+#define OMAP34XX_CLKSTCTRL_ENABLE_AUTO		0x3
 
 /*
  * CLKCTRL_IDLEST_*: possible values for the CM_*_CLKCTRL.IDLEST bitfield:

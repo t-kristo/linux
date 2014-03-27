@@ -22,8 +22,14 @@
 #include "cm.h"
 #include "cm2xxx_3xxx_private.h"
 #include "cm3xxx.h"
-#include "cm-regbits-34xx.h"
 #include "clockdomain.h"
+
+#define OMAP34XX_CLKSTCTRL_DISABLE_AUTO		0x0
+#define OMAP34XX_CLKSTCTRL_FORCE_SLEEP		0x1
+#define OMAP34XX_CLKSTCTRL_FORCE_WAKEUP		0x2
+#define OMAP34XX_CLKSTCTRL_ENABLE_AUTO		0x3
+
+#define OMAP3430_AUTO_PERIPH_DPLL_MASK		(0x7 << 3)
 
 static const u8 omap3xxx_cm_idlest_offs[] = {
 	CM_IDLEST1, CM_IDLEST2, OMAP2430_CM_IDLEST3

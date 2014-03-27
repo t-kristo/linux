@@ -27,7 +27,6 @@
 #include "cm2_44xx.h"
 #include "cm44xx.h"
 #include "cminst44xx.h"
-#include "cm-regbits-34xx.h"
 #include "prcm44xx.h"
 #include "prm44xx.h"
 #include "prcm_mpu44xx.h"
@@ -39,6 +38,11 @@
 #define OMAP4430_CLKTRCTRL_MASK		(0x3 << 0)
 #define OMAP4430_MODULEMODE_SHIFT	0
 #define OMAP4430_MODULEMODE_MASK	(0x3 << 0)
+
+#define OMAP34XX_CLKSTCTRL_DISABLE_AUTO	0x0
+#define OMAP34XX_CLKSTCTRL_FORCE_SLEEP	0x1
+#define OMAP34XX_CLKSTCTRL_FORCE_WAKEUP	0x2
+#define OMAP34XX_CLKSTCTRL_ENABLE_AUTO	0x3
 
 /*
  * CLKCTRL_IDLEST_*: possible values for the CM_*_CLKCTRL.IDLEST bitfield:
