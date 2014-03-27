@@ -20,7 +20,7 @@
 
 #include "vp.h"
 #include "powerdomain.h"
-#include "prm3xxx.h"
+#include <linux/power/omap/prm3xxx.h>
 #include "prm2xxx_3xxx_private.h"
 #include "cm2xxx_3xxx_private.h"
 #include <linux/power/omap/cm3xxx.h>
