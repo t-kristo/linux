@@ -16,7 +16,7 @@
 #ifndef __ARCH_ARM_MACH_OMAP2_CM2XXX_3XXX_PRIVATE_H
 #define __ARCH_ARM_MACH_OMAP2_CM2XXX_3XXX_PRIVATE_H
 
-#include "cm.h"
+#include <linux/power/omap/cm.h>
 #include <linux/power/omap/cm2xxx_3xxx.h>
 
 #ifndef __ASSEMBLER__

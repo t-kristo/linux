@@ -10,8 +10,8 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
-#ifndef __ARCH_ASM_MACH_OMAP2_CM_H
-#define __ARCH_ASM_MACH_OMAP2_CM_H
+#ifndef __LINUX_POWER_OMAP_CM_H
+#define __LINUX_POWER_OMAP_CM_H
 
 /*
  * MAX_MODULE_READY_TIME: max duration in microseconds to wait for the
@@ -25,7 +25,7 @@
 # ifndef __ASSEMBLER__
 extern void __iomem *cm_base;
 extern void __iomem *cm2_base;
-extern void omap2_set_globals_cm(void __iomem *cm, void __iomem *cm2);
+void omap2_set_globals_cm(void __iomem *cm, void __iomem *cm2);
 # endif
 
 /*
@@ -52,12 +52,12 @@ struct cm_ll_data {
 	int (*wait_module_ready)(s16 prcm_mod, u8 idlest_id, u8 idlest_shift);
 };
 
-extern int cm_split_idlest_reg(void __iomem *idlest_reg, s16 *prcm_inst,
-			       u8 *idlest_reg_id);
-extern int cm_wait_module_ready(s16 prcm_mod, u8 idlest_id, u8 idlest_shift);
+int cm_split_idlest_reg(void __iomem *idlest_reg, s16 *prcm_inst,
+			u8 *idlest_reg_id);
+int cm_wait_module_ready(s16 prcm_mod, u8 idlest_id, u8 idlest_shift);
 
-extern int cm_register(struct cm_ll_data *cld);
-extern int cm_unregister(struct cm_ll_data *cld);
+int cm_register(struct cm_ll_data *cld);
+int cm_unregister(struct cm_ll_data *cld);
 
 # endif
 

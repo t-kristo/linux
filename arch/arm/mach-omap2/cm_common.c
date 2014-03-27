@@ -18,7 +18,7 @@
 
 #include <linux/power/omap/cm2xxx.h>
 #include <linux/power/omap/cm3xxx.h>
-#include "cm.h"
+#include <linux/power/omap/cm.h>
 #include "prcm-common.h"
 
 /*

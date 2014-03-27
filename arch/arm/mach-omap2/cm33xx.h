@@ -17,7 +17,7 @@
 #ifndef __ARCH_ARM_MACH_OMAP2_CM_33XX_H
 #define __ARCH_ARM_MACH_OMAP2_CM_33XX_H
 
-#include "cm.h"
+#include <linux/power/omap/cm.h>
 #include <linux/power/omap/cm33xx.h>
 
 /* CM base address */

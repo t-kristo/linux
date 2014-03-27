@@ -22,7 +22,7 @@
 #include <linux/io.h>
 
 #include "clockdomain.h"
-#include "cm.h"
+#include <linux/power/omap/cm.h>
 #include "cm1_44xx.h"
 #include "cm2_44xx.h"
 #include <linux/power/omap/cm44xx.h>

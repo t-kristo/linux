@@ -25,7 +25,7 @@
 #include "soc.h"
 #include "clock.h"
 #include "clock2xxx.h"
-#include "cm.h"
+#include <linux/power/omap/cm.h>
 #include "cm-regbits-24xx.h"
 
 struct clk_hw *dclk_hw;

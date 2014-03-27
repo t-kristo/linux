@@ -31,7 +31,7 @@
 #include "soc.h"
 #include "clockdomain.h"
 #include "clock.h"
-#include "cm.h"
+#include <linux/power/omap/cm.h>
 #include "cm2xxx.h"
 #include "cm3xxx.h"
 #include "cm-regbits-24xx.h"

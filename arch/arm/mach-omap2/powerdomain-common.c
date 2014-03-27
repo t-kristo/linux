@@ -15,7 +15,7 @@
 #include <linux/kernel.h>
 #include <linux/bug.h>
 #include "pm.h"
-#include "cm.h"
+#include <linux/power/omap/cm.h>
 #include "prm-regbits-34xx.h"
 #include "prm-regbits-44xx.h"
 

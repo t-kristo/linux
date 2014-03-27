@@ -19,7 +19,7 @@
 #include <linux/io.h>
 
 #include "prm2xxx_3xxx.h"
-#include "cm.h"
+#include <linux/power/omap/cm.h>
 #include "cm2xxx_3xxx_private.h"
 #include <linux/power/omap/cm3xxx.h>
 #include "clockdomain.h"
