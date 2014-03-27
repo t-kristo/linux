@@ -31,7 +31,7 @@
 #include "soc.h"
 #include "clockdomain.h"
 #include "clock.h"
-#include "cm2xxx_3xxx.h"
+#include <linux/power/omap/cm2xxx_3xxx.h>
 #include "cm-regbits-34xx.h"
 
 /* CM_AUTOIDLE_PLL*.AUTO_* bit values */

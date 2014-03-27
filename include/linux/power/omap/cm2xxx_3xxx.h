@@ -13,10 +13,8 @@
  * other.  The CM modules/instances on OMAP4 are quite different, so
  * they are handled in a separate file.
  */
-#ifndef __ARCH_ASM_MACH_OMAP2_CM2XXX_3XXX_H
-#define __ARCH_ASM_MACH_OMAP2_CM2XXX_3XXX_H
-
-#include "cm.h"
+#ifndef __LINUX_POWER_OMAP_CM2XXX_3XXX_H
+#define __LINUX_POWER_OMAP_CM2XXX_3XXX_H
 
 /*
  * Module specific CM register offsets from CM_BASE + domain offset
@@ -48,10 +46,10 @@
 
 #ifndef __ASSEMBLER__
 
-extern int omap2xxx_cm_apll54_enable(void);
-extern void omap2xxx_cm_apll54_disable(void);
-extern int omap2xxx_cm_apll96_enable(void);
-extern void omap2xxx_cm_apll96_disable(void);
+int omap2xxx_cm_apll54_enable(void);
+void omap2xxx_cm_apll54_disable(void);
+int omap2xxx_cm_apll96_enable(void);
+void omap2xxx_cm_apll96_disable(void);
 
 #endif
 

@@ -33,7 +33,7 @@
 #include "omap-pm.h"
 
 #include "soc.h"
-#include "cm2xxx_3xxx.h"
+#include <linux/power/omap/cm2xxx_3xxx.h>
 #include "prm2xxx_3xxx.h"
 #include "pm.h"
 

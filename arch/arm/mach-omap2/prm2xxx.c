@@ -22,7 +22,7 @@
 #include "clockdomain.h"
 #include "prm2xxx.h"
 #include "prm2xxx_3xxx_private.h"
-#include "cm2xxx_3xxx.h"
+#include <linux/power/omap/cm2xxx_3xxx.h>
 
 #define OMAP24XX_FORCESTATE_MASK		(1 << 18)
 #define OMAP24XX_AUTOIDLE_MASK			(1 << 0)

@@ -22,7 +22,7 @@
 #include <linux/spinlock.h>
 #include <trace/events/power.h>
 
-#include "cm2xxx_3xxx.h"
+#include <linux/power/omap/cm2xxx_3xxx.h>
 #include "prcm44xx.h"
 #include "prm2xxx_3xxx.h"
 #include "prm44xx.h"
