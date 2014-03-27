@@ -32,7 +32,6 @@
 #include "prm2xxx.h"
 #include "prm3xxx.h"
 #include "prm44xx.h"
-#include "clock.h"
 
 /*
  * OMAP_PRCM_MAX_NR_PENDING_REG: maximum number of PRM_IRQ*_MPU regs
@@ -481,18 +480,16 @@ static struct of_device_id omap_prcm_dt_match_table[] = {
 	{ }
 };
 
-static struct clk_hw_omap memmap_dummy_ck = {
-	.flags = MEMMAP_ADDRESSING,
-};
-
 static u32 prm_clk_readl(void __iomem *reg)
 {
-	return omap2_clk_readl(&memmap_dummy_ck, reg);
+	struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
+	return readl_relaxed(clk_memmaps[r->index] + r->offset);
 }
 
 static void prm_clk_writel(u32 val, void __iomem *reg)
 {
-	omap2_clk_writel(val, &memmap_dummy_ck, reg);
+	struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
+	writel_relaxed(val, clk_memmaps[r->index] + r->offset);
 }
 
 static struct ti_clk_ll_ops omap_clk_ll_ops = {
