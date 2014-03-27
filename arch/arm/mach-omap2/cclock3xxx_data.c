@@ -79,12 +79,15 @@ static const char *osc_sys_ck_parent_names[] = {
 };
 
 DEFINE_CLK_MUX(osc_sys_ck, osc_sys_ck_parent_names, NULL, 0x0,
-	       OMAP3430_PRM_CLKSEL, OMAP3430_SYS_CLKIN_SEL_SHIFT,
-	       OMAP3430_SYS_CLKIN_SEL_WIDTH, 0x0, NULL);
+	       OMAP34XX_PRM_REGADDR(OMAP3430_CCR_MOD, OMAP3_PRM_CLKSEL_OFFSET),
+	       OMAP3430_SYS_CLKIN_SEL_SHIFT, OMAP3430_SYS_CLKIN_SEL_WIDTH, 0x0,
+	       NULL);
 
 DEFINE_CLK_DIVIDER(sys_ck, "osc_sys_ck", &osc_sys_ck, 0x0,
-		   OMAP3430_PRM_CLKSRC_CTRL, OMAP_SYSCLKDIV_SHIFT,
-		   OMAP_SYSCLKDIV_WIDTH, CLK_DIVIDER_ONE_BASED, NULL);
+		   OMAP34XX_PRM_REGADDR(OMAP3430_GR_MOD,
+					OMAP3_PRM_CLKSRC_CTRL_OFFSET),
+		   OMAP_SYSCLKDIV_SHIFT, OMAP_SYSCLKDIV_WIDTH,
+		   CLK_DIVIDER_ONE_BASED, NULL);
 
 static struct dpll_data dpll3_dd = {
 	.mult_div1_reg	= OMAP_CM_REGADDR(PLL_MOD, CM_CLKSEL1),
@@ -2824,7 +2827,8 @@ static struct clk_hw_omap sys_clkout1_hw = {
 	.hw = {
 		.clk = &sys_clkout1,
 	},
-	.enable_reg	= OMAP3430_PRM_CLKOUT_CTRL,
+	.enable_reg	= OMAP34XX_PRM_REGADDR(OMAP3430_CCR_MOD,
+					       OMAP3_PRM_CLKOUT_CTRL_OFFSET),
 	.enable_bit	= OMAP3430_CLKOUT_EN_SHIFT,
 };
 
