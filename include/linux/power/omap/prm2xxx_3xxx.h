@@ -13,11 +13,8 @@
  * other.  The PRM on OMAP4 has a new register layout, and is handled
  * in a separate file.
  */
-#ifndef __ARCH_ARM_MACH_OMAP2_PRM2XXX_3XXX_H
-#define __ARCH_ARM_MACH_OMAP2_PRM2XXX_3XXX_H
-
-#include "prcm-common.h"
-#include "prm.h"
+#ifndef __LINUX_POWER_OMAP_PRM2XXX_3XXX_H
+#define __LINUX_POWER_OMAP_PRM2XXX_3XXX_H
 
 /*
  * Module specific PRM register offsets from PRM_BASE + domain offset
@@ -50,32 +47,34 @@
 #ifndef __ASSEMBLER__
 
 #include <linux/io.h>
-#include "powerdomain.h"
+
+struct powerdomain;
+struct clockdomain;
 
 /* These omap2_ PRM functions apply to both OMAP2 and 3 */
-extern int omap2_prm_is_hardreset_asserted(s16 prm_mod, u8 shift);
-extern int omap2_prm_assert_hardreset(s16 prm_mod, u8 shift);
-extern int omap2_prm_deassert_hardreset(s16 prm_mod, u8 rst_shift, u8 st_shift);
+int omap2_prm_is_hardreset_asserted(s16 prm_mod, u8 shift);
+int omap2_prm_assert_hardreset(s16 prm_mod, u8 shift);
+int omap2_prm_deassert_hardreset(s16 prm_mod, u8 rst_shift, u8 st_shift);
 
-extern int omap2_pwrdm_set_next_pwrst(struct powerdomain *pwrdm, u8 pwrst);
-extern int omap2_pwrdm_read_next_pwrst(struct powerdomain *pwrdm);
-extern int omap2_pwrdm_read_pwrst(struct powerdomain *pwrdm);
-extern int omap2_pwrdm_set_mem_onst(struct powerdomain *pwrdm, u8 bank,
-				    u8 pwrst);
-extern int omap2_pwrdm_set_mem_retst(struct powerdomain *pwrdm, u8 bank,
-				     u8 pwrst);
-extern int omap2_pwrdm_read_mem_pwrst(struct powerdomain *pwrdm, u8 bank);
-extern int omap2_pwrdm_read_mem_retst(struct powerdomain *pwrdm, u8 bank);
-extern int omap2_pwrdm_set_logic_retst(struct powerdomain *pwrdm, u8 pwrst);
-extern int omap2_pwrdm_wait_transition(struct powerdomain *pwrdm);
+int omap2_pwrdm_set_next_pwrst(struct powerdomain *pwrdm, u8 pwrst);
+int omap2_pwrdm_read_next_pwrst(struct powerdomain *pwrdm);
+int omap2_pwrdm_read_pwrst(struct powerdomain *pwrdm);
+int omap2_pwrdm_set_mem_onst(struct powerdomain *pwrdm, u8 bank,
+			     u8 pwrst);
+int omap2_pwrdm_set_mem_retst(struct powerdomain *pwrdm, u8 bank,
+			      u8 pwrst);
+int omap2_pwrdm_read_mem_pwrst(struct powerdomain *pwrdm, u8 bank);
+int omap2_pwrdm_read_mem_retst(struct powerdomain *pwrdm, u8 bank);
+int omap2_pwrdm_set_logic_retst(struct powerdomain *pwrdm, u8 pwrst);
+int omap2_pwrdm_wait_transition(struct powerdomain *pwrdm);
 
-extern int omap2_clkdm_add_wkdep(struct clockdomain *clkdm1,
-				 struct clockdomain *clkdm2);
-extern int omap2_clkdm_del_wkdep(struct clockdomain *clkdm1,
-				 struct clockdomain *clkdm2);
-extern int omap2_clkdm_read_wkdep(struct clockdomain *clkdm1,
-				  struct clockdomain *clkdm2);
-extern int omap2_clkdm_clear_all_wkdeps(struct clockdomain *clkdm);
+int omap2_clkdm_add_wkdep(struct clockdomain *clkdm1,
+			  struct clockdomain *clkdm2);
+int omap2_clkdm_del_wkdep(struct clockdomain *clkdm1,
+			  struct clockdomain *clkdm2);
+int omap2_clkdm_read_wkdep(struct clockdomain *clkdm1,
+			   struct clockdomain *clkdm2);
+int omap2_clkdm_clear_all_wkdeps(struct clockdomain *clkdm);
 
 #endif /* __ASSEMBLER */
 

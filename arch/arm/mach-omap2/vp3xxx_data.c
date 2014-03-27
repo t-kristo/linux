@@ -25,7 +25,7 @@
 #include "voltage.h"
 
 #include "vp.h"
-#include "prm2xxx_3xxx.h"
+#include <linux/power/omap/prm2xxx_3xxx.h>
 
 static const struct omap_vp_ops omap3_vp_ops = {
 	.check_txdone = omap3_prm_vp_check_txdone,

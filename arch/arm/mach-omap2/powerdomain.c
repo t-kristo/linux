@@ -24,7 +24,7 @@
 
 #include <linux/power/omap/cm2xxx_3xxx.h>
 #include "prcm44xx.h"
-#include "prm2xxx_3xxx.h"
+#include <linux/power/omap/prm2xxx_3xxx.h>
 #include "prm44xx.h"
 
 #include <asm/cpu.h>

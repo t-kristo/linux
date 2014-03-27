@@ -18,7 +18,7 @@
 
 #include "prcm-common.h"
 #include "prm.h"
-#include "prm2xxx_3xxx.h"
+#include <linux/power/omap/prm2xxx_3xxx.h>
 
 #define OMAP34XX_PRM_REGADDR(module, reg)				\
 		OMAP2_L4_IO_ADDRESS(OMAP3430_PRM_BASE + (module) + (reg))

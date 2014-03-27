@@ -18,7 +18,7 @@
 
 #include "prcm-common.h"
 #include "prm.h"
-#include "prm2xxx_3xxx.h"
+#include <linux/power/omap/prm2xxx_3xxx.h>
 
 #ifndef __ASSEMBLER__
 

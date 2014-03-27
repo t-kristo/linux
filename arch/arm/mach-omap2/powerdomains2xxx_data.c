@@ -19,7 +19,7 @@
 #include "powerdomains2xxx_3xxx_data.h"
 
 #include "prcm-common.h"
-#include "prm2xxx_3xxx.h"
+#include <linux/power/omap/prm2xxx_3xxx.h>
 #include "prm-regbits-24xx.h"
 
 /* 24XX powerdomains and dependencies */

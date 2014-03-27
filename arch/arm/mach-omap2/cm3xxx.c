@@ -18,11 +18,12 @@
 #include <linux/err.h>
 #include <linux/io.h>
 
-#include "prm2xxx_3xxx.h"
+#include <linux/power/omap/prm2xxx_3xxx.h>
 #include <linux/power/omap/cm.h>
 #include "cm2xxx_3xxx_private.h"
 #include <linux/power/omap/cm3xxx.h>
 #include "clockdomain.h"
+#include "prcm-common.h"
 
 #define OMAP34XX_CLKSTCTRL_DISABLE_AUTO		0x0
 #define OMAP34XX_CLKSTCTRL_FORCE_SLEEP		0x1
