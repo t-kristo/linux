@@ -25,7 +25,6 @@
 #include "cm.h"
 #include "cm1_44xx.h"
 #include "cm2_44xx.h"
-#include "cm44xx.h"
 #include "cminst44xx.h"
 #include "prcm44xx.h"
 #include "prm44xx.h"
@@ -43,6 +42,9 @@
 #define OMAP34XX_CLKSTCTRL_FORCE_SLEEP	0x1
 #define OMAP34XX_CLKSTCTRL_FORCE_WAKEUP	0x2
 #define OMAP34XX_CLKSTCTRL_ENABLE_AUTO	0x3
+
+#define OMAP4_CM_CLKSTCTRL		0x0000
+#define OMAP4_CM_STATICDEP		0x0004
 
 /*
  * CLKCTRL_IDLEST_*: possible values for the CM_*_CLKCTRL.IDLEST bitfield:

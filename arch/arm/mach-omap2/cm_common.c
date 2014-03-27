@@ -18,7 +18,8 @@
 
 #include <linux/power/omap/cm2xxx.h>
 #include <linux/power/omap/cm3xxx.h>
-#include "cm44xx.h"
+#include "cm.h"
+#include "prcm-common.h"
 
 /*
  * cm_ll_data: function pointers to SoC-specific implementations of
