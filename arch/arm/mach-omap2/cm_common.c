@@ -16,7 +16,7 @@
 #include <linux/errno.h>
 #include <linux/of.h>
 
-#include "cm2xxx.h"
+#include <linux/power/omap/cm2xxx.h>
 #include "cm3xxx.h"
 #include "cm44xx.h"
 
