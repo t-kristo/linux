@@ -24,7 +24,6 @@
 #include "prm2xxx_3xxx_private.h"
 #include "cm2xxx_3xxx_private.h"
 #include "cm3xxx.h"
-#include "cm-regbits-34xx.h"
 
 #define OMAP3430_GLOBAL_COLD_RST_MASK			(1 << 0)
 #define OMAP3430_GLOBAL_COLD_RST_SHIFT			0
@@ -78,6 +77,12 @@
 
 #define OMAP3430_LASTPOWERSTATEENTERED_MASK		(0x3 << 0)
 #define OMAP3430_LOGICSTATEST_MASK			(1 << 2)
+
+#define OMAP3430ES2_EN_USBHOST2_SHIFT			1
+
+#define OMAP3430_CM_FCLKEN_IVA2_EN_IVA2_MASK		(1 << 0)
+
+#define OMAP3430_CLKACTIVITY_IVA2_MASK			(1 << 0)
 
 static const struct omap_prcm_irq omap3_prcm_irqs[] = {
 	OMAP_PRCM_IRQ("wkup",	0,	0),

@@ -16,7 +16,6 @@
 #include <linux/bug.h>
 #include "pm.h"
 #include "cm.h"
-#include "cm-regbits-34xx.h"
 #include "prm-regbits-34xx.h"
 #include "prm-regbits-44xx.h"
 
