@@ -23,20 +23,6 @@ extern void omap4_cminst_module_enable(u8 mode, u8 part, u16 inst, s16 cdoffs,
 				       u16 clkctrl_offs);
 extern void omap4_cminst_module_disable(u8 part, u16 inst, s16 cdoffs,
 					u16 clkctrl_offs);
-/*
- * In an ideal world, we would not export these low-level functions,
- * but this will probably take some time to fix properly
- */
-u32 omap4_cminst_read_inst_reg(u8 part, u16 inst, u16 idx);
-void omap4_cminst_write_inst_reg(u32 val, u8 part, u16 inst, u16 idx);
-u32 omap4_cminst_rmw_inst_reg_bits(u32 mask, u32 bits, u8 part,
-				   u16 inst, s16 idx);
-u32 omap4_cminst_set_inst_reg_bits(u32 bits, u8 part, u16 inst,
-				   s16 idx);
-u32 omap4_cminst_clear_inst_reg_bits(u32 bits, u8 part, u16 inst,
-				     s16 idx);
-extern u32 omap4_cminst_read_inst_reg_bits(u8 part, u16 inst, s16 idx,
-					   u32 mask);
 
 extern void omap_cm_base_init(void);
 
