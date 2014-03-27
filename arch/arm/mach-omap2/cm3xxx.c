@@ -21,7 +21,7 @@
 #include "prm2xxx_3xxx.h"
 #include "cm.h"
 #include "cm2xxx_3xxx_private.h"
-#include "cm3xxx.h"
+#include <linux/power/omap/cm3xxx.h>
 #include "clockdomain.h"
 
 #define OMAP34XX_CLKSTCTRL_DISABLE_AUTO		0x0

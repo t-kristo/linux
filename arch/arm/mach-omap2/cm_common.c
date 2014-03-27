@@ -17,7 +17,7 @@
 #include <linux/of.h>
 
 #include <linux/power/omap/cm2xxx.h>
-#include "cm3xxx.h"
+#include <linux/power/omap/cm3xxx.h>
 #include "cm44xx.h"
 
 /*

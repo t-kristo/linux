@@ -23,7 +23,7 @@
 #include "prm3xxx.h"
 #include "prm2xxx_3xxx_private.h"
 #include "cm2xxx_3xxx_private.h"
-#include "cm3xxx.h"
+#include <linux/power/omap/cm3xxx.h>
 
 #define OMAP3430_GLOBAL_COLD_RST_MASK			(1 << 0)
 #define OMAP3430_GLOBAL_COLD_RST_SHIFT			0
