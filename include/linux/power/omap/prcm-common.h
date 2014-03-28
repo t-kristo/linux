@@ -519,6 +519,21 @@ struct omap_prcm_irq_setup {
 
 struct of_device_id;
 
+#define PRCM_REGISTER_CLOCKS			0x1
+
+struct prcm_match_data {
+	u32 flags;
+	u16 index;
+	u16 offset;
+};
+
+enum {
+	PRCM_CLK_MEMMAP_INDEX_PRM = 0,
+	PRCM_CLK_MEMMAP_INDEX_CM1,
+	PRCM_CLK_MEMMAP_INDEX_CM2,
+	PRCM_CLK_MEMMAP_INDEX_SCRM,
+};
+
 extern void __iomem *clk_memmaps[];
 
 void omap_prcm_irq_cleanup(void);
@@ -529,6 +544,9 @@ void omap_prcm_irq_complete(void);
 void omap_pcs_legacy_init(int irq, void (*rearm)(void));
 int of_prcm_module_init(struct of_device_id *match_table);
 int of_cm_init(void);
+int of_cm_base_init(void);
+int of_prcm_base_init(void);
+int of_scrm_base_init(void);
 
 # endif
 

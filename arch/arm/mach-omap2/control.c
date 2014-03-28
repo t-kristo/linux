@@ -14,6 +14,8 @@
 
 #include <linux/kernel.h>
 #include <linux/io.h>
+#include <linux/of.h>
+#include <linux/of_address.h>
 
 #include "soc.h"
 #include "iomap.h"
@@ -612,17 +614,39 @@ void __init omap3_ctrl_init(void)
 }
 #endif /* CONFIG_ARCH_OMAP3 && CONFIG_PM */
 
+static const struct prcm_match_data scrm_base_data = {
+	.flags = PRCM_REGISTER_CLOCKS,
+	.index = PRCM_CLK_MEMMAP_INDEX_SCRM,
+};
+
 static struct of_device_id omap_scrm_dt_match_table[] = {
-	{ .compatible = "ti,am3-scrm" },
-	{ .compatible = "ti,am4-scrm" },
-	{ .compatible = "ti,omap2-scrm" },
-	{ .compatible = "ti,omap3-scrm" },
-	{ .compatible = "ti,omap4-scrm" },
-	{ .compatible = "ti,omap5-scrm" },
+	{ .compatible = "ti,am3-scrm", .data = &scrm_base_data },
+	{ .compatible = "ti,am4-scrm", .data = &scrm_base_data },
+	{ .compatible = "ti,omap2-scrm", .data = &scrm_base_data },
+	{ .compatible = "ti,omap3-scrm", .data = &scrm_base_data },
 	{ }
 };
 
 int __init of_scrm_init(void)
 {
 	return of_prcm_module_init(omap_scrm_dt_match_table);
+}
+
+int __init of_scrm_base_init(void)
+{
+	struct device_node *np;
+	const struct of_device_id *match;
+	const struct prcm_match_data *data;
+
+	for_each_matching_node_and_match(np, omap_scrm_dt_match_table, &match) {
+		data = match->data;
+
+		if (clk_memmaps[data->index])
+			pr_warn("WARN: multiple scrm compatible mods\n");
+
+		clk_memmaps[data->index] = of_iomap(np, 0);
+		omap2_ctrl_base = clk_memmaps[data->index];
+	}
+
+	return 0;
 }
