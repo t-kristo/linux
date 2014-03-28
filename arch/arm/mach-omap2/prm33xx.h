@@ -17,7 +17,7 @@
 #define __ARCH_ARM_MACH_OMAP2_PRM33XX_H
 
 #include <linux/power/omap/prcm-common.h>
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 #include <linux/power/omap/prm33xx.h>
 
 #define AM33XX_PRM_BASE               0x44E00000

@@ -34,14 +34,13 @@
 #include <linux/uaccess.h>
 #include <linux/irq.h>
 #include <linux/interrupt.h>
-
+#include <linux/power/omap/prm.h>
 
 #include "omap_hwmod.h"
 
 #include "soc.h"
 #include "control.h"
 #include "mux.h"
-#include "prm.h"
 #include "common.h"
 
 #define OMAP_MUX_BASE_OFFSET		0x30	/* Offset from CTRL_BASE */

@@ -20,7 +20,7 @@
 
 #include "common.h"
 #include "pm.h"
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 #include "clockdomain.h"
 
 /* Machine specific information */

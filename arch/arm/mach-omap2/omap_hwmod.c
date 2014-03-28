@@ -155,7 +155,7 @@
 #include "cm3xxx.h"
 #include <linux/power/omap/cm44xx.h>
 #include "cm33xx.h"
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 #include "prm3xxx.h"
 #include "prm44xx.h"
 #include "prm33xx.h"

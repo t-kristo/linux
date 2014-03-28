@@ -29,7 +29,7 @@
 
 #include <asm/cpu.h>
 
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 #include "powerdomain.h"
 #include "clockdomain.h"
 #include "voltage.h"

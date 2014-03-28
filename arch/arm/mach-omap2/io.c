@@ -45,7 +45,7 @@
 #include "sram.h"
 #include "cm2xxx.h"
 #include "cm3xxx.h"
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 #include <linux/power/omap/cm.h>
 #include "prcm_mpu44xx.h"
 #include <linux/power/omap/cm44xx.h>

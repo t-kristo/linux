@@ -25,7 +25,7 @@
 #include "prcm44xx.h"
 #include "prminst44xx_private.h"
 #include "powerdomain.h"
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/prm44xx_54xx.h>
 

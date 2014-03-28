@@ -24,7 +24,7 @@
 
 #include <linux/power/omap/prm44xx_54xx.h>
 #include <linux/power/omap/prcm-common.h>
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 #include <linux/power/omap/prm7xx.h>
 
 #define DRA7XX_PRM_BASE		0x4ae06000

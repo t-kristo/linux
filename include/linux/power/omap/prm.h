@@ -10,8 +10,8 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
-#ifndef __ARCH_ARM_MACH_OMAP2_PRM_H
-#define __ARCH_ARM_MACH_OMAP2_PRM_H
+#ifndef __LINUX_POWER_OMAP_PRM_H
+#define __LINUX_POWER_OMAP_PRM_H
 
 #include <linux/power/omap/prcm-common.h>
 
@@ -19,7 +19,7 @@
 extern void __iomem *prm_base;
 extern u16 prm_dev_inst;
 extern u16 prm_features;
-extern void omap2_set_globals_prm(void __iomem *prm);
+void omap2_set_globals_prm(void __iomem *prm);
 int of_prcm_init(void);
 # endif
 
@@ -151,12 +151,12 @@ struct prm_ll_data {
 	int (*late_init)(void);
 };
 
-extern int prm_register(struct prm_ll_data *pld);
-extern int prm_unregister(struct prm_ll_data *pld);
+int prm_register(struct prm_ll_data *pld);
+int prm_unregister(struct prm_ll_data *pld);
 
-extern u32 prm_read_reset_sources(void);
-extern bool prm_was_any_context_lost_old(u8 part, s16 inst, u16 idx);
-extern void prm_clear_context_loss_flags_old(u8 part, s16 inst, u16 idx);
+u32 prm_read_reset_sources(void);
+bool prm_was_any_context_lost_old(u8 part, s16 inst, u16 idx);
+void prm_clear_context_loss_flags_old(u8 part, s16 inst, u16 idx);
 
 #endif
 

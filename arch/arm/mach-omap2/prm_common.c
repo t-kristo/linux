@@ -33,7 +33,7 @@
 #include <linux/power/omap/prm3xxx.h>
 #include <linux/power/omap/prm44xx.h>
 
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 #include <linux/power/omap/prcm-common.h>
 
 /*

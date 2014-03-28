@@ -17,7 +17,7 @@
 #define __ARCH_ARM_MACH_OMAP2_PRM2XXX_3XXX_PRIVATE_H
 
 #include <linux/power/omap/prcm-common.h>
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 #include <linux/power/omap/prm2xxx_3xxx.h>
 
 #ifndef __ASSEMBLER__

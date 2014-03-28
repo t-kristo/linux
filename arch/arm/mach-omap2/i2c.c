@@ -19,12 +19,13 @@
  *
  */
 
+#include <linux/power/omap/prm.h>
+
 #include "soc.h"
 #include "omap_hwmod.h"
 #include "omap_device.h"
 #include "omap-pm.h"
 
-#include "prm.h"
 #include "common.h"
 #include "mux.h"
 #include "i2c.h"

@@ -23,6 +23,7 @@
 #include <linux/clk.h>
 #include <linux/err.h>
 #include <linux/delay.h>
+#include <linux/power/omap/prm.h>
 
 #include <video/omapdss.h>
 #include "omap_hwmod.h"
@@ -34,7 +35,6 @@
 #include "iomap.h"
 #include "control.h"
 #include "display.h"
-#include "prm.h"
 
 #define DISPC_CONTROL		0x0040
 #define DISPC_CONTROL2		0x0238

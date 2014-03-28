@@ -21,7 +21,7 @@
 #include <linux/power/omap/prm33xx.h>
 
 #include "powerdomain.h"
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 
 #define AM33XX_LASTPOWERSTATEENTERED_SHIFT	24
 #define AM33XX_LASTPOWERSTATEENTERED_MASK	(0x3 << 24)

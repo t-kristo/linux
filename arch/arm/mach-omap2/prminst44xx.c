@@ -16,7 +16,7 @@
 #include <linux/err.h>
 #include <linux/io.h>
 
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/prm44xx.h>
 #include <linux/power/omap/prm54xx.h>

@@ -24,8 +24,8 @@
 #include <linux/kernel.h>
 #include <linux/err.h>
 #include <linux/platform_data/gpio-omap.h>
+#include <linux/power/omap/prm.h>
 
-#include "prm.h"
 #include "common.h"
 #include "control.h"
 #include "omap_hwmod.h"

@@ -21,7 +21,7 @@
 #include <linux/err.h>
 #include <linux/io.h>
 
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 #include "clockdomain.h"
 #include <linux/power/omap/cm.h>
 #include "cm1_44xx.h"
