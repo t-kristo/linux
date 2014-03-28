@@ -20,7 +20,7 @@ extern void __iomem *prm_base;
 extern u16 prm_dev_inst;
 extern u16 prm_features;
 extern void omap2_set_globals_prm(void __iomem *prm);
-int of_prcm_init(void);
+int of_prcm_late_init(void);
 # endif
 
 /*
