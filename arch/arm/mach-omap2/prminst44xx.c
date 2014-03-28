@@ -22,7 +22,6 @@
 #include <linux/power/omap/prm54xx.h>
 #include <linux/power/omap/prm7xx.h>
 #include <linux/power/omap/prcm44xx.h>
-#include "prcm_mpu44xx.h"
 
 #define OMAP4430_RST_GLOBAL_WARM_SW_MASK		(1 << 0)
 

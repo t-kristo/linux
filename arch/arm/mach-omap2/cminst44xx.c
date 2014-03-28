@@ -27,7 +27,6 @@
 #include <linux/power/omap/cm44xx.h>
 #include <linux/power/omap/prcm44xx.h>
 #include <linux/power/omap/prm44xx.h>
-#include "prcm_mpu44xx.h"
 #include <linux/power/omap/prcm-common.h>
 
 #define OMAP4430_IDLEST_SHIFT		16
