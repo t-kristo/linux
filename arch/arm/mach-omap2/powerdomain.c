@@ -25,10 +25,11 @@
 #include <linux/power/omap/cm2xxx_3xxx.h>
 #include "prcm44xx.h"
 #include <linux/power/omap/prm2xxx_3xxx.h>
-#include "prm44xx.h"
+#include <linux/power/omap/prm44xx.h>
 
 #include <asm/cpu.h>
 
+#include "prm.h"
 #include "powerdomain.h"
 #include "clockdomain.h"
 #include "voltage.h"
