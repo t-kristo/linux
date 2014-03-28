@@ -17,7 +17,7 @@
 #include <linux/io.h>
 
 #include "prm.h"
-#include "prcm-common.h"
+#include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/prm44xx.h>
 #include <linux/power/omap/prm54xx.h>
 #include <linux/power/omap/prm7xx.h>

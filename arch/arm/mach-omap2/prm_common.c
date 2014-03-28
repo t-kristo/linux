@@ -34,7 +34,7 @@
 #include <linux/power/omap/prm44xx.h>
 
 #include "prm.h"
-#include "prcm-common.h"
+#include <linux/power/omap/prcm-common.h>
 
 /*
  * OMAP_PRCM_MAX_NR_PENDING_REG: maximum number of PRM_IRQ*_MPU regs

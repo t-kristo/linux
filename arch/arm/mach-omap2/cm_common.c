@@ -19,7 +19,7 @@
 #include <linux/power/omap/cm2xxx.h>
 #include <linux/power/omap/cm3xxx.h>
 #include <linux/power/omap/cm.h>
-#include "prcm-common.h"
+#include <linux/power/omap/prcm-common.h>
 
 /*
  * cm_ll_data: function pointers to SoC-specific implementations of

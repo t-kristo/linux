@@ -23,7 +23,7 @@
 #include "cm2xxx_3xxx_private.h"
 #include <linux/power/omap/cm2xxx.h>
 #include "clockdomain.h"
-#include "prcm-common.h"
+#include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/prm2xxx_3xxx.h>
 
 /* CM_AUTOIDLE_PLL.AUTO_* bit values for DPLLs */

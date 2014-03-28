@@ -1,6 +1,3 @@
-#ifndef __ARCH_ASM_MACH_OMAP2_PRCM_COMMON_H
-#define __ARCH_ASM_MACH_OMAP2_PRCM_COMMON_H
-
 /*
  * OMAP2/3 PRCM base and module definitions
  *
@@ -13,6 +10,9 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
+
+#ifndef __LINUX_POWER_OMAP_PRCM_COMMON_H
+#define __LINUX_POWER_OMAP_PRCM_COMMON_H
 
 /* Module offsets from both CM_BASE & PRM_BASE */
 
@@ -521,12 +521,11 @@ struct of_device_id;
 
 extern void __iomem *clk_memmaps[];
 
-extern void omap_prcm_irq_cleanup(void);
-extern int omap_prcm_register_chain_handler(
-	struct omap_prcm_irq_setup *irq_setup);
-extern int omap_prcm_event_to_irq(const char *event);
-extern void omap_prcm_irq_prepare(void);
-extern void omap_prcm_irq_complete(void);
+void omap_prcm_irq_cleanup(void);
+int omap_prcm_register_chain_handler(struct omap_prcm_irq_setup *irq_setup);
+int omap_prcm_event_to_irq(const char *event);
+void omap_prcm_irq_prepare(void);
+void omap_prcm_irq_complete(void);
 void omap_pcs_legacy_init(int irq, void (*rearm)(void));
 int of_prcm_module_init(struct of_device_id *match_table);
 int of_cm_init(void);
@@ -534,4 +533,3 @@ int of_cm_init(void);
 # endif
 
 #endif
-

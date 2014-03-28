@@ -23,7 +23,7 @@
 #define __ARCH_ARM_MACH_OMAP2_PRM7XX_H
 
 #include <linux/power/omap/prm44xx_54xx.h>
-#include "prcm-common.h"
+#include <linux/power/omap/prcm-common.h>
 #include "prm.h"
 #include <linux/power/omap/prm7xx.h>
 
