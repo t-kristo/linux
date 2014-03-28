@@ -22,10 +22,13 @@
 #include "vp.h"
 #include <linux/power/omap/prm44xx.h>
 #include <linux/power/omap/prm54xx.h>
-#include "prm7xx.h"
+#include <linux/power/omap/prm7xx.h>
 #include "prcm44xx.h"
 #include "prminst44xx_private.h"
 #include "powerdomain.h"
+#include "prm.h"
+#include "prcm-common.h"
+#include "prm44xx_54xx.h"
 
 #define OMAP4430_GLOBAL_COLD_RST_SHIFT			0
 #define OMAP4430_GLOBAL_WARM_SW_RST_SHIFT		1
