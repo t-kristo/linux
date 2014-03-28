@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef __ARCH_ARM_MACH_OMAP2_PRM44XX_54XX_H
-#define __ARCH_ARM_MACH_OMAP2_PRM44XX_54XX_H
+#ifndef __LINUX_POWER_OMAP_PRM44XX_54XX_H
+#define __LINUX_POWER_OMAP_PRM44XX_54XX_H
 
 /* Function prototypes */
 #ifndef __ASSEMBLER__
@@ -34,9 +34,9 @@ void omap4_prm_vp_clear_txdone(u8 vp_id);
  * OMAP4/OMAP5 access functions for voltage controller (VC) and
  * voltage proccessor (VP) in the PRM.
  */
-extern u32 omap4_prm_vcvp_read(u8 offset);
-extern void omap4_prm_vcvp_write(u32 val, u8 offset);
-extern u32 omap4_prm_vcvp_rmw(u32 mask, u32 bits, u8 offset);
+u32 omap4_prm_vcvp_read(u8 offset);
+void omap4_prm_vcvp_write(u32 val, u8 offset);
+u32 omap4_prm_vcvp_rmw(u32 mask, u32 bits, u8 offset);
 
 #if defined(CONFIG_ARCH_OMAP4) || defined(CONFIG_SOC_OMAP5) || \
 	defined(CONFIG_SOC_DRA7XX) || defined(CONFIG_SOC_AM43XX)
@@ -48,13 +48,13 @@ static inline void omap44xx_prm_reconfigure_io_chain(void)
 #endif
 
 /* PRM interrupt-related functions */
-extern void omap44xx_prm_read_pending_irqs(unsigned long *events);
-extern void omap44xx_prm_ocp_barrier(void);
-extern void omap44xx_prm_save_and_clear_irqen(u32 *saved_mask);
-extern void omap44xx_prm_restore_irqen(u32 *saved_mask);
+void omap44xx_prm_read_pending_irqs(unsigned long *events);
+void omap44xx_prm_ocp_barrier(void);
+void omap44xx_prm_save_and_clear_irqen(u32 *saved_mask);
+void omap44xx_prm_restore_irqen(u32 *saved_mask);
 
 int __init omap44xx_prm_init(u16 cpu_type);
-extern u32 omap44xx_prm_get_reset_sources(void);
+u32 omap44xx_prm_get_reset_sources(void);
 
 #endif
 

@@ -28,7 +28,7 @@
 #include "powerdomain.h"
 #include "prm.h"
 #include "prcm-common.h"
-#include "prm44xx_54xx.h"
+#include <linux/power/omap/prm44xx_54xx.h>
 
 #define OMAP4430_GLOBAL_COLD_RST_SHIFT			0
 #define OMAP4430_GLOBAL_WARM_SW_RST_SHIFT		1

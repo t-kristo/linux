@@ -21,7 +21,7 @@
 #ifndef __ARCH_ARM_MACH_OMAP2_PRM54XX_H
 #define __ARCH_ARM_MACH_OMAP2_PRM54XX_H
 
-#include "prm44xx_54xx.h"
+#include <linux/power/omap/prm44xx_54xx.h>
 #include "prcm-common.h"
 #include "prm.h"
 #include <linux/power/omap/prm54xx.h>
