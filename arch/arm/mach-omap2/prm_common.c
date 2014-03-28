@@ -32,6 +32,8 @@
 #include "prm2xxx.h"
 #include "prm3xxx.h"
 #include "prm44xx.h"
+#include "prminst44xx.h"
+#include "cm44xx.h"
 
 /*
  * OMAP_PRCM_MAX_NR_PENDING_REG: maximum number of PRM_IRQ*_MPU regs
@@ -616,18 +618,38 @@ int prm_unregister(struct prm_ll_data *pld)
 	return 0;
 }
 
-static struct of_device_id omap_prm_dt_match_table[] = {
-	{ .compatible = "ti,omap3-prm" },
-	{ .compatible = "ti,omap4-prm" },
-	{ .compatible = "ti,omap5-prm" },
-	{ .compatible = "ti,dra7-prm" },
-	{ }
+static const struct prcm_match_data prm_base_data = {
+	.flags = PRCM_REGISTER_CLOCKS,
+	.index = PRCM_CLK_MEMMAP_INDEX_PRM,
 };
 
-static struct of_device_id omap_prcm_dt_match_table[] = {
-	{ .compatible = "ti,am3-prcm" },
-	{ .compatible = "ti,am4-prcm" },
-	{ .compatible = "ti,omap2-prcm" },
+static const struct prcm_match_data prcm_base_data = {
+	.flags = 0,
+	.index = PRCM_CLK_MEMMAP_INDEX_PRM,
+};
+
+static const struct prcm_match_data scrm_base_data = {
+	.flags = PRCM_REGISTER_CLOCKS,
+	.index = PRCM_CLK_MEMMAP_INDEX_SCRM,
+};
+
+static const struct prcm_match_data omap3_prm_data = {
+	.flags = PRCM_REGISTER_CLOCKS,
+	.index = PRCM_CLK_MEMMAP_INDEX_PRM,
+	.offset = 0x800,
+};
+
+
+static struct of_device_id omap_prm_dt_match_table[] = {
+	{ .compatible = "ti,omap3-prm", .data = &omap3_prm_data },
+	{ .compatible = "ti,omap4-prm", .data = &prm_base_data },
+	{ .compatible = "ti,omap5-prm", .data = &prm_base_data },
+	{ .compatible = "ti,dra7-prm", .data = &prm_base_data },
+	{ .compatible = "ti,am3-prcm", .data = &prcm_base_data },
+	{ .compatible = "ti,am4-prcm", .data = &prcm_base_data },
+	{ .compatible = "ti,omap2-prcm", .data = &prcm_base_data },
+	{ .compatible = "ti,omap4-scrm", .data = &scrm_base_data },
+	{ .compatible = "ti,omap5-scrm", .data = &scrm_base_data },
 	{ }
 };
 
@@ -648,38 +670,66 @@ static struct ti_clk_ll_ops omap_clk_ll_ops = {
 	.clk_writel = prm_clk_writel,
 };
 
-static int prcm_memmap_index;
-
 int __init of_prcm_module_init(struct of_device_id *match_table)
 {
 	struct device_node *np;
-	void __iomem *mem;
+	const struct of_device_id *match;
+	const struct prcm_match_data *data;
 
 	ti_clk_ll_ops = &omap_clk_ll_ops;
 
-	for_each_matching_node(np, match_table) {
-		mem = of_iomap(np, 0);
-		clk_memmaps[prcm_memmap_index] = mem;
-		ti_dt_clk_init_provider(np, prcm_memmap_index);
+	for_each_matching_node_and_match(np, match_table, &match) {
+		data = match->data;
+		if (!(data->flags & PRCM_REGISTER_CLOCKS))
+			continue;
+		ti_dt_clk_init_provider(np, data->index);
 		ti_dt_clockdomains_setup(np);
-		prcm_memmap_index++;
 	}
 
 	return 0;
 }
 
-int __init of_prm_init(void)
-{
-	return of_prcm_module_init(omap_prm_dt_match_table);
-}
-
-int __init of_prcm_init(void)
+int __init of_prcm_late_init(void)
 {
 	int ret;
 
-	ret = of_prm_init();
-	ret |= of_cm_init();
-	ret |= of_prcm_module_init(omap_prcm_dt_match_table);
+	ret = of_prcm_module_init(omap_prm_dt_match_table);
+	ret |= of_cm_late_init();
+	return ret;
+}
+
+static int of_prm_early_init(void)
+{
+	struct device_node *np;
+	const struct of_device_id *match;
+	const struct prcm_match_data *data;
+
+	for_each_matching_node_and_match(np, omap_prm_dt_match_table, &match) {
+		data = match->data;
+		if (clk_memmaps[data->index])
+			pr_warn("WARNING: multiple prcm compatible mods, %d\n",
+				data->index);
+
+		clk_memmaps[data->index] = of_iomap(np, 0);
+
+		if (data->index == PRCM_CLK_MEMMAP_INDEX_PRM)
+			prm_base = clk_memmaps[data->index] + data->offset;
+	}
+
+	return 0;
+}
+
+
+int __init of_prcm_early_init(void)
+{
+	int ret;
+
+	ret = of_prm_early_init();
+	ret |= of_cm_early_init();
+	ret |= of_scrm_early_init();
+
+	omap_prm_base_init();
+	omap_cm_base_init();
 
 	return ret;
 }

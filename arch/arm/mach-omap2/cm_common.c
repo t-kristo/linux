@@ -15,6 +15,7 @@
 #include <linux/init.h>
 #include <linux/errno.h>
 #include <linux/of.h>
+#include <linux/of_address.h>
 
 #include "cm2xxx.h"
 #include "cm3xxx.h"
@@ -190,19 +191,61 @@ int cm_unregister(struct cm_ll_data *cld)
 	return 0;
 }
 
+static const struct prcm_match_data cm_base_data = {
+	.flags = PRCM_REGISTER_CLOCKS,
+	.index = PRCM_CLK_MEMMAP_INDEX_CM1,
+};
+
+static const struct prcm_match_data cm2_base_data = {
+	.flags = PRCM_REGISTER_CLOCKS,
+	.index = PRCM_CLK_MEMMAP_INDEX_CM2,
+};
+
+static const struct prcm_match_data omap3_cm_data = {
+	.flags = PRCM_REGISTER_CLOCKS,
+	.index = PRCM_CLK_MEMMAP_INDEX_CM1,
+	.offset = 0x800,
+};
+
 static struct of_device_id omap_cm_dt_match_table[] = {
-	{ .compatible = "ti,omap3-cm" },
-	{ .compatible = "ti,omap4-cm1" },
-	{ .compatible = "ti,omap4-cm2" },
-	{ .compatible = "ti,omap5-cm-core-aon" },
-	{ .compatible = "ti,omap5-cm-core" },
-	{ .compatible = "ti,dra7-cm-core-aon" },
-	{ .compatible = "ti,dra7-cm-core" },
+	{ .compatible = "ti,omap3-cm", .data = &omap3_cm_data },
+	{ .compatible = "ti,omap4-cm1", .data = &cm_base_data },
+	{ .compatible = "ti,omap4-cm2", .data = &cm2_base_data },
+	{ .compatible = "ti,omap5-cm-core-aon", .data = &cm_base_data },
+	{ .compatible = "ti,omap5-cm-core", .data = &cm2_base_data },
+	{ .compatible = "ti,dra7-cm-core-aon", .data = &cm_base_data },
+	{ .compatible = "ti,dra7-cm-core", .data = &cm2_base_data },
+	{ .compatible = "ti,am3-prcm", .data = &cm_base_data },
+	{ .compatible = "ti,am4-prcm", .data = &cm_base_data },
 	{ }
 };
 
 
-int __init of_cm_init(void)
+int __init of_cm_late_init(void)
 {
 	return of_prcm_module_init(omap_cm_dt_match_table);
+}
+
+int __init of_cm_early_init(void)
+{
+	struct device_node *np;
+	const struct of_device_id *match;
+	const struct prcm_match_data *data;
+
+	for_each_matching_node_and_match(np, omap_cm_dt_match_table, &match) {
+		data = match->data;
+		if (clk_memmaps[data->index])
+			pr_warn("WARNING: multiple cm compatible mods %d\n",
+				data->index);
+
+		clk_memmaps[data->index] = of_iomap(np, 0);
+
+		if (data->index == PRCM_CLK_MEMMAP_INDEX_CM1)
+			cm_base = clk_memmaps[data->index] + data->offset;
+
+		if (data->index == PRCM_CLK_MEMMAP_INDEX_CM2)
+			cm2_base = clk_memmaps[data->index] + data->offset;
+	}
+
+	return 0;
 }
