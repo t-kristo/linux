@@ -14,7 +14,6 @@
 #include "powerdomain.h"
 
 #include <linux/power/omap/prcm-common.h>
-#include "prcm44xx.h"
 #include "prcm43xx.h"
 
 static struct powerdomain gfx_43xx_pwrdm = {

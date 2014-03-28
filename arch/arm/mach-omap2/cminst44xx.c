@@ -27,7 +27,7 @@
 #include "cm1_44xx.h"
 #include "cm2_44xx.h"
 #include <linux/power/omap/cm44xx.h>
-#include "prcm44xx.h"
+#include <linux/power/omap/prcm44xx.h>
 #include <linux/power/omap/prm44xx.h>
 #include "prcm_mpu44xx.h"
 #include <linux/power/omap/prcm-common.h>

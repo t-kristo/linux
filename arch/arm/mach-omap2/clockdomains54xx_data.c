@@ -27,7 +27,7 @@
 
 #include "cm-regbits-54xx.h"
 #include "prm54xx.h"
-#include "prcm44xx.h"
+#include <linux/power/omap/prcm44xx.h>
 #include "prcm_mpu54xx.h"
 
 /* Static Dependencies for OMAP4 Clock Domains */

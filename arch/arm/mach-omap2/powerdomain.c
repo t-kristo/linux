@@ -23,7 +23,7 @@
 #include <trace/events/power.h>
 
 #include <linux/power/omap/cm2xxx_3xxx.h>
-#include "prcm44xx.h"
+#include <linux/power/omap/prcm44xx.h>
 #include <linux/power/omap/prm2xxx_3xxx.h>
 #include <linux/power/omap/prm44xx.h>
 
