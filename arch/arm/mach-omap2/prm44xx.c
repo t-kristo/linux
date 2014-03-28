@@ -21,7 +21,7 @@
 
 #include "vp.h"
 #include <linux/power/omap/prm44xx.h>
-#include "prm54xx.h"
+#include <linux/power/omap/prm54xx.h>
 #include "prm7xx.h"
 #include "prcm44xx.h"
 #include "prminst44xx_private.h"
