@@ -21,7 +21,6 @@
 #include <linux/power/omap/prm44xx.h>
 #include <linux/power/omap/prm54xx.h>
 #include <linux/power/omap/prm7xx.h>
-#include "prminst44xx.h"
 #include "prcm44xx.h"
 #include "prcm_mpu44xx.h"
 

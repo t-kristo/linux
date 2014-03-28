@@ -12,7 +12,7 @@
 #ifndef __ARCH_ARM_MACH_OMAP2_PRMINST44XX_PRIVATE_H
 #define __ARCH_ARM_MACH_OMAP2_PRMINST44XX_PRIVATE_H
 
-#include "prminst44xx.h"
+#include <linux/power/omap/prm44xx.h>
 
 /*
  * In an ideal world, we would not export these low-level functions,

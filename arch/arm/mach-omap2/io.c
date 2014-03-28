@@ -48,7 +48,6 @@
 #include "prm.h"
 #include <linux/power/omap/cm.h>
 #include "prcm_mpu44xx.h"
-#include "prminst44xx.h"
 #include <linux/power/omap/cm44xx.h>
 #include "prm2xxx.h"
 #include "prm3xxx.h"

@@ -9,7 +9,7 @@
 
 #include <linux/types.h>
 #include <linux/reboot.h>
-#include "prminst44xx.h"
+#include <linux/power/omap/prm44xx.h>
 
 /**
  * omap44xx_restart - trigger a software restart of the SoC

@@ -417,4 +417,16 @@
 #define OMAP4_PRM_MODEM_IF_CTRL_OFFSET			0x00f4
 #define OMAP4_PRM_VC_ERRST_OFFSET			0x00f8
 
+#ifndef __ASSEMBLER__
+void omap4_prminst_global_warm_sw_reset(void);
+int omap4_prminst_is_hardreset_asserted(u8 shift, u8 part, s16 inst,
+					u16 rstctrl_offs);
+int omap4_prminst_assert_hardreset(u8 shift, u8 part, s16 inst,
+				   u16 rstctrl_offs);
+int omap4_prminst_deassert_hardreset(u8 shift, u8 part, s16 inst,
+				     u16 rstctrl_offs);
+void omap4_prminst_mpuss_clear_prev_logic_pwrst(void);
+void omap_prm_base_init(void);
+#endif
+
 #endif
