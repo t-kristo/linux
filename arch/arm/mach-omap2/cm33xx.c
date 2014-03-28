@@ -22,7 +22,7 @@
 #include <linux/err.h>
 #include <linux/io.h>
 
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 #include <linux/power/omap/cm.h>
 #include <linux/power/omap/cm33xx.h>
 #include <linux/power/omap/prm33xx.h>

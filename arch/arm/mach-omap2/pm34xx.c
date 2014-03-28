@@ -37,7 +37,7 @@
 #include <asm/suspend.h>
 #include <asm/system_misc.h>
 
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 #include "powerdomain.h"
 #include "soc.h"
 #include "common.h"

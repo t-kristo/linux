@@ -11,12 +11,10 @@
  * published by the Free Software Foundation.
  */
 
-#ifndef __ARCH_ARM_MACH_OMAP2_CLOCKDOMAIN_H
-#define __ARCH_ARM_MACH_OMAP2_CLOCKDOMAIN_H
+#ifndef __LINUX_POWER_OMAP_CLOCKDOMAIN_H
+#define __LINUX_POWER_OMAP_CLOCKDOMAIN_H
 
 #include <linux/init.h>
-
-#include "powerdomain.h"
 
 /*
  * Clockdomain flags
@@ -98,6 +96,7 @@ struct clkdm_dep {
 
 struct omap_hwmod;
 struct clk;
+struct powerdomain;
 
 /**
  * struct clockdomain - OMAP clockdomain
@@ -159,13 +158,19 @@ struct clockdomain {
  * @clkdm_clk_disable: Put the clkdm in right state for a clock disable
  */
 struct clkdm_ops {
-	int	(*clkdm_add_wkdep)(struct clockdomain *clkdm1, struct clockdomain *clkdm2);
-	int	(*clkdm_del_wkdep)(struct clockdomain *clkdm1, struct clockdomain *clkdm2);
-	int	(*clkdm_read_wkdep)(struct clockdomain *clkdm1, struct clockdomain *clkdm2);
+	int	(*clkdm_add_wkdep)(struct clockdomain *clkdm1,
+				   struct clockdomain *clkdm2);
+	int	(*clkdm_del_wkdep)(struct clockdomain *clkdm1,
+				   struct clockdomain *clkdm2);
+	int	(*clkdm_read_wkdep)(struct clockdomain *clkdm1,
+				    struct clockdomain *clkdm2);
 	int	(*clkdm_clear_all_wkdeps)(struct clockdomain *clkdm);
-	int	(*clkdm_add_sleepdep)(struct clockdomain *clkdm1, struct clockdomain *clkdm2);
-	int	(*clkdm_del_sleepdep)(struct clockdomain *clkdm1, struct clockdomain *clkdm2);
-	int	(*clkdm_read_sleepdep)(struct clockdomain *clkdm1, struct clockdomain *clkdm2);
+	int	(*clkdm_add_sleepdep)(struct clockdomain *clkdm1,
+				      struct clockdomain *clkdm2);
+	int	(*clkdm_del_sleepdep)(struct clockdomain *clkdm1,
+				      struct clockdomain *clkdm2);
+	int	(*clkdm_read_sleepdep)(struct clockdomain *clkdm1,
+				       struct clockdomain *clkdm2);
 	int	(*clkdm_clear_all_sleepdeps)(struct clockdomain *clkdm);
 	int	(*clkdm_sleep)(struct clockdomain *clkdm);
 	int	(*clkdm_wakeup)(struct clockdomain *clkdm);
@@ -212,17 +217,17 @@ int clkdm_clk_disable(struct clockdomain *clkdm, struct clk *clk);
 int clkdm_hwmod_enable(struct clockdomain *clkdm, struct omap_hwmod *oh);
 int clkdm_hwmod_disable(struct clockdomain *clkdm, struct omap_hwmod *oh);
 
-extern void __init omap242x_clockdomains_init(void);
-extern void __init omap243x_clockdomains_init(void);
-extern void __init omap3xxx_clockdomains_init(void);
-extern void __init am33xx_clockdomains_init(void);
-extern void __init omap44xx_clockdomains_init(void);
-extern void __init omap54xx_clockdomains_init(void);
-extern void __init dra7xx_clockdomains_init(void);
+void __init omap242x_clockdomains_init(void);
+void __init omap243x_clockdomains_init(void);
+void __init omap3xxx_clockdomains_init(void);
+void __init am33xx_clockdomains_init(void);
+void __init omap44xx_clockdomains_init(void);
+void __init omap54xx_clockdomains_init(void);
+void __init dra7xx_clockdomains_init(void);
 void am43xx_clockdomains_init(void);
 
-extern void clkdm_add_autodeps(struct clockdomain *clkdm);
-extern void clkdm_del_autodeps(struct clockdomain *clkdm);
+void clkdm_add_autodeps(struct clockdomain *clkdm);
+void clkdm_del_autodeps(struct clockdomain *clkdm);
 
 extern struct clkdm_ops omap2_clkdm_operations;
 extern struct clkdm_ops omap3_clkdm_operations;

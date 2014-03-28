@@ -29,7 +29,7 @@
 #include <linux/clkdev.h>
 
 #include "soc.h"
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 #include "clock.h"
 #include <linux/power/omap/cm2xxx_3xxx.h>
 #include "cm-regbits-34xx.h"

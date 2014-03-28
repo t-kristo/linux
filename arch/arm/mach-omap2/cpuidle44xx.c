@@ -21,7 +21,7 @@
 #include "common.h"
 #include "pm.h"
 #include <linux/power/omap/prm.h>
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 
 /* Machine specific information */
 struct idle_statedata {

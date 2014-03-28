@@ -29,7 +29,8 @@
 #include <linux/bitops.h>
 
 #include "soc.h"
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
+#include "powerdomain.h"
 
 /* clkdm_list contains all registered struct clockdomains */
 static LIST_HEAD(clkdm_list);

@@ -29,7 +29,7 @@
 #include <asm/cpuidle.h>
 
 #include "powerdomain.h"
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 
 #include "pm.h"
 #include "control.h"

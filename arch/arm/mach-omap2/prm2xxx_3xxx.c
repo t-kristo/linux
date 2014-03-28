@@ -18,7 +18,7 @@
 
 #include "powerdomain.h"
 #include "prm2xxx_3xxx_private.h"
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 
 /**
  * omap2_prm_is_hardreset_asserted - read the HW reset line state of

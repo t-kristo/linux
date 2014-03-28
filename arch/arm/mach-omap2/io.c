@@ -32,7 +32,7 @@
 #include "iomap.h"
 #include "voltage.h"
 #include "powerdomain.h"
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 #include "common.h"
 #include "clock.h"
 #include "clock2xxx.h"

@@ -29,7 +29,7 @@
 
 #include "clock.h"
 #include "powerdomain.h"
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 #include "omap-pm.h"
 
 #include "soc.h"

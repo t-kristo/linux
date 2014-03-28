@@ -11,7 +11,7 @@
 #include <linux/kernel.h>
 #include <linux/io.h>
 
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 #include "prcm43xx.h"
 
 static struct clockdomain l4_cefuse_43xx_clkdm = {

@@ -30,7 +30,7 @@
 #include "soc.h"
 #include "iomap.h"
 #include "common.h"
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 #include "pm.h"
 
 #define CPU_MASK		0xff0ffff0

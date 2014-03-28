@@ -28,7 +28,7 @@
 #include <linux/power/omap/prcm-common.h>
 #include "voltage.h"
 #include "powerdomain.h"
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 #include "pm.h"
 #include "twl-common.h"
 

@@ -31,7 +31,7 @@
 
 #include <linux/power/omap/prm.h>
 #include "powerdomain.h"
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 #include "voltage.h"
 
 #include "soc.h"

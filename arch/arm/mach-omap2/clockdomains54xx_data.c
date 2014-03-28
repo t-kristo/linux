@@ -21,7 +21,7 @@
 #include <linux/kernel.h>
 #include <linux/io.h>
 
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 #include "cm1_54xx.h"
 #include "cm2_54xx.h"
 

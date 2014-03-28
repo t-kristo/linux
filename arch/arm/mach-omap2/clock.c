@@ -29,7 +29,7 @@
 #include <trace/events/power.h>
 
 #include "soc.h"
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 #include "clock.h"
 #include <linux/power/omap/cm.h>
 #include "cm2xxx.h"

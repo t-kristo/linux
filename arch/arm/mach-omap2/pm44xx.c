@@ -20,7 +20,7 @@
 
 #include "soc.h"
 #include "common.h"
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 #include "powerdomain.h"
 #include "pm.h"
 

@@ -19,7 +19,7 @@
 #include <linux/irq.h>
 
 #include "powerdomain.h"
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 #include <linux/power/omap/prm2xxx.h>
 #include "prm2xxx_3xxx_private.h"
 #include <linux/power/omap/cm2xxx_3xxx.h>
