@@ -16,7 +16,7 @@
 #include <linux/bug.h>
 
 #include "soc.h"
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 #include "powerdomains2xxx_3xxx_data.h"
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/prm2xxx_3xxx.h>

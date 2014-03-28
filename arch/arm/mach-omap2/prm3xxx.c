@@ -18,7 +18,7 @@
 #include <linux/io.h>
 #include <linux/irq.h>
 
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 #include <linux/power/omap/prm3xxx.h>
 #include "prm2xxx_3xxx_private.h"
 #include "cm2xxx_3xxx_private.h"

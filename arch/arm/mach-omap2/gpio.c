@@ -28,7 +28,7 @@
 #include "omap_device.h"
 #include "omap-pm.h"
 
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 
 static int __init omap2_gpio_dev_init(struct omap_hwmod *oh, void *unused)
 {

@@ -21,7 +21,7 @@
 
 #include "omap-wakeupgen.h"
 #include "common.h"
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 
 /*
  * platform-specific code to shutdown a CPU

@@ -21,7 +21,7 @@
 #include "soc.h"
 #include "common.h"
 #include <linux/power/omap/clockdomain.h>
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 #include "pm.h"
 
 u16 pm44xx_errata;

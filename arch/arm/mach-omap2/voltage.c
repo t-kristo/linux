@@ -36,7 +36,7 @@
 #include "control.h"
 
 #include "voltage.h"
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 
 #include "vc.h"
 #include "vp.h"

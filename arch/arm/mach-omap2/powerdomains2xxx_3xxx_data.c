@@ -31,7 +31,7 @@
  * address offset is different between the C55 and C64 DSPs.
  */
 
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/prm.h>

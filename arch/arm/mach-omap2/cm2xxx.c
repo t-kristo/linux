@@ -25,7 +25,7 @@
 #include <linux/power/omap/clockdomain.h>
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/prm2xxx_3xxx.h>
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 
 /* CM_AUTOIDLE_PLL.AUTO_* bit values for DPLLs */
 #define DPLL_AUTOIDLE_DISABLE				0x0

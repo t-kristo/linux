@@ -16,7 +16,7 @@
 #include <linux/err.h>
 #include <linux/io.h>
 
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 #include "prm2xxx_3xxx_private.h"
 #include <linux/power/omap/clockdomain.h>
 

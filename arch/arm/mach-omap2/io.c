@@ -31,7 +31,7 @@
 #include "soc.h"
 #include "iomap.h"
 #include "voltage.h"
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 #include <linux/power/omap/clockdomain.h>
 #include "common.h"
 #include "clock.h"

@@ -16,7 +16,7 @@
 #include <linux/kernel.h>
 #include <linux/init.h>
 
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 #include <linux/power/omap/prcm-common.h>
 #include "prm-regbits-33xx.h"
 #include "prm33xx.h"

@@ -23,7 +23,7 @@
 #ifndef __ASSEMBLER__
 
 #include <linux/io.h>
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 
 /* Power/reset management domain register get/set */
 static inline u32 omap2_prm_read_mod_reg(s16 module, u16 idx)

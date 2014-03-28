@@ -13,7 +13,7 @@
 
 #include <linux/err.h>
 
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 
 #ifdef CONFIG_CPU_IDLE
 extern int __init omap3_idle_init(void);

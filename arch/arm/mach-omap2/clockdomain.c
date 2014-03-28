@@ -30,7 +30,7 @@
 
 #include "soc.h"
 #include <linux/power/omap/clockdomain.h>
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 
 /* clkdm_list contains all registered struct clockdomains */
 static LIST_HEAD(clkdm_list);

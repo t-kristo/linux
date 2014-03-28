@@ -54,7 +54,7 @@
 
 #include "soc.h"
 #include "common.h"
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 #include "omap-secure.h"
 
 #define REALTIME_COUNTER_BASE				0x48243200

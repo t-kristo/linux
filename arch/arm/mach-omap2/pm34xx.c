@@ -38,7 +38,7 @@
 #include <asm/system_misc.h>
 
 #include <linux/power/omap/clockdomain.h>
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 #include "soc.h"
 #include "common.h"
 #include "cm3xxx.h"

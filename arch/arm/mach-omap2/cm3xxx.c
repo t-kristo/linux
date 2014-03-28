@@ -24,7 +24,7 @@
 #include <linux/power/omap/cm3xxx.h>
 #include <linux/power/omap/clockdomain.h>
 #include <linux/power/omap/prcm-common.h>
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 
 #define OMAP34XX_CLKSTCTRL_DISABLE_AUTO		0x0
 #define OMAP34XX_CLKSTCTRL_FORCE_SLEEP		0x1

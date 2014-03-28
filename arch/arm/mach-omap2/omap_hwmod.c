@@ -150,7 +150,7 @@
 #include "soc.h"
 #include "common.h"
 #include <linux/power/omap/clockdomain.h>
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 #include "cm2xxx.h"
 #include "cm3xxx.h"
 #include <linux/power/omap/cm44xx.h>
