@@ -46,15 +46,6 @@
 #define CM_CLKSEL2					0x0044
 #define OMAP2_CM_CLKSTCTRL				0x0048
 
-#ifndef __ASSEMBLER__
-
-extern int omap2xxx_cm_apll54_enable(void);
-extern void omap2xxx_cm_apll54_disable(void);
-extern int omap2xxx_cm_apll96_enable(void);
-extern void omap2xxx_cm_apll96_disable(void);
-
-#endif
-
 /* CM register bits shared between 24XX and 3430 */
 
 /* CM_CLKSEL_GFX */
