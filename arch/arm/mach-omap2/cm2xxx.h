@@ -53,8 +53,6 @@ extern void omap2xxx_cm_set_dpll_disable_autoidle(void);
 extern void omap2xxx_cm_set_dpll_auto_low_power_stop(void);
 
 extern bool omap2xxx_cm_is_clkdm_in_hwsup(s16 module, u32 mask);
-extern int omap2xxx_cm_wait_module_ready(s16 prcm_mod, u8 idlest_id,
-					 u8 idlest_shift);
 extern int omap2xxx_cm_split_idlest_reg(void __iomem *idlest_reg,
 					s16 *prcm_inst, u8 *idlest_reg_id);
 extern int omap2xxx_cm_fclks_active(void);
