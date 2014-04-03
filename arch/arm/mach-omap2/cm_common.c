@@ -121,6 +121,30 @@ int cm_wait_module_idle(u8 part, s16 prcm_mod, u16 idlest_reg, u8 idlest_shift)
 					    idlest_shift);
 }
 
+int cm_module_enable(u8 mode, u8 part, u16 inst, u16 clkctrl_offs)
+{
+	if (!cm_ll_data->module_enable) {
+		WARN_ONCE(1, "cm: %s: no low-level function defined\n",
+			  __func__);
+		return -EINVAL;
+	}
+
+	cm_ll_data->module_enable(mode, part, inst, clkctrl_offs);
+	return 0;
+}
+
+int cm_module_disable(u8 part, u16 inst, u16 clkctrl_offs)
+{
+	if (!cm_ll_data->module_disable) {
+		WARN_ONCE(1, "cm: %s: no low-level function defined\n",
+			  __func__);
+		return -EINVAL;
+	}
+
+	cm_ll_data->module_disable(part, inst, clkctrl_offs);
+	return 0;
+}
+
 /**
  * cm_register - register per-SoC low-level data with the CM
  * @cld: low-level per-SoC OMAP CM data & function pointers to register
