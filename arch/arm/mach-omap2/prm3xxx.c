@@ -88,6 +88,7 @@ static void omap3xxx_prm_read_pending_irqs(unsigned long *events);
 static void omap3xxx_prm_ocp_barrier(void);
 static void omap3xxx_prm_save_and_clear_irqen(u32 *saved_mask);
 static void omap3xxx_prm_restore_irqen(u32 *saved_mask);
+static void omap3xxx_prm_reconfigure_io_chain(void);
 
 static const struct omap_prcm_irq omap3_prcm_irqs[] = {
 	OMAP_PRCM_IRQ("wkup",	0,	0),
@@ -437,7 +438,7 @@ void __init omap3_prm_init_pm(bool has_uart4, bool has_iva)
  * deasserting WUCLKIN and clearing the ST_IO_CHAIN WKST bit.  No
  * return value.
  */
-void omap3xxx_prm_reconfigure_io_chain(void)
+static void omap3xxx_prm_reconfigure_io_chain(void)
 {
 	int i = 0;
 

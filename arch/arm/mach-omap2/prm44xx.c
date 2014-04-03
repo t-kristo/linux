@@ -67,6 +67,7 @@ static void omap44xx_prm_read_pending_irqs(unsigned long *events);
 static void omap44xx_prm_ocp_barrier(void);
 static void omap44xx_prm_save_and_clear_irqen(u32 *saved_mask);
 static void omap44xx_prm_restore_irqen(u32 *saved_mask);
+static void omap44xx_prm_reconfigure_io_chain(void);
 
 static const struct omap_prcm_irq omap4_prcm_irqs[] = {
 	OMAP_PRCM_IRQ("wkup",   0,      0),
@@ -309,7 +310,7 @@ static void omap44xx_prm_restore_irqen(u32 *saved_mask)
  * deasserting WUCLKIN and waiting for WUCLKOUT to be deasserted.
  * No return value. XXX Are the final two steps necessary?
  */
-void omap44xx_prm_reconfigure_io_chain(void)
+static void omap44xx_prm_reconfigure_io_chain(void)
 {
 	int i = 0;
 
