@@ -53,7 +53,8 @@
 #include "powerdomain.h"
 
 /* These omap2_ PRM functions apply to both OMAP2 and 3 */
-extern int omap2_prm_is_hardreset_asserted(s16 prm_mod, u8 shift);
+extern int omap2_prm_is_hardreset_asserted(u8 shift, u8 part, s16 prm_mod,
+					   u16 offset);
 extern int omap2_prm_assert_hardreset(u8 shift, u8 part, s16 prm_mod,
 				      u16 offset);
 extern int omap2_prm_deassert_hardreset(u8 rst_shift, u8 st_shift, u8 part,
