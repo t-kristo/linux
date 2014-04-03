@@ -680,7 +680,7 @@ int __init omap44xx_prm_init(u16 cpu_type)
 		break;
 	case PRM_AM43XX:
 		prm_dev_inst = AM43XX_PRM_DEVICE_INST;
-		return 0;
+		break;
 	default:
 		pr_err("%s: unsupported cpu type: %d\n", __func__, cpu_type);
 		return -EINVAL;
