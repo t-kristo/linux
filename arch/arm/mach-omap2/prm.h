@@ -155,7 +155,8 @@ struct prm_ll_data {
 	int (*assert_hardreset)(u8 shift, u8 part, s16 prm_mod, u16 offset);
 	int (*deassert_hardreset)(u8 shift, u8 st_shift, u8 part, s16 prm_mod,
 				  u16 offset, u16 st_offset);
-				  
+	int (*is_hardreset_asserted)(u8 shift, u8 part, s16 prm_mod,
+				     u16 offset);			  
 };
 
 extern int prm_register(struct prm_ll_data *pld);
@@ -164,6 +165,7 @@ extern int prm_unregister(struct prm_ll_data *pld);
 int prm_assert_hardreset(u8 shift, u8 part, s16 prm_mod, u16 offset);
 int prm_deassert_hardreset(u8 shift, u8 st_shift, u8 part, s16 prm_mod,
 			   u16 offset, u16 st_offset);
+int prm_is_hardreset_asserted(u8 shift, u8 part, s16 prm_mod, u16 offset);
 extern u32 prm_read_reset_sources(void);
 extern bool prm_was_any_context_lost_old(u8 part, s16 inst, u16 idx);
 extern void prm_clear_context_loss_flags_old(u8 part, s16 inst, u16 idx);
