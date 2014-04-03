@@ -694,6 +694,7 @@ static int omap3xxx_prm_late_init(void);
 static struct prm_ll_data omap3xxx_prm_ll_data = {
 	.read_reset_sources = &omap3xxx_prm_read_reset_sources,
 	.late_init = &omap3xxx_prm_late_init,
+	.assert_hardreset = &omap2_prm_assert_hardreset,
 };
 
 int __init omap3xxx_prm_init(u16 cpu_type)
