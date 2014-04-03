@@ -373,24 +373,6 @@
 
 
 #ifndef __ASSEMBLER__
-bool am33xx_cm_is_clkdm_in_hwsup(u16 inst, u16 cdoffs);
 int am33xx_cm_init(void);
-
-#ifdef CONFIG_SOC_AM33XX
-extern void am33xx_cm_module_enable(u8 mode, u16 inst, s16 cdoffs,
-					u16 clkctrl_offs);
-extern void am33xx_cm_module_disable(u16 inst, s16 cdoffs,
-					u16 clkctrl_offs);
-#else
-static inline void am33xx_cm_module_enable(u8 mode, u16 inst, s16 cdoffs,
-					u16 clkctrl_offs)
-{
-}
-static inline void am33xx_cm_module_disable(u16 inst, s16 cdoffs,
-					u16 clkctrl_offs)
-{
-}
-#endif
-
 #endif /* ASSEMBLER */
 #endif
