@@ -158,6 +158,7 @@ struct prm_ll_data {
 	int (*is_hardreset_asserted)(u8 shift, u8 part, s16 prm_mod,
 				     u16 offset);			  
 	void (*reset_system)(void);
+	int (*clear_mod_irqs)(s16 module, u8 regs, u32 wkst_mask);
 };
 
 extern int prm_register(struct prm_ll_data *pld);
@@ -173,6 +174,7 @@ extern void prm_clear_context_loss_flags_old(u8 part, s16 inst, u16 idx);
 void prm_reset_system(void);
 
 void prm_reconfigure_io_chain(void);
+int prm_clear_mod_irqs(s16 module, u8 regs, u32 wkst_mask);
 
 #endif
 
