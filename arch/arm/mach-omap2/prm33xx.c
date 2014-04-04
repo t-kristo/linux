@@ -342,7 +342,7 @@ static int am33xx_check_vcvp(void)
 	return 0;
 }
 
-void am33xx_prm_global_warm_sw_reset(void)
+static void am33xx_prm_global_warm_sw_reset(void)
 {
 	am33xx_prm_rmw_reg_bits(AM33XX_RST_GLOBAL_WARM_SW_MASK,
 				AM33XX_RST_GLOBAL_WARM_SW_MASK,
@@ -376,6 +376,7 @@ static struct prm_ll_data am33xx_prm_ll_data = {
 	.assert_hardreset		= am33xx_prm_assert_hardreset,
 	.deassert_hardreset		= am33xx_prm_deassert_hardreset,
 	.is_hardreset_asserted		= am33xx_prm_is_hardreset_asserted,
+	.reset_system			= am33xx_prm_global_warm_sw_reset,
 };
 
 int __init am33xx_prm_init(void)
