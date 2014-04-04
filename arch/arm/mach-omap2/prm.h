@@ -159,6 +159,8 @@ struct prm_ll_data {
 				     u16 offset);			  
 	void (*reset_system)(void);
 	int (*clear_mod_irqs)(s16 module, u8 regs, u32 wkst_mask);
+	u32 (*vp_check_txdone)(u8 vp_id);
+	void (*vp_clear_txdone)(u8 vp_id);
 };
 
 extern int prm_register(struct prm_ll_data *pld);
@@ -175,6 +177,18 @@ void prm_reset_system(void);
 
 void prm_reconfigure_io_chain(void);
 int prm_clear_mod_irqs(s16 module, u8 regs, u32 wkst_mask);
+
+/*
+ * Voltage Processor (VP) identifiers
+ */
+#define OMAP3_VP_VDD_MPU_ID	0
+#define OMAP3_VP_VDD_CORE_ID	1
+#define OMAP4_VP_VDD_CORE_ID	0
+#define OMAP4_VP_VDD_IVA_ID	1
+#define OMAP4_VP_VDD_MPU_ID	2
+
+u32 prm_vp_check_txdone(u8 vp_id);
+void prm_vp_clear_txdone(u8 vp_id);
 
 #endif
 
