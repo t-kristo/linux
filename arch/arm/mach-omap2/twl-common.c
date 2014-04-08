@@ -39,6 +39,12 @@ static struct i2c_board_info __initdata pmic_i2c_board_info = {
 	.flags		= I2C_CLIENT_WAKE,
 };
 
+struct voltdm_data {
+	int	(*get_voltage)(void *data);
+	int	(*set_voltage)(void *data, int target_uV);
+	void	*data;
+};
+
 #if defined(CONFIG_ARCH_OMAP3) || defined(CONFIG_ARCH_OMAP4)
 static int twl_set_voltage(void *data, int target_uV)
 {
@@ -52,6 +58,16 @@ static int twl_get_voltage(void *data)
 	return voltdm_get_voltage(voltdm);
 }
 #endif
+
+void prm_get_voltdm(int id, struct voltdm_data **voltdm)
+{
+	if (id == 0) {
+		*voltdm = kzalloc(sizeof(*voltdm), GFP_KERNEL);
+		(*voltdm)->data = voltdm_lookup("mpu_iva");
+		(*voltdm)->get_voltage = twl_get_voltage;
+		(*voltdm)->set_voltage = twl_set_voltage;
+	}
+}
 
 void __init omap_pmic_init(int bus, u32 clkrate,
 			   const char *pmic_type, int pmic_irq,
@@ -82,10 +98,6 @@ void __init omap4_pmic_init(const char *pmic_type,
 
 void __init omap_pmic_late_init(void)
 {
-	/* Init the OMAP TWL parameters (if PMIC has been registerd) */
-	if (!pmic_i2c_board_info.irq)
-		return;
-
 	omap3_twl_init();
 	omap4_twl_init();
 }

@@ -22,7 +22,6 @@
 #include <linux/regulator/of_regulator.h>
 #include <linux/i2c/twl.h>
 
-
 /*
  * The TWL4030/TW5030/TPS659x0/TWL6030 family chips include power management, a
  * USB OTG transceiver, an RTC, ADC, PWM, and lots more.  Some versions
@@ -33,6 +32,12 @@
  * voltage regulators.  This is usually augmented with state machine
  * based control.
  */
+
+struct voltdm_data {
+	int	(*get_voltage)(void *data);
+	int	(*set_voltage)(void *data, int target_uV);
+	void	*data;
+};
 
 struct twlreg_info {
 	/* start of regulator's PM_RECEIVER control register bank */
@@ -60,15 +65,7 @@ struct twlreg_info {
 	/* chip specific features */
 	unsigned long		features;
 
-	/*
-	 * optional override functions for voltage set/get
-	 * these are currently only used for SMPS regulators
-	 */
-	int			(*get_voltage)(void *data);
-	int			(*set_voltage)(void *data, int target_uV);
-
-	/* data passed from board for external get/set voltage */
-	void			*data;
+	struct voltdm_data	*voltdm;
 };
 
 
@@ -499,8 +496,8 @@ twl4030smps_set_voltage(struct regulator_dev *rdev, int min_uV, int max_uV,
 	struct twlreg_info *info = rdev_get_drvdata(rdev);
 	int vsel = DIV_ROUND_UP(min_uV - 600000, 12500);
 
-	if (info->set_voltage) {
-		return info->set_voltage(info->data, min_uV);
+	if (info->voltdm) {
+		return info->voltdm->set_voltage(info->voltdm->data, min_uV);
 	} else {
 		twlreg_write(info, TWL_MODULE_PM_RECEIVER,
 			VREG_VOLTAGE_SMPS_4030, vsel);
@@ -514,8 +511,8 @@ static int twl4030smps_get_voltage(struct regulator_dev *rdev)
 	struct twlreg_info *info = rdev_get_drvdata(rdev);
 	int vsel;
 
-	if (info->get_voltage)
-		return info->get_voltage(info->data);
+	if (info->voltdm)
+		return info->voltdm->get_voltage(info->voltdm->data);
 
 	vsel = twlreg_read(info, TWL_MODULE_PM_RECEIVER,
 		VREG_VOLTAGE_SMPS_4030);
@@ -533,8 +530,8 @@ static int twl6030coresmps_set_voltage(struct regulator_dev *rdev, int min_uV,
 {
 	struct twlreg_info *info = rdev_get_drvdata(rdev);
 
-	if (info->set_voltage)
-		return info->set_voltage(info->data, min_uV);
+	if (info->voltdm)
+		return info->voltdm->set_voltage(info->voltdm->data, min_uV);
 
 	return -ENODEV;
 }
@@ -543,8 +540,8 @@ static int twl6030coresmps_get_voltage(struct regulator_dev *rdev)
 {
 	struct twlreg_info *info = rdev_get_drvdata(rdev);
 
-	if (info->get_voltage)
-		return info->get_voltage(info->data);
+	if (info->voltdm)
+		return info->voltdm->get_voltage(info->voltdm->data);
 
 	return -ENODEV;
 }
@@ -1087,6 +1084,8 @@ static const struct of_device_id twl_of_match[] = {
 };
 MODULE_DEVICE_TABLE(of, twl_of_match);
 
+void prm_get_voltdm(int id, struct voltdm_data **voltdm);
+
 static int twlreg_probe(struct platform_device *pdev)
 {
 	int				i, id;
@@ -1135,9 +1134,13 @@ static int twlreg_probe(struct platform_device *pdev)
 	if (drvdata) {
 		/* copy the driver data into regulator data */
 		info->features = drvdata->features;
-		info->data = drvdata->data;
-		info->set_voltage = drvdata->set_voltage;
-		info->get_voltage = drvdata->get_voltage;
+		info->voltdm = kzalloc(sizeof(*info->voltdm), GFP_KERNEL);
+		info->voltdm->data = drvdata->data;
+		info->voltdm->set_voltage = drvdata->set_voltage;
+		info->voltdm->get_voltage = drvdata->get_voltage;
+	} else {
+		/* HACK: get voltdm funcs + data */
+		prm_get_voltdm(id, &info->voltdm);
 	}
 
 	/* Constrain board-specific capabilities according to what
