@@ -636,10 +636,41 @@ static const struct prcm_match_data scrm_base_data = {
 	.index = PRCM_REGMAP_INDEX_SCRM,
 };
 
+static const struct prcm_match_data omap3_prm_vcvp_data = {
+	.index = PRCM_REGMAP_INDEX_VCVP,
+	.offset = 0x1200,
+	.size = 0x100,
+};
+
+static const struct prcm_match_data omap4_prm_vcvp_data = {
+	.index = PRCM_REGMAP_INDEX_VCVP,
+	.offset = 0x1b00,
+	.size = 0x100,
+};
+
+static const struct prcm_match_data omap5_prm_vcvp_data = {
+	.index = PRCM_REGMAP_INDEX_VCVP,
+	.offset = 0x1c00,
+	.size = 0x100,
+};
+
 static const struct prcm_match_data omap3_prm_data = {
-	.flags = PRCM_REGISTER_CLOCKS,
+	.flags = PRCM_REGISTER_CLOCKS | PRCM_REGMAP_IGNORE_OFFSET,
 	.index = PRCM_REGMAP_INDEX_PRM,
 	.offset = 0x800,
+	.next = &omap3_prm_vcvp_data,
+};
+
+static const struct prcm_match_data omap4_prm_data = {
+	.flags = PRCM_REGISTER_CLOCKS,
+	.index = PRCM_REGMAP_INDEX_PRM,
+	.next = &omap4_prm_vcvp_data,
+};
+
+static const struct prcm_match_data omap5_prm_data = {
+	.flags = PRCM_REGISTER_CLOCKS,
+	.index = PRCM_REGMAP_INDEX_PRM,
+	.next = &omap5_prm_vcvp_data,
 };
 
 static u32 prm_clk_readl(void __iomem *reg)
@@ -665,8 +696,8 @@ static struct ti_clk_ll_ops omap_clk_ll_ops = {
 
 static struct of_device_id omap_prm_dt_match_table[] = {
 	{ .compatible = "ti,omap3-prm", .data = &omap3_prm_data },
-	{ .compatible = "ti,omap4-prm", .data = &prm_base_data },
-	{ .compatible = "ti,omap5-prm", .data = &prm_base_data },
+	{ .compatible = "ti,omap4-prm", .data = &omap4_prm_data },
+	{ .compatible = "ti,omap5-prm", .data = &omap5_prm_data },
 	{ .compatible = "ti,dra7-prm", .data = &prm_base_data },
 	{ .compatible = "ti,am3-prcm", .data = &prcm_base_data },
 	{ .compatible = "ti,am4-prcm", .data = &prcm_base_data },
@@ -744,14 +775,19 @@ static void prcm_build_regmap(int id)
 	struct platform_device *pdev;
 	struct prcm_early_dev *edev;
 	struct prcm_iomap *iomap = &prcm_iomaps[id];
+	u16 offset;
 
+	offset = iomap->data->offset;
+	if (iomap->data->flags & PRCM_REGMAP_IGNORE_OFFSET)
+		offset = 0;
+	prcm_regmap_config.max_register = iomap->data->size;
 	pdev = platform_device_alloc(iomap->np->name, 0);
 	dev_set_name(&pdev->dev, "%s", pdev->name);
 	edev = kzalloc(sizeof(*edev), GFP_KERNEL);
 	edev->dev = pdev;
 	edev->node = iomap->np;
 	list_add(&edev->link, &prcm_early_devs);
-	iomap->regmap = regmap_init_mmio(&pdev->dev, iomap->mem,
+	iomap->regmap = regmap_init_mmio(&pdev->dev, iomap->mem + offset,
 					 &prcm_regmap_config);
 }
 
@@ -772,7 +808,10 @@ static int of_prm_early_init(void)
 		if (data->index == PRCM_REGMAP_INDEX_SCRM)
 			scrm_base = mem + data->offset;
 
-		prcm_add_iomap(np, mem, data);
+		while (data) {
+			prcm_add_iomap(np, mem, data);
+			data = data->next;
+		}
 	}
 
 	return 0;
