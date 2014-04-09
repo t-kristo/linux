@@ -522,11 +522,14 @@ struct regmap;
 struct device_node;
 
 #define PRCM_REGISTER_CLOCKS			0x1
+#define PRCM_REGMAP_IGNORE_OFFSET		0x2
 
 struct prcm_match_data {
 	u32 flags;
 	u16 index;
 	u16 offset;
+	u16 size;
+	const struct prcm_match_data *next;
 };
 
 enum {

@@ -202,7 +202,7 @@ static const struct prcm_match_data cm2_base_data = {
 };
 
 static const struct prcm_match_data omap3_cm_data = {
-	.flags = PRCM_REGISTER_CLOCKS,
+	.flags = PRCM_REGISTER_CLOCKS | PRCM_REGMAP_IGNORE_OFFSET,
 	.index = PRCM_REGMAP_INDEX_CM1,
 	.offset = 0x800,
 };
