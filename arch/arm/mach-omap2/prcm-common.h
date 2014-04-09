@@ -527,9 +527,12 @@ struct prcm_init_data {
 	u32 flags;
 	u16 index;
 	u16 offset;
+	u16 regmap_offset;
 	u16 features;
+	u16 size;
 	int (*init)(const struct prcm_init_data *data);
 	s32 device_inst_offset;
+	const struct prcm_init_data *next;
 };
 
 enum {
@@ -537,6 +540,7 @@ enum {
 	PRCM_REGMAP_INDEX_CM1,
 	PRCM_REGMAP_INDEX_CM2,
 	PRCM_REGMAP_INDEX_SCRM,
+	PRCM_REGMAP_INDEX_VCVP,
 	PRCM_MAX_REGMAPS,
 };
 

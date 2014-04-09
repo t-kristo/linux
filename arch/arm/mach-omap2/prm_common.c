@@ -642,12 +642,26 @@ static const struct prcm_init_data scrm_data = {
 	.index = PRCM_REGMAP_INDEX_SCRM,
 };
 
+static const struct prcm_init_data omap3_prm_vcvp_data = {
+	.index = PRCM_REGMAP_INDEX_VCVP,
+	/* module start offset is OMAP3430_IVA2_MOD on omap3 */
+	.regmap_offset = OMAP3430_GR_MOD - OMAP3430_IVA2_MOD,
+	.size = 0x100,
+};
+
 static const struct prcm_init_data omap3_prm_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
 	.index = PRCM_REGMAP_INDEX_PRM,
 
-	/* IVA2 offset is -0x800, need to get this to positive */
-	.offset = 0x800,
+	/* module start offset is OMAP3430_IVA2_MOD on omap3 */
+	.offset = -OMAP3430_IVA2_MOD,
+	.next = &omap3_prm_vcvp_data,
+};
+
+static const struct prcm_init_data omap4_prm_vcvp_data = {
+	.index = PRCM_REGMAP_INDEX_VCVP,
+	.regmap_offset = OMAP4430_PRM_DEVICE_INST,
+	.size = 0x100,
 };
 
 static const struct prcm_init_data omap4_prm_data = {
@@ -656,6 +670,13 @@ static const struct prcm_init_data omap4_prm_data = {
 	.features = PRM_HAS_IO_WAKEUP | PRM_HAS_VOLTAGE,
 	.init = omap44xx_prm_init,
 	.device_inst_offset = OMAP4430_PRM_DEVICE_INST,
+	.next = &omap4_prm_vcvp_data,
+};
+
+static const struct prcm_init_data omap5_prm_vcvp_data = {
+	.index = PRCM_REGMAP_INDEX_VCVP,
+	.regmap_offset = OMAP54XX_PRM_DEVICE_INST,
+	.size = 0x100,
 };
 
 static const struct prcm_init_data omap5_prm_data = {
@@ -664,6 +685,7 @@ static const struct prcm_init_data omap5_prm_data = {
 	.features = PRM_HAS_IO_WAKEUP | PRM_HAS_VOLTAGE,
 	.init = omap44xx_prm_init,
 	.device_inst_offset = OMAP54XX_PRM_DEVICE_INST,
+	.next = &omap5_prm_vcvp_data,
 };
 
 static const struct prcm_init_data dra7_prm_data = {
@@ -759,13 +781,15 @@ static void prcm_build_regmap(int id)
 	struct prcm_early_dev *edev;
 	struct prcm_iomap *iomap = &prcm_iomaps[id];
 
+	prcm_regmap_config.max_register = iomap->data->size;
 	pdev = platform_device_alloc(iomap->np->name, 0);
 	dev_set_name(&pdev->dev, "%s", pdev->name);
 	edev = kzalloc(sizeof(*edev), GFP_KERNEL);
 	edev->dev = pdev;
 	edev->node = iomap->np;
 	list_add(&edev->link, &prcm_early_devs);
-	iomap->regmap = regmap_init_mmio(&pdev->dev, iomap->mem,
+	iomap->regmap = regmap_init_mmio(&pdev->dev, iomap->mem +
+					 iomap->data->regmap_offset,
 					 &prcm_regmap_config);
 }
 
@@ -848,7 +872,10 @@ static int of_prm_base_init(void)
 		if (data->index == PRCM_REGMAP_INDEX_SCRM)
 			scrm_base = mem + data->offset;
 
-		prcm_add_iomap(np, mem, data);
+		while (data) {
+			prcm_add_iomap(np, mem, data);
+			data = data->next;
+		}
 	}
 
 	return 0;
