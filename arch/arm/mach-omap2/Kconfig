@@ -109,6 +109,7 @@ config ARCH_OMAP2PLUS
 	select SPARSE_IRQ
 	select TI_PRIV_EDMA
 	select USE_OF
+	select REGMAP_MMIO
 	help
 	  Systems based on OMAP2, OMAP3, OMAP4 or OMAP5
 

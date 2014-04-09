@@ -275,7 +275,7 @@ extern const struct clksel_rate div_1_3_rates[];
 extern const struct clksel_rate div_1_4_rates[];
 extern const struct clksel_rate div31_1to31_rates[];
 
-extern void __iomem *clk_memmaps[];
+extern struct regmap *clk_regmaps[];
 
 extern int am33xx_clk_init(void);
 

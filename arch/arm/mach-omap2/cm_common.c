@@ -193,17 +193,17 @@ int cm_unregister(struct cm_ll_data *cld)
 
 static const struct prcm_match_data cm_base_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
-	.index = PRCM_CLK_MEMMAP_INDEX_CM1,
+	.index = PRCM_REGMAP_INDEX_CM1,
 };
 
 static const struct prcm_match_data cm2_base_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
-	.index = PRCM_CLK_MEMMAP_INDEX_CM2,
+	.index = PRCM_REGMAP_INDEX_CM2,
 };
 
 static const struct prcm_match_data omap3_cm_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
-	.index = PRCM_CLK_MEMMAP_INDEX_CM1,
+	.index = PRCM_REGMAP_INDEX_CM1,
 	.offset = 0x800,
 };
 
@@ -231,20 +231,20 @@ int __init of_cm_early_init(void)
 	struct device_node *np;
 	const struct of_device_id *match;
 	const struct prcm_match_data *data;
+	void __iomem *mem;
 
 	for_each_matching_node_and_match(np, omap_cm_dt_match_table, &match) {
 		data = match->data;
-		if (clk_memmaps[data->index])
-			pr_warn("WARNING: multiple cm compatible mods %d\n",
-				data->index);
 
-		clk_memmaps[data->index] = of_iomap(np, 0);
+		mem = of_iomap(np, 0);
 
-		if (data->index == PRCM_CLK_MEMMAP_INDEX_CM1)
-			cm_base = clk_memmaps[data->index] + data->offset;
+		if (data->index == PRCM_REGMAP_INDEX_CM1)
+			cm_base = mem + data->offset;
 
-		if (data->index == PRCM_CLK_MEMMAP_INDEX_CM2)
-			cm2_base = clk_memmaps[data->index] + data->offset;
+		if (data->index == PRCM_REGMAP_INDEX_CM2)
+			cm2_base = mem + data->offset;
+
+		prcm_add_iomap(np, mem, data);
 	}
 
 	return 0;
