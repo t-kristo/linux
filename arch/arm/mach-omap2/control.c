@@ -616,7 +616,7 @@ void __init omap3_ctrl_init(void)
 
 static const struct prcm_match_data scrm_base_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
-	.index = PRCM_CLK_MEMMAP_INDEX_SCRM,
+	.index = PRCM_REGMAP_INDEX_SCRM,
 };
 
 static struct of_device_id omap_scrm_dt_match_table[] = {
@@ -641,11 +641,9 @@ int __init of_scrm_early_init(void)
 	for_each_matching_node_and_match(np, omap_scrm_dt_match_table, &match) {
 		data = match->data;
 
-		if (clk_memmaps[data->index])
-			pr_warn("WARN: multiple scrm compatible mods\n");
+		omap2_ctrl_base = of_iomap(np, 0);
 
-		clk_memmaps[data->index] = of_iomap(np, 0);
-		omap2_ctrl_base = clk_memmaps[data->index];
+		prcm_add_iomap(np, omap2_ctrl_base, data);
 	}
 
 	return 0;

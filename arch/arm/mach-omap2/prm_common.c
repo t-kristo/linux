@@ -27,6 +27,8 @@
 #include <linux/of_address.h>
 #include <linux/clk-provider.h>
 #include <linux/clk/ti.h>
+#include <linux/regmap.h>
+#include <linux/of_platform.h>
 
 #include "prm2xxx_3xxx.h"
 #include "prm2xxx.h"
@@ -60,6 +62,7 @@ static struct omap_prcm_irq_setup *prcm_irq_setup;
 
 /* prm_base: base virtual address of the PRM IP block */
 void __iomem *prm_base;
+void __iomem *scrm_base;
 
 u16 prm_features;
 u16 prm_dev_inst;
@@ -620,25 +623,45 @@ int prm_unregister(struct prm_ll_data *pld)
 
 static const struct prcm_match_data prm_base_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
-	.index = PRCM_CLK_MEMMAP_INDEX_PRM,
+	.index = PRCM_REGMAP_INDEX_PRM,
 };
 
 static const struct prcm_match_data prcm_base_data = {
 	.flags = 0,
-	.index = PRCM_CLK_MEMMAP_INDEX_PRM,
+	.index = PRCM_REGMAP_INDEX_PRM,
 };
 
 static const struct prcm_match_data scrm_base_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
-	.index = PRCM_CLK_MEMMAP_INDEX_SCRM,
+	.index = PRCM_REGMAP_INDEX_SCRM,
 };
 
 static const struct prcm_match_data omap3_prm_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
-	.index = PRCM_CLK_MEMMAP_INDEX_PRM,
+	.index = PRCM_REGMAP_INDEX_PRM,
 	.offset = 0x800,
 };
 
+static u32 prm_clk_readl(void __iomem *reg)
+{
+	struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
+	u32 val;
+
+	regmap_read(clk_regmaps[r->index], r->offset, &val);
+
+	return val;
+}
+
+static void prm_clk_writel(u32 val, void __iomem *reg)
+{
+	struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
+	regmap_write(clk_regmaps[r->index], r->offset, val);
+}
+
+static struct ti_clk_ll_ops omap_clk_ll_ops = {
+	.clk_readl = prm_clk_readl,
+	.clk_writel = prm_clk_writel,
+};
 
 static struct of_device_id omap_prm_dt_match_table[] = {
 	{ .compatible = "ti,omap3-prm", .data = &omap3_prm_data },
@@ -653,23 +676,6 @@ static struct of_device_id omap_prm_dt_match_table[] = {
 	{ }
 };
 
-static u32 prm_clk_readl(void __iomem *reg)
-{
-	struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
-	return readl_relaxed(clk_memmaps[r->index] + r->offset);
-}
-
-static void prm_clk_writel(u32 val, void __iomem *reg)
-{
-	struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
-	writel_relaxed(val, clk_memmaps[r->index] + r->offset);
-}
-
-static struct ti_clk_ll_ops omap_clk_ll_ops = {
-	.clk_readl = prm_clk_readl,
-	.clk_writel = prm_clk_writel,
-};
-
 int __init of_prcm_module_init(struct of_device_id *match_table)
 {
 	struct device_node *np;
@@ -682,12 +688,21 @@ int __init of_prcm_module_init(struct of_device_id *match_table)
 		data = match->data;
 		if (!(data->flags & PRCM_REGISTER_CLOCKS))
 			continue;
+		clk_regmaps[data->index] = prcm_regmap_get(data->index);
 		ti_dt_clk_init_provider(np, data->index);
 		ti_dt_clockdomains_setup(np);
 	}
 
 	return 0;
 }
+
+static LIST_HEAD(prcm_early_devs);
+
+struct prcm_early_dev {
+	struct device_node *node;
+	struct platform_device *dev;
+	struct list_head link;
+};
 
 int __init of_prcm_late_init(void)
 {
@@ -698,27 +713,99 @@ int __init of_prcm_late_init(void)
 	return ret;
 }
 
+struct prcm_iomap {
+	void __iomem *mem;
+	struct device_node *np;
+	struct regmap *regmap;
+	const struct prcm_match_data *data;
+	int usecount;
+};
+
+static struct prcm_iomap prcm_iomaps[PRCM_MAX_REGMAPS];
+
+static struct regmap_config prcm_regmap_config = {
+	.reg_bits = 32,
+	.reg_stride = 4,
+	.val_bits = 32,
+};
+
+void prcm_add_iomap(struct device_node *np, void __iomem *mem,
+		     const struct prcm_match_data *data)
+{
+	struct prcm_iomap *iomap = &prcm_iomaps[data->index];
+
+	iomap->np = np;
+	iomap->mem = mem;
+	iomap->data = data;
+}
+
+static void prcm_build_regmap(int id)
+{
+	struct platform_device *pdev;
+	struct prcm_early_dev *edev;
+	struct prcm_iomap *iomap = &prcm_iomaps[id];
+
+	pdev = platform_device_alloc(iomap->np->name, 0);
+	dev_set_name(&pdev->dev, "%s", pdev->name);
+	edev = kzalloc(sizeof(*edev), GFP_KERNEL);
+	edev->dev = pdev;
+	edev->node = iomap->np;
+	list_add(&edev->link, &prcm_early_devs);
+	iomap->regmap = regmap_init_mmio(&pdev->dev, iomap->mem,
+					 &prcm_regmap_config);
+}
+
 static int of_prm_early_init(void)
 {
 	struct device_node *np;
 	const struct of_device_id *match;
 	const struct prcm_match_data *data;
+	void __iomem *mem;
 
 	for_each_matching_node_and_match(np, omap_prm_dt_match_table, &match) {
 		data = match->data;
-		if (clk_memmaps[data->index])
-			pr_warn("WARNING: multiple prcm compatible mods, %d\n",
-				data->index);
 
-		clk_memmaps[data->index] = of_iomap(np, 0);
+		mem = of_iomap(np, 0);
 
-		if (data->index == PRCM_CLK_MEMMAP_INDEX_PRM)
-			prm_base = clk_memmaps[data->index] + data->offset;
+		if (data->index == PRCM_REGMAP_INDEX_PRM)
+			prm_base = mem + data->offset;
+		if (data->index == PRCM_REGMAP_INDEX_SCRM)
+			scrm_base = mem + data->offset;
+
+		prcm_add_iomap(np, mem, data);
 	}
 
 	return 0;
 }
 
+struct regmap *prcm_regmap_get(int id)
+{
+	if (id < 0 || id >= PRCM_MAX_REGMAPS)
+		return ERR_PTR(-EINVAL);
+
+	if (prcm_iomaps[id].usecount)
+		return ERR_PTR(-EBUSY);
+
+	prcm_iomaps[id].usecount++;
+
+	if (!prcm_iomaps[id].regmap)
+		prcm_build_regmap(id);
+
+	return prcm_iomaps[id].regmap;
+}
+
+int prcm_regmap_put(int id, struct regmap *map)
+{
+	if (id < 0 || id >= PRCM_MAX_REGMAPS)
+		return -EINVAL;
+
+	if (!prcm_iomaps[id].usecount)
+		return -EBUSY;
+
+	prcm_iomaps[id].usecount--;
+
+	return 0;
+}
 
 int __init of_prcm_early_init(void)
 {

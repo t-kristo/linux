@@ -518,6 +518,8 @@ struct omap_prcm_irq_setup {
 	}
 
 struct of_device_id;
+struct regmap;
+struct device_node;
 
 #define PRCM_REGISTER_CLOCKS			0x1
 
@@ -528,13 +530,15 @@ struct prcm_match_data {
 };
 
 enum {
-	PRCM_CLK_MEMMAP_INDEX_PRM = 0,
-	PRCM_CLK_MEMMAP_INDEX_CM1,
-	PRCM_CLK_MEMMAP_INDEX_CM2,
-	PRCM_CLK_MEMMAP_INDEX_SCRM,
+	PRCM_REGMAP_INDEX_PRM = 0,
+	PRCM_REGMAP_INDEX_CM1,
+	PRCM_REGMAP_INDEX_CM2,
+	PRCM_REGMAP_INDEX_SCRM,
+	PRCM_REGMAP_INDEX_VCVP,
+	PRCM_MAX_REGMAPS,
 };
 
-extern void __iomem *clk_memmaps[];
+extern struct regmap *clk_regmaps[];
 
 extern void omap_prcm_irq_cleanup(void);
 extern int omap_prcm_register_chain_handler(
@@ -548,6 +552,10 @@ int of_cm_early_init(void);
 int of_cm_late_init(void);
 int of_prcm_early_init(void);
 int of_scrm_early_init(void);
+int prcm_regmap_put(int id, struct regmap *map);
+struct regmap *prcm_regmap_get(int id);
+void prcm_add_iomap(struct device_node *np, void __iomem *mem,
+		    const struct prcm_match_data *data);
 
 # endif
 
