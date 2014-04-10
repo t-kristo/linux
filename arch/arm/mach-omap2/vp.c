@@ -17,19 +17,19 @@ static u32 _vp_set_init_voltage(struct voltagedomain *voltdm, u32 volt)
 
 	vsel = voltdm->pmic->uv_to_vsel(volt);
 
-	vpconfig = voltdm->read(vp->vpconfig);
+	vpconfig = voltdm->ops->read(vp->vpconfig);
 	vpconfig &= ~(vp->common->vpconfig_initvoltage_mask |
 		      vp->common->vpconfig_forceupdate |
 		      vp->common->vpconfig_initvdd);
 	vpconfig |= vsel << __ffs(vp->common->vpconfig_initvoltage_mask);
-	voltdm->write(vpconfig, vp->vpconfig);
+	voltdm->ops->write(vpconfig, vp->vpconfig);
 
 	/* Trigger initVDD value copy to voltage processor */
-	voltdm->write((vpconfig | vp->common->vpconfig_initvdd),
-		       vp->vpconfig);
+	voltdm->ops->write((vpconfig | vp->common->vpconfig_initvdd),
+			   vp->vpconfig);
 
 	/* Clear initVDD copy trigger bit */
-	voltdm->write(vpconfig, vp->vpconfig);
+	voltdm->ops->write(vpconfig, vp->vpconfig);
 
 	return vpconfig;
 }
@@ -46,7 +46,7 @@ void __init omap_vp_init(struct voltagedomain *voltdm)
 		return;
 	}
 
-	if (!voltdm->read || !voltdm->write) {
+	if (!voltdm->ops || !voltdm->ops->read || !voltdm->ops->write) {
 		pr_err("%s: No read/write API for accessing vdd_%s regs\n",
 			__func__, voltdm->name);
 		return;
@@ -75,23 +75,23 @@ void __init omap_vp_init(struct voltagedomain *voltdm)
 	val = (voltdm->pmic->vp_erroroffset <<
 	       __ffs(voltdm->vp->common->vpconfig_erroroffset_mask)) |
 		vp->common->vpconfig_timeouten;
-	voltdm->write(val, vp->vpconfig);
+	voltdm->ops->write(val, vp->vpconfig);
 
 	/* VSTEPMIN */
 	val = (waittime << vp->common->vstepmin_smpswaittimemin_shift) |
 		(vstepmin <<  vp->common->vstepmin_stepmin_shift);
-	voltdm->write(val, vp->vstepmin);
+	voltdm->ops->write(val, vp->vstepmin);
 
 	/* VSTEPMAX */
 	val = (vstepmax << vp->common->vstepmax_stepmax_shift) |
 		(waittime << vp->common->vstepmax_smpswaittimemax_shift);
-	voltdm->write(val, vp->vstepmax);
+	voltdm->ops->write(val, vp->vstepmax);
 
 	/* VLIMITTO */
 	val = (vddmax << vp->common->vlimitto_vddmax_shift) |
 		(vddmin << vp->common->vlimitto_vddmin_shift) |
 		(timeout <<  vp->common->vlimitto_timeout_shift);
-	voltdm->write(val, vp->vlimitto);
+	voltdm->ops->write(val, vp->vlimitto);
 }
 
 int omap_vp_update_errorgain(struct voltagedomain *voltdm,
@@ -108,10 +108,10 @@ int omap_vp_update_errorgain(struct voltagedomain *voltdm,
 		return -EINVAL;
 
 	/* Setting vp errorgain based on the voltage */
-	voltdm->rmw(voltdm->vp->common->vpconfig_errorgain_mask,
-		    volt_data->vp_errgain <<
-		    __ffs(voltdm->vp->common->vpconfig_errorgain_mask),
-		    voltdm->vp->vpconfig);
+	voltdm->ops->rmw(voltdm->vp->common->vpconfig_errorgain_mask,
+			 volt_data->vp_errgain <<
+			 __ffs(voltdm->vp->common->vpconfig_errorgain_mask),
+			 voltdm->vp->vpconfig);
 
 	return 0;
 }
@@ -148,8 +148,8 @@ int omap_vp_forceupdate_scale(struct voltagedomain *voltdm,
 	vpconfig = _vp_set_init_voltage(voltdm, target_volt);
 
 	/* Force update of voltage */
-	voltdm->write(vpconfig | vp->common->vpconfig_forceupdate,
-		      voltdm->vp->vpconfig);
+	voltdm->ops->write(vpconfig | vp->common->vpconfig_forceupdate,
+			   voltdm->vp->vpconfig);
 
 	/*
 	 * Wait for TransactionDone. Typical latency is <200us.
@@ -181,7 +181,7 @@ int omap_vp_forceupdate_scale(struct voltagedomain *voltdm,
 			__func__, voltdm->name);
 
 	/* Clear force bit */
-	voltdm->write(vpconfig, vp->vpconfig);
+	voltdm->ops->write(vpconfig, vp->vpconfig);
 
 	return 0;
 }
@@ -204,7 +204,7 @@ void omap_vp_enable(struct voltagedomain *voltdm)
 	}
 
 	vp = voltdm->vp;
-	if (!voltdm->read || !voltdm->write) {
+	if (!voltdm->ops || !voltdm->ops->read || !voltdm->ops->write) {
 		pr_err("%s: No read/write API for accessing vdd_%s regs\n",
 			__func__, voltdm->name);
 		return;
@@ -225,7 +225,7 @@ void omap_vp_enable(struct voltagedomain *voltdm)
 
 	/* Enable VP */
 	vpconfig |= vp->common->vpconfig_vpenable;
-	voltdm->write(vpconfig, vp->vpconfig);
+	voltdm->ops->write(vpconfig, vp->vpconfig);
 
 	vp->enabled = true;
 }
@@ -249,7 +249,7 @@ void omap_vp_disable(struct voltagedomain *voltdm)
 	}
 
 	vp = voltdm->vp;
-	if (!voltdm->read || !voltdm->write) {
+	if (!voltdm->ops || !voltdm->ops->read || !voltdm->ops->write) {
 		pr_err("%s: No read/write API for accessing vdd_%s regs\n",
 			__func__, voltdm->name);
 		return;
@@ -263,14 +263,14 @@ void omap_vp_disable(struct voltagedomain *voltdm)
 	}
 
 	/* Disable VP */
-	vpconfig = voltdm->read(vp->vpconfig);
+	vpconfig = voltdm->ops->read(vp->vpconfig);
 	vpconfig &= ~vp->common->vpconfig_vpenable;
-	voltdm->write(vpconfig, vp->vpconfig);
+	voltdm->ops->write(vpconfig, vp->vpconfig);
 
 	/*
 	 * Wait for VP idle Typical latency is <2us. Maximum latency is ~100us
 	 */
-	omap_test_timeout((voltdm->read(vp->vstatus)),
+	omap_test_timeout((voltdm->ops->read(vp->vstatus)),
 			  VP_IDLE_TIMEOUT, timeout);
 
 	if (timeout >= VP_IDLE_TIMEOUT)

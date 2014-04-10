@@ -51,6 +51,18 @@ struct omap_vfsm_instance {
 };
 
 /**
+ * struct voltdm_ops - SoC specific voltage domain register access operations
+ * @read: read a VC/VP register
+ * @write: write a VC/VP register
+ * @rmw: read-modify-write a VC/VP register
+ */
+struct voltdm_ops {
+	u32 (*read) (u8 offset);
+	void (*write) (u32 val, u8 offset);
+	u32 (*rmw)(u32 mask, u32 bits, u8 offset);
+};
+
+/**
  * struct voltagedomain - omap voltage domain global structure.
  * @name: Name of the voltage domain which can be used as a unique identifier.
  * @scalable: Whether or not this voltage domain is scalable
@@ -58,9 +70,7 @@ struct omap_vfsm_instance {
  * @pwrdm_list: list_head linking all powerdomains in this voltagedomain
  * @vc: pointer to VC channel associated with this voltagedomain
  * @vp: pointer to VP associated with this voltagedomain
- * @read: read a VC/VP register
- * @write: write a VC/VP register
- * @read: read-modify-write a VC/VP register
+ * @ops: VC/VP register access operations
  * @sys_clk: system clock name/frequency, used for various timing calculations
  * @scale: function used to scale the voltage of the voltagedomain
  * @nominal_volt: current nominal voltage for this voltage domain
@@ -80,9 +90,7 @@ struct voltagedomain {
 	struct omap_vc_param *vc_param;
 
 	/* VC/VP register access functions: SoC specific */
-	u32 (*read) (u8 offset);
-	void (*write) (u32 val, u8 offset);
-	u32 (*rmw)(u32 mask, u32 bits, u8 offset);
+	struct voltdm_ops *ops;
 
 	union {
 		const char *name;
