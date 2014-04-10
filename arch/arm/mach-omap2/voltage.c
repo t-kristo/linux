@@ -26,6 +26,7 @@
 #include <linux/debugfs.h>
 #include <linux/slab.h>
 #include <linux/clk.h>
+#include <linux/regmap.h>
 
 #include "common.h"
 
@@ -35,6 +36,7 @@
 #include "prcm44xx.h"
 #include "prminst44xx.h"
 #include "control.h"
+#include "prcm-common.h"
 
 #include "voltage.h"
 #include "powerdomain.h"
@@ -43,6 +45,34 @@
 #include "vp.h"
 
 static LIST_HEAD(voltdm_list);
+static struct regmap *voltage_regmap;
+
+static u32 vcvp_regmap_read(u8 offset)
+{
+	u32 val;
+
+	regmap_read(voltage_regmap, offset, &val);
+
+	return val;
+}
+
+static void vcvp_regmap_write(u32 val, u8 offset)
+{
+	regmap_write(voltage_regmap, offset, val);
+}
+
+static u32 vcvp_regmap_rmw(u32 mask, u32 bits, u8 offset)
+{
+	regmap_update_bits(voltage_regmap, offset, mask, bits);
+
+	return bits & mask;
+}
+
+struct voltdm_ops voltdm_regmap_ops = {
+	.read = vcvp_regmap_read,
+	.write = vcvp_regmap_write,
+	.rmw = vcvp_regmap_rmw,
+};
 
 /* Public functions */
 /**
@@ -270,6 +300,8 @@ int __init omap_voltage_late_init(void)
 			__func__);
 		return -EINVAL;
 	}
+
+	voltage_regmap = prcm_regmap_get(PRCM_REGMAP_INDEX_VCVP);
 
 	list_for_each_entry(voltdm, &voltdm_list, node) {
 		struct clk *sys_ck;
