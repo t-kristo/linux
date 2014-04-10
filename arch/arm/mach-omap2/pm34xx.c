@@ -50,6 +50,7 @@
 #include "sdrc.h"
 #include "sram.h"
 #include "control.h"
+#include "vc.h"
 
 /* pm34xx errata defined in pm.h */
 u16 pm34xx_errata;
@@ -282,6 +283,7 @@ void omap_sram_idle(void)
 
 	/* CORE */
 	if (core_next_state < PWRDM_POWER_ON) {
+		omap3_vc_set_pmic_signaling(core_next_state);
 		if (core_next_state == PWRDM_POWER_OFF) {
 			omap3_core_save_context();
 			omap3_cm_save_context();
