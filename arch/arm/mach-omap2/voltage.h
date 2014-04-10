@@ -165,6 +165,8 @@ struct omap_vc_param {
 	u32 off;
 };
 
+extern struct voltdm_ops voltdm_regmap_ops;
+
 void omap_voltage_get_volttable(struct voltagedomain *voltdm,
 		struct omap_volt_data **volt_data);
 struct omap_volt_data *omap_voltage_get_voltdata(struct voltagedomain *voltdm,
