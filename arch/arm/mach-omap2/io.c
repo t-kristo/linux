@@ -468,6 +468,8 @@ void __init omap3_init_early(void)
 	omap2_set_globals_prm(OMAP2_L4_IO_ADDRESS(OMAP3430_PRM_BASE));
 	omap2_set_globals_cm(OMAP2_L4_IO_ADDRESS(OMAP3430_CM_BASE), NULL);
 	of_prcm_base_init();
+	if (!of_have_populated_dt())
+		omap3_prm_legacy_regmap_init();
 	omap3xxx_check_revision();
 	omap3xxx_check_features();
 	omap3xxx_prm_init();
