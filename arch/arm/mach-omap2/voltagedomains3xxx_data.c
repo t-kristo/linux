@@ -48,12 +48,16 @@ static const struct omap_vfsm_instance omap3_vdd2_vfsm = {
 	.voltsetup_mask = OMAP3430_SETUP_TIME2_MASK,
 };
 
-static struct voltagedomain omap3_voltdm_mpu = {
-	.name = "mpu_iva",
-	.scalable = true,
+static struct voltdm_ops omap3_voltdm_ops = {
 	.read = omap3_prm_vcvp_read,
 	.write = omap3_prm_vcvp_write,
 	.rmw = omap3_prm_vcvp_rmw,
+};
+
+static struct voltagedomain omap3_voltdm_mpu = {
+	.name = "mpu_iva",
+	.scalable = true,
+	.ops = &omap3_voltdm_ops,
 	.vc = &omap3_vc_mpu,
 	.vfsm = &omap3_vdd1_vfsm,
 	.vp = &omap3_vp_mpu,
@@ -62,9 +66,7 @@ static struct voltagedomain omap3_voltdm_mpu = {
 static struct voltagedomain omap3_voltdm_core = {
 	.name = "core",
 	.scalable = true,
-	.read = omap3_prm_vcvp_read,
-	.write = omap3_prm_vcvp_write,
-	.rmw = omap3_prm_vcvp_rmw,
+	.ops = &omap3_voltdm_ops,
 	.vc = &omap3_vc_core,
 	.vfsm = &omap3_vdd2_vfsm,
 	.vp = &omap3_vp_core,
