@@ -860,6 +860,16 @@ int __init of_prcm_early_init(void)
 	return ret;
 }
 
+static struct device_node dummy_prm_node = {
+	.name = "prm",
+};
+
+void __init omap3_prm_legacy_regmap_init(void)
+{
+	prcm_add_iomap(&dummy_prm_node, prm_base - omap3_prm_data.offset,
+		       &omap3_prm_vcvp_data);
+}
+
 static int __init prm_late_init(void)
 {
 	if (prm_ll_data->late_init)
