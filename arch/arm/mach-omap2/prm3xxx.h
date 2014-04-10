@@ -132,14 +132,6 @@
 
 #ifndef __ASSEMBLER__
 
-/*
- * OMAP3 access functions for voltage controller (VC) and
- * voltage proccessor (VP) in the PRM.
- */
-extern u32 omap3_prm_vcvp_read(u8 offset);
-extern void omap3_prm_vcvp_write(u32 val, u8 offset);
-extern u32 omap3_prm_vcvp_rmw(u32 mask, u32 bits, u8 offset);
-
 int __init omap3xxx_prm_init(u16 cpu_type);
 void omap3xxx_prm_iva_idle(void);
 void omap3_prm_reset_modem(void);
