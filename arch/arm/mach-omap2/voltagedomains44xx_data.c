@@ -47,16 +47,10 @@ static const struct omap_vfsm_instance omap4_vdd_core_vfsm = {
 	.voltsetup_off_reg = OMAP4_PRM_VOLTSETUP_CORE_OFF_OFFSET,
 };
 
-static struct voltdm_ops omap4_voltdm_ops = {
-	.read = omap4_prm_vcvp_read,
-	.write = omap4_prm_vcvp_write,
-	.rmw = omap4_prm_vcvp_rmw,
-};
-
 static struct voltagedomain omap4_voltdm_mpu = {
 	.name = "mpu",
 	.scalable = true,
-	.ops = &omap4_voltdm_ops,
+	.ops = &voltdm_regmap_ops,
 	.vc = &omap4_vc_mpu,
 	.vfsm = &omap4_vdd_mpu_vfsm,
 	.vp = &omap4_vp_mpu,
@@ -65,7 +59,7 @@ static struct voltagedomain omap4_voltdm_mpu = {
 static struct voltagedomain omap4_voltdm_iva = {
 	.name = "iva",
 	.scalable = true,
-	.ops = &omap4_voltdm_ops,
+	.ops = &voltdm_regmap_ops,
 	.vc = &omap4_vc_iva,
 	.vfsm = &omap4_vdd_iva_vfsm,
 	.vp = &omap4_vp_iva,
@@ -74,7 +68,7 @@ static struct voltagedomain omap4_voltdm_iva = {
 static struct voltagedomain omap4_voltdm_core = {
 	.name = "core",
 	.scalable = true,
-	.ops = &omap4_voltdm_ops,
+	.ops = &voltdm_regmap_ops,
 	.vc = &omap4_vc_core,
 	.vfsm = &omap4_vdd_core_vfsm,
 	.vp = &omap4_vp_core,

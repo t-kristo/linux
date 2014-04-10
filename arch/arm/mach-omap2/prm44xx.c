@@ -190,26 +190,6 @@ static void omap4_prm_vp_clear_txdone(u8 vp_id)
 				     vp->irqstatus_mpu);
 };
 
-u32 omap4_prm_vcvp_read(u8 offset)
-{
-	return omap4_prminst_read_inst_reg(OMAP4430_PRM_PARTITION,
-					   OMAP4430_PRM_DEVICE_INST, offset);
-}
-
-void omap4_prm_vcvp_write(u32 val, u8 offset)
-{
-	omap4_prminst_write_inst_reg(val, OMAP4430_PRM_PARTITION,
-				     OMAP4430_PRM_DEVICE_INST, offset);
-}
-
-u32 omap4_prm_vcvp_rmw(u32 mask, u32 bits, u8 offset)
-{
-	return omap4_prminst_rmw_inst_reg_bits(mask, bits,
-					       OMAP4430_PRM_PARTITION,
-					       OMAP4430_PRM_DEVICE_INST,
-					       offset);
-}
-
 static inline u32 _read_pending_irq_reg(u16 irqen_offs, u16 irqst_offs)
 {
 	u32 mask, st;

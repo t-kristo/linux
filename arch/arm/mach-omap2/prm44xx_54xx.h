@@ -26,14 +26,6 @@
 /* Function prototypes */
 #ifndef __ASSEMBLER__
 
-/*
- * OMAP4/OMAP5 access functions for voltage controller (VC) and
- * voltage proccessor (VP) in the PRM.
- */
-extern u32 omap4_prm_vcvp_read(u8 offset);
-extern void omap4_prm_vcvp_write(u32 val, u8 offset);
-extern u32 omap4_prm_vcvp_rmw(u32 mask, u32 bits, u8 offset);
-
 int __init omap44xx_prm_init(u16 cpu_type);
 
 #endif
