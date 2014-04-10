@@ -33,12 +33,16 @@ static const struct omap_vfsm_instance omap5_vdd_core_vfsm = {
 	.voltsetup_reg = OMAP54XX_PRM_VOLTSETUP_CORE_RET_SLEEP_OFFSET,
 };
 
-static struct voltagedomain omap5_voltdm_mpu = {
-	.name = "mpu",
-	.scalable = true,
+static struct voltdm_ops omap5_voltdm_ops = {
 	.read = omap4_prm_vcvp_read,
 	.write = omap4_prm_vcvp_write,
 	.rmw = omap4_prm_vcvp_rmw,
+};
+
+static struct voltagedomain omap5_voltdm_mpu = {
+	.name = "mpu",
+	.scalable = true,
+	.ops = &omap5_voltdm_ops,
 	.vc = &omap4_vc_mpu,
 	.vfsm = &omap5_vdd_mpu_vfsm,
 	.vp = &omap4_vp_mpu,
@@ -47,9 +51,7 @@ static struct voltagedomain omap5_voltdm_mpu = {
 static struct voltagedomain omap5_voltdm_mm = {
 	.name = "mm",
 	.scalable = true,
-	.read = omap4_prm_vcvp_read,
-	.write = omap4_prm_vcvp_write,
-	.rmw = omap4_prm_vcvp_rmw,
+	.ops = &omap5_voltdm_ops,
 	.vc = &omap4_vc_iva,
 	.vfsm = &omap5_vdd_mm_vfsm,
 	.vp = &omap4_vp_iva,
@@ -58,9 +60,7 @@ static struct voltagedomain omap5_voltdm_mm = {
 static struct voltagedomain omap5_voltdm_core = {
 	.name = "core",
 	.scalable = true,
-	.read = omap4_prm_vcvp_read,
-	.write = omap4_prm_vcvp_write,
-	.rmw = omap4_prm_vcvp_rmw,
+	.ops = &omap5_voltdm_ops,
 	.vc = &omap4_vc_core,
 	.vfsm = &omap5_vdd_core_vfsm,
 	.vp = &omap4_vp_core,
