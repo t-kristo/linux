@@ -16,6 +16,7 @@
 #include <linux/errno.h>
 #include <linux/of.h>
 #include <linux/of_address.h>
+#include <linux/of_platform.h>
 
 #include "cm2xxx.h"
 #include "cm3xxx.h"
@@ -244,8 +245,34 @@ int __init of_cm_early_init(void)
 		if (data->index == PRCM_REGMAP_INDEX_CM2)
 			cm2_base = mem + data->offset;
 
-		prcm_add_iomap(np, mem, data);
+		prcm_add_iomap(np, mem, data, 0);
 	}
 
 	return 0;
 }
+
+static int __init cm_probe(struct platform_device *pdev)
+{
+	return prcm_probe_early_devs(pdev);
+}
+
+static int cm_remove(struct platform_device *pdev)
+{
+	return 0;
+}
+
+static struct platform_driver cm_driver = {
+	.probe		= cm_probe,
+	.remove		= cm_remove,
+	.driver		= {
+		.name	= "cm-driver",
+		.owner	= THIS_MODULE,
+		.of_match_table = of_match_ptr(omap_cm_dt_match_table),
+	},
+};
+
+static int __init cm_late_init(void)
+{
+	return platform_driver_register(&cm_driver);
+}
+subsys_initcall(cm_late_init);

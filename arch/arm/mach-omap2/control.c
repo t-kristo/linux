@@ -16,6 +16,7 @@
 #include <linux/io.h>
 #include <linux/of.h>
 #include <linux/of_address.h>
+#include <linux/of_platform.h>
 
 #include "soc.h"
 #include "iomap.h"
@@ -643,8 +644,34 @@ int __init of_scrm_early_init(void)
 
 		omap2_ctrl_base = of_iomap(np, 0);
 
-		prcm_add_iomap(np, omap2_ctrl_base, data);
+		prcm_add_iomap(np, omap2_ctrl_base, data, 0);
 	}
 
 	return 0;
 }
+
+static int __init scrm_probe(struct platform_device *pdev)
+{
+	return prcm_probe_early_devs(pdev);
+}
+
+static int scrm_remove(struct platform_device *pdev)
+{
+	return 0;
+}
+
+static struct platform_driver scrm_driver = {
+	.probe		= scrm_probe,
+	.remove		= scrm_remove,
+	.driver		= {
+		.name	= "scrm-driver",
+		.owner	= THIS_MODULE,
+		.of_match_table = of_match_ptr(omap_scrm_dt_match_table),
+	},
+};
+
+static int __init scrm_late_init(void)
+{
+	return platform_driver_register(&scrm_driver);
+}
+subsys_initcall(scrm_late_init);
