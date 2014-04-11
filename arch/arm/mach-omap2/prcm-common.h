@@ -520,6 +520,7 @@ struct omap_prcm_irq_setup {
 struct of_device_id;
 struct regmap;
 struct device_node;
+struct platform_device;
 
 #define PRCM_REGISTER_CLOCKS			0x1
 #define PRCM_REGMAP_IGNORE_OFFSET		0x2
@@ -558,7 +559,8 @@ int of_scrm_early_init(void);
 int prcm_regmap_put(int id, struct regmap *map);
 struct regmap *prcm_regmap_get(int id);
 void prcm_add_iomap(struct device_node *np, void __iomem *mem,
-		    const struct prcm_match_data *data);
+		    const struct prcm_match_data *data, int id);
+int prcm_probe_early_devs(struct platform_device *pdev);
 
 # endif
 

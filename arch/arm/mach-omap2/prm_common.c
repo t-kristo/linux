@@ -750,6 +750,7 @@ struct prcm_iomap {
 	struct regmap *regmap;
 	const struct prcm_match_data *data;
 	int usecount;
+	int id;
 };
 
 static struct prcm_iomap prcm_iomaps[PRCM_MAX_REGMAPS];
@@ -761,13 +762,14 @@ static struct regmap_config prcm_regmap_config = {
 };
 
 void prcm_add_iomap(struct device_node *np, void __iomem *mem,
-		     const struct prcm_match_data *data)
+		     const struct prcm_match_data *data, int id)
 {
 	struct prcm_iomap *iomap = &prcm_iomaps[data->index];
 
 	iomap->np = np;
 	iomap->mem = mem;
 	iomap->data = data;
+	iomap->id = id;
 }
 
 static void prcm_build_regmap(int id)
@@ -781,8 +783,8 @@ static void prcm_build_regmap(int id)
 	if (iomap->data->flags & PRCM_REGMAP_IGNORE_OFFSET)
 		offset = 0;
 	prcm_regmap_config.max_register = iomap->data->size;
-	pdev = platform_device_alloc(iomap->np->name, 0);
-	dev_set_name(&pdev->dev, "%s", pdev->name);
+	pdev = platform_device_alloc(iomap->np->name, iomap->id);
+	dev_set_name(&pdev->dev, "%s.%d", pdev->name, iomap->id);
 	edev = kzalloc(sizeof(*edev), GFP_KERNEL);
 	edev->dev = pdev;
 	edev->node = iomap->np;
@@ -797,6 +799,7 @@ static int of_prm_early_init(void)
 	const struct of_device_id *match;
 	const struct prcm_match_data *data;
 	void __iomem *mem;
+	int id = 0;
 
 	for_each_matching_node_and_match(np, omap_prm_dt_match_table, &match) {
 		data = match->data;
@@ -809,7 +812,7 @@ static int of_prm_early_init(void)
 			scrm_base = mem + data->offset;
 
 		while (data) {
-			prcm_add_iomap(np, mem, data);
+			prcm_add_iomap(np, mem, data, id++);
 			data = data->next;
 		}
 	}
@@ -867,13 +870,58 @@ static struct device_node dummy_prm_node = {
 void __init omap3_prm_legacy_regmap_init(void)
 {
 	prcm_add_iomap(&dummy_prm_node, prm_base - omap3_prm_data.offset,
-		       &omap3_prm_vcvp_data);
+		       &omap3_prm_vcvp_data, 0);
 }
+
+int prcm_probe_early_devs(struct platform_device *pdev)
+{
+	struct prcm_early_dev *edev;
+	int ret;
+
+	list_for_each_entry(edev, &prcm_early_devs, link) {
+		if (edev->node == pdev->dev.of_node) {
+			platform_device_add(edev->dev);
+			edev->dev->dev.driver = pdev->dev.driver;
+			ret = device_bind_driver(&edev->dev->dev);
+			if (ret)
+				return ret;
+		}
+	}
+
+	return 0;
+}
+
+static int __init prm_probe(struct platform_device *pdev)
+{
+	int ret;
+
+	ret = prcm_probe_early_devs(pdev);
+	if (ret)
+		return ret;
+
+	if (prm_ll_data->late_init)
+		return prm_ll_data->late_init();
+
+	return 0;
+}
+
+static int prm_remove(struct platform_device *pdev)
+{
+	return 0;
+}
+
+static struct platform_driver prm_driver = {
+	.probe		= prm_probe,
+	.remove		= prm_remove,
+	.driver		= {
+		.name	= "prm-driver",
+		.owner	= THIS_MODULE,
+		.of_match_table = of_match_ptr(omap_prm_dt_match_table),
+	},
+};
 
 static int __init prm_late_init(void)
 {
-	if (prm_ll_data->late_init)
-		return prm_ll_data->late_init();
-	return 0;
+	return platform_driver_register(&prm_driver);
 }
 subsys_initcall(prm_late_init);
