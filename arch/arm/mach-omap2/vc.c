@@ -70,6 +70,7 @@ static struct omap_vc_channel_cfg vc_mutant_channel_cfg = {
 };
 
 static struct omap_vc_channel_cfg *vc_cfg_bits;
+static struct voltagedomain *voltdm_ptr;
 
 /* Default I2C trace length on pcb, 6.3cm. Used for capacitance calculations. */
 static u32 sr_i2c_pcb_length = 63;
@@ -234,27 +235,25 @@ void omap3_vc_set_pmic_signaling(int core_next_state)
 	struct omap3_vc_config *c = omap3_vc_timings;
 	u32 voltctrl;
 
-	voltctrl = omap2_prm_read_mod_reg(OMAP3430_GR_MOD,
-					  OMAP3_PRM_VOLTCTRL_OFFSET);
+	voltctrl = voltdm_ptr->read(OMAP3_PRM_VOLTCTRL_OFFSET);
 	switch (core_next_state) {
 	case PWRDM_POWER_OFF:
 		voltctrl &= ~(OMAP3430_PRM_VOLTCTRL_AUTO_RET |
 			      OMAP3430_PRM_VOLTCTRL_AUTO_SLEEP);
 		voltctrl |= OMAP3430_PRM_VOLTCTRL_AUTO_OFF;
 		if (voltctrl & OMAP3430_PRM_VOLTCTRL_SEL_OFF)
-			omap2_prm_write_mod_reg(c->voltsetup2, OMAP3430_GR_MOD,
-						OMAP3_PRM_VOLTSETUP2_OFFSET);
+			voltdm_ptr->write(c->voltsetup2,
+					  OMAP3_PRM_VOLTSETUP2_OFFSET);
 		else
-			omap2_prm_write_mod_reg(c->voltsetup1, OMAP3430_GR_MOD,
-						OMAP3_PRM_VOLTSETUP1_OFFSET);
+			voltdm_ptr->write(c->voltsetup1,
+					  OMAP3_PRM_VOLTSETUP1_OFFSET);
 		break;
 	case PWRDM_POWER_RET:
 		c++;
 		voltctrl &= ~(OMAP3430_PRM_VOLTCTRL_AUTO_OFF |
 			      OMAP3430_PRM_VOLTCTRL_AUTO_SLEEP);
 		voltctrl |= OMAP3430_PRM_VOLTCTRL_AUTO_RET;
-		omap2_prm_write_mod_reg(c->voltsetup1, OMAP3430_GR_MOD,
-					OMAP3_PRM_VOLTSETUP1_OFFSET);
+		voltdm_ptr->write(c->voltsetup1, OMAP3_PRM_VOLTSETUP1_OFFSET);
 		break;
 	default:
 		voltctrl &= ~(OMAP3430_PRM_VOLTCTRL_AUTO_OFF |
@@ -262,8 +261,7 @@ void omap3_vc_set_pmic_signaling(int core_next_state)
 		voltctrl |= OMAP3430_PRM_VOLTCTRL_AUTO_SLEEP;
 		break;
 	}
-	omap2_prm_write_mod_reg(voltctrl, OMAP3430_GR_MOD,
-				OMAP3_PRM_VOLTCTRL_OFFSET);
+	voltdm_ptr->write(voltctrl, OMAP3_PRM_VOLTCTRL_OFFSET);
 }
 
 /*
@@ -275,8 +273,7 @@ static void __init omap3_vc_init_pmic_signaling(void)
 {
 	u32 val, old;
 
-	val = omap2_prm_read_mod_reg(OMAP3430_GR_MOD,
-				     OMAP3_PRM_POLCTRL_OFFSET);
+	val = voltdm_ptr->read(OMAP3_PRM_POLCTRL_OFFSET);
 	old = val;
 
 	if (old & OMAP3430_PRM_POLCTRL_CLKREQ_POL)
@@ -288,8 +285,7 @@ static void __init omap3_vc_init_pmic_signaling(void)
 		pr_debug("PM: fixing sys_clkreq and sys_off_mode polarity 0x%x -> 0x%x\n",
 			 old, val);
 	}
-	omap2_prm_write_mod_reg(val, OMAP3430_GR_MOD,
-				OMAP3_PRM_POLCTRL_OFFSET);
+	voltdm_ptr->write(val, OMAP3_PRM_POLCTRL_OFFSET);
 
 	/*
 	 * By default let's use I2C4 signaling for retention idle
@@ -300,14 +296,12 @@ static void __init omap3_vc_init_pmic_signaling(void)
 	 * Note that no actual voltage scaling will happen unless the
 	 * board specific twl4030 PMIC scripts are loaded.
 	 */
-	val = omap2_prm_read_mod_reg(OMAP3430_GR_MOD,
-				     OMAP3_PRM_VOLTCTRL_OFFSET);
+	val = voltdm_ptr->read(OMAP3_PRM_VOLTCTRL_OFFSET);
 	old = val;
 	val |= OMAP3430_PRM_VOLTCTRL_SEL_OFF;
 	pr_debug("PM: enabling voltctrl sys_off_mode signaling 0x%x -> 0x%x\n",
 		 old, val);
-	omap2_prm_write_mod_reg(val, OMAP3430_GR_MOD,
-				OMAP3_PRM_VOLTCTRL_OFFSET);
+	voltdm_ptr->write(val, OMAP3_PRM_VOLTCTRL_OFFSET);
 	omap3_vc_set_pmic_signaling(PWRDM_POWER_ON);
 }
 
@@ -757,6 +751,8 @@ void __init omap_vc_init_channel(struct voltagedomain *voltdm)
 			__func__, voltdm->name);
 		return;
 	}
+
+	voltdm_ptr = voltdm;
 
 	vc->cfg_channel = 0;
 	if (vc->flags & OMAP_VC_CHANNEL_CFG_MUTANT)
