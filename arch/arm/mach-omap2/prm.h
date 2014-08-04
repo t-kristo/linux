@@ -39,6 +39,7 @@ enum {
 	PRM_OMAP4,
 	PRM_OMAP5,
 	PRM_DRA7,
+	PRM_AM43XX,
 };
 #endif
 

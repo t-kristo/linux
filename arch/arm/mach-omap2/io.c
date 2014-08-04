@@ -617,6 +617,7 @@ void __init am43xx_init_early(void)
 	omap_cm_base_init();
 	omap3xxx_check_revision();
 	am33xx_check_features();
+	omap44xx_prm_init(PRM_AM43XX);
 	am43xx_powerdomains_init();
 	am43xx_clockdomains_init();
 	am43xx_hwmod_init();
