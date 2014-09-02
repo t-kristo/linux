@@ -16,21 +16,6 @@
 #include <linux/clkdev.h>
 #include <linux/clk/ti.h>
 
-/*
- * OMAP4 ABE DPLL default frequency. In OMAP4460 TRM version V, section
- * "3.6.3.2.3 CM1_ABE Clock Generator" states that the "DPLL_ABE_X2_CLK
- * must be set to 196.608 MHz" and hence, the DPLL locked frequency is
- * half of this value.
- */
-#define OMAP4_DPLL_ABE_DEFFREQ				98304000
-
-/*
- * OMAP4 USB DPLL default frequency. In OMAP4430 TRM version V, section
- * "3.6.3.9.5 DPLL_USB Preferred Settings" shows that the preferred
- * locked frequency for the USB DPLL is 960MHz.
- */
-#define OMAP4_DPLL_USB_DEFFREQ				960000000
-
 static struct ti_dt_clk omap44xx_clks[] = {
 	DT_CLK(NULL, "extalt_clkin_ck", "extalt_clkin_ck"),
 	DT_CLK(NULL, "pad_clks_src_ck", "pad_clks_src_ck"),
@@ -280,36 +265,9 @@ static struct ti_dt_clk omap44xx_clks[] = {
 
 int __init omap4xxx_dt_clk_init(void)
 {
-	int rc;
-	struct clk *abe_dpll_ref, *abe_dpll, *sys_32k_ck, *usb_dpll;
-
 	ti_dt_clocks_register(omap44xx_clks);
 
 	omap2_clk_disable_autoidle_all();
-
-	/*
-	 * Lock USB DPLL on OMAP4 devices so that the L3INIT power
-	 * domain can transition to retention state when not in use.
-	 */
-	usb_dpll = clk_get_sys(NULL, "dpll_usb_ck");
-	rc = clk_set_rate(usb_dpll, OMAP4_DPLL_USB_DEFFREQ);
-	if (rc)
-		pr_err("%s: failed to configure USB DPLL!\n", __func__);
-
-	/*
-	 * On OMAP4460 the ABE DPLL fails to turn on if in idle low-power
-	 * state when turning the ABE clock domain. Workaround this by
-	 * locking the ABE DPLL on boot.
-	 * Lock the ABE DPLL in any case to avoid issues with audio.
-	 */
-	abe_dpll_ref = clk_get_sys(NULL, "abe_dpll_refclk_mux_ck");
-	sys_32k_ck = clk_get_sys(NULL, "sys_32k_ck");
-	rc = clk_set_parent(abe_dpll_ref, sys_32k_ck);
-	abe_dpll = clk_get_sys(NULL, "dpll_abe_ck");
-	if (!rc)
-		rc = clk_set_rate(abe_dpll, OMAP4_DPLL_ABE_DEFFREQ);
-	if (rc)
-		pr_err("%s: failed to configure ABE DPLL!\n", __func__);
 
 	return 0;
 }
