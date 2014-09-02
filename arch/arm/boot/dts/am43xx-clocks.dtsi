@@ -484,6 +484,8 @@
 		compatible = "ti,mux-clock";
 		clocks = <&sysclk_div>, <&dpll_core_m5_ck>, <&dpll_disp_m2_ck>;
 		reg = <0x4238>;
+		assigned-clocks = <&cpsw_cpts_rft_clk>;
+		assigned-clock-parents = <&dpll_core_m5_ck>;
 	};
 
 	clk_32k_mosc_ck: clk_32k_mosc_ck {
