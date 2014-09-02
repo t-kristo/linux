@@ -193,6 +193,8 @@
 		compatible = "ti,omap4-dpll-m4xen-clock";
 		clocks = <&abe_dpll_clk_mux>, <&abe_dpll_bypass_clk_mux>;
 		reg = <0x01e0>, <0x01e4>, <0x01ec>, <0x01e8>;
+		assigned-clocks = <&dpll_abe_ck>;
+		assigned-clock-rates = <180633600>;
 	};
 
 	dpll_abe_x2_ck: dpll_abe_x2_ck {
@@ -210,6 +212,8 @@
 		reg = <0x01f0>;
 		ti,index-starts-at-one;
 		ti,invert-autoidle-bit;
+		assigned-clocks = <&dpll_abe_m2x2_ck>;
+		assigned-clock-rates = <361267200>;
 	};
 
 	abe_clk: abe_clk {
@@ -421,6 +425,8 @@
 		compatible = "ti,omap4-dpll-clock";
 		clocks = <&sys_clkin1>, <&dpll_abe_m3x2_ck>;
 		reg = <0x02a8>, <0x02ac>, <0x02b4>, <0x02b0>;
+		assigned-clocks = <&dpll_gmac_ck>;
+		assigned-clock-rates = <1000000000>;
 	};
 
 	dpll_gmac_m2_ck: dpll_gmac_m2_ck {
@@ -813,6 +819,8 @@
 		compatible = "ti,mux-clock";
 		clocks = <&sys_clkin1>, <&sys_clkin2>;
 		reg = <0x0118>;
+		assigned-clocks = <&abe_dpll_sys_clk_mux>;
+		assigned-clock-parents = <&sys_clkin2>;
 	};
 
 	abe_dpll_bypass_clk_mux: abe_dpll_bypass_clk_mux {
@@ -1280,6 +1288,8 @@
 		compatible = "ti,omap4-dpll-j-type-clock";
 		clocks = <&sys_clkin1>, <&usb_dpll_hs_clk_div>;
 		reg = <0x0180>, <0x0184>, <0x018c>, <0x0188>;
+		assigned-clocks = <&dpll_usb_ck>;
+		assigned-clock-rates = <960000000>;
 	};
 
 	dpll_usb_m2_ck: dpll_usb_m2_ck {
