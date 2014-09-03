@@ -366,6 +366,8 @@
 		compatible = "ti,mux-clock";
 		clocks = <&tclkin_ck>, <&sys_clkin_ck>, <&clkdiv32k_ick>;
 		reg = <0x050c>;
+		assigned-clocks = <&timer3_fck>;
+		assigned-clock-parents = <&sys_clkin_ck>;
 	};
 
 	timer4_fck: timer4_fck {
@@ -387,6 +389,8 @@
 		compatible = "ti,mux-clock";
 		clocks = <&tclkin_ck>, <&sys_clkin_ck>, <&clkdiv32k_ick>;
 		reg = <0x051c>;
+		assigned-clocks = <&timer6_fck>;
+		assigned-clock-parents = <&sys_clkin_ck>;
 	};
 
 	timer7_fck: timer7_fck {
@@ -425,6 +429,8 @@
 		compatible = "ti,mux-clock";
 		clocks = <&clk_rc32k_ck>, <&clkdiv32k_ick>;
 		reg = <0x0538>;
+		assigned-clocks = <&wdt1_fck>;
+		assigned-clock-parents = <&clkdiv32k_ick>;
 	};
 
 	l4_rtc_gclk: l4_rtc_gclk {
