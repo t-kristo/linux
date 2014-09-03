@@ -423,6 +423,102 @@ void prm_clear_context_loss_flags_old(u8 part, s16 inst, u16 idx)
 }
 
 /**
+ * prm_assert_hardreset - assert hardreset for an IP block
+ * @shift: register bit shift corresponding to the reset line
+ * @part: PRM partition
+ * @prm_mod: PRM submodule base or instance offset
+ * @offset: register offset
+ *
+ * Asserts a hardware reset line for an IP block.
+ */
+int prm_assert_hardreset(u8 shift, u8 part, s16 prm_mod, u16 offset)
+{
+	if (!prm_ll_data->assert_hardreset) {
+		WARN_ONCE(1, "prm: %s: no mapping function defined\n",
+			  __func__);
+		return -EINVAL;
+	}
+
+	return prm_ll_data->assert_hardreset(shift, part, prm_mod, offset);
+}
+
+/**
+ * prm_deassert_hardreset - deassert hardreset for an IP block
+ * @shift: register bit shift corresponding to the reset line
+ * @st_shift: reset status bit shift corresponding to the reset line
+ * @part: PRM partition
+ * @prm_mod: PRM submodule base or instance offset
+ * @offset: register offset
+ * @st_offset: status register offset
+ *
+ * Deasserts a hardware reset line for an IP block.
+ */
+int prm_deassert_hardreset(u8 shift, u8 st_shift, u8 part, s16 prm_mod,
+			   u16 offset, u16 st_offset)
+{
+	if (!prm_ll_data->deassert_hardreset) {
+		WARN_ONCE(1, "prm: %s: no mapping function defined\n",
+			  __func__);
+		return -EINVAL;
+	}
+
+	return prm_ll_data->deassert_hardreset(shift, st_shift, part, prm_mod,
+					       offset, st_offset);
+}
+
+/**
+ * prm_is_hardreset_asserted - check the hardreset status for an IP block
+ * @shift: register bit shift corresponding to the reset line
+ * @part: PRM partition
+ * @prm_mod: PRM submodule base or instance offset
+ * @offset: register offset
+ *
+ * Checks if a hardware reset line for an IP block is enabled or not.
+ */
+int prm_is_hardreset_asserted(u8 shift, u8 part, s16 prm_mod, u16 offset)
+{
+	if (!prm_ll_data->is_hardreset_asserted) {
+		WARN_ONCE(1, "prm: %s: no mapping function defined\n",
+			  __func__);
+		return -EINVAL;
+	}
+
+	return prm_ll_data->is_hardreset_asserted(shift, part, prm_mod, offset);
+}
+
+/**
+ * prm_reconfigure_io_chain - clear latches and reconfigure I/O chain
+ *
+ * Clear any previously-latched I/O wakeup events and ensure that the
+ * I/O wakeup gaes are aligned with the current mux settings.
+ * Calls SoC specific I/O chain reconfigure function if available,
+ * otherwise does nothing.
+ */
+void prm_reconfigure_io_chain(void)
+{
+	if (!prcm_irq_setup || !prcm_irq_setup->reconfigure_io_chain)
+		return;
+
+	prcm_irq_setup->reconfigure_io_chain();
+}
+
+/**
+ * prm_reset_system - trigger global SW reset
+ *
+ * Triggers SoC specific global warm reset to reboot the device.
+ */
+void prm_reset_system(void)
+{
+	if (!prm_ll_data->reset_system) {
+		WARN_ONCE(1, "prm: %s: no mapping function defined\n",
+			  __func__);
+		return;
+	}
+
+	prm_ll_data->reset_system();
+}
+
+/**
  * prm_register - register per-SoC low-level data with the PRM
  * @pld: low-level per-SoC OMAP PRM data & function pointers to register
  *
