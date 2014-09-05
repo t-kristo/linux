@@ -519,6 +519,21 @@ struct omap_prcm_irq_setup {
 
 struct of_device_id;
 
+#define PRCM_REGISTER_CLOCKS			0x1
+
+struct prcm_match_data {
+	u32 flags;
+	u16 index;
+	u16 offset;
+};
+
+enum {
+	CLK_MEMMAP_INDEX_PRM = 0,
+	CLK_MEMMAP_INDEX_CM1,
+	CLK_MEMMAP_INDEX_CM2,
+	CLK_MEMMAP_INDEX_SCRM,
+};
+
 extern void omap_prcm_irq_cleanup(void);
 extern int omap_prcm_register_chain_handler(
 	struct omap_prcm_irq_setup *irq_setup);
@@ -526,7 +541,11 @@ extern int omap_prcm_event_to_irq(const char *event);
 extern void omap_prcm_irq_prepare(void);
 extern void omap_prcm_irq_complete(void);
 int of_prcm_module_init(struct of_device_id *match_table);
+int of_cm_base_init(void);
 int of_cm_init(void);
+int of_prcm_base_init(void);
+int of_prcm_init(void);
+int of_scrm_base_init(void);
 
 # endif
 
