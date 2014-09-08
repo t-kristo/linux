@@ -711,8 +711,10 @@ int __init omap44xx_prm_init(const struct prcm_init_data *data)
 	return prm_register(&omap44xx_prm_ll_data);
 }
 
+#define PRM_IRQ_DEFAULT 0x1
+
 static struct of_device_id omap_prm_dt_match_table[] = {
-	{ .compatible = "ti,omap4-prm" },
+	{ .compatible = "ti,omap4-prm", .data = (void *)PRM_IRQ_DEFAULT },
 	{ .compatible = "ti,omap5-prm" },
 	{ .compatible = "ti,dra7-prm" },
 	{ }
@@ -721,6 +723,7 @@ static struct of_device_id omap_prm_dt_match_table[] = {
 static int omap44xx_prm_late_init(void)
 {
 	struct device_node *np;
+	const struct of_device_id *of_id;
 	int irq_num;
 
 	if (!(prm_features & PRM_HAS_IO_WAKEUP))
@@ -730,19 +733,20 @@ static int omap44xx_prm_late_init(void)
 	if (!of_have_populated_dt())
 		return 0;
 
-	np = of_find_matching_node(NULL, omap_prm_dt_match_table);
+	np = of_find_matching_node_and_match(NULL, omap_prm_dt_match_table,
+					     &of_id);
 
 	if (!np) {
-		/* Default loaded up with OMAP4 values */
-		if (!cpu_is_omap44xx())
-			return 0;
+		/* Fatal error, should never happen */
+		pr_err("%s: no matching PRM node found!\n", __func__);
+		return -EINVAL;
 	} else {
 		irq_num = of_irq_get(np, 0);
 		/*
 		 * Already have OMAP4 IRQ num. For all other platforms, we need
 		 * IRQ numbers from DT
 		 */
-		if (irq_num < 0 && !cpu_is_omap44xx()) {
+		if (irq_num < 0 && (u32)of_id->data != PRM_IRQ_DEFAULT) {
 			if (irq_num == -EPROBE_DEFER)
 				return irq_num;
 
