@@ -527,6 +527,7 @@ struct prcm_init_data {
 	u16 offset;
 	u16 features;
 	int (*init)(const struct prcm_init_data *data);
+	s32 device_inst_offset;
 };
 
 enum {

@@ -33,6 +33,10 @@
 #include "prm2xxx.h"
 #include "prm3xxx.h"
 #include "prm44xx.h"
+#include "prm54xx.h"
+#include "prm7xx.h"
+#include "prm44xx_54xx.h"
+#include "prcm43xx.h"
 #include "prminst44xx.h"
 #include "cm44xx.h"
 #include "common.h"
@@ -648,6 +652,7 @@ static const struct prcm_init_data omap4_prm_data = {
 	.index = CLK_MEMMAP_INDEX_PRM,
 	.features = PRM_HAS_IO_WAKEUP | PRM_HAS_VOLTAGE,
 	.init = omap44xx_prm_init,
+	.device_inst_offset = OMAP4430_PRM_DEVICE_INST,
 };
 
 static const struct prcm_init_data omap5_prm_data = {
@@ -655,6 +660,7 @@ static const struct prcm_init_data omap5_prm_data = {
 	.index = CLK_MEMMAP_INDEX_PRM,
 	.features = PRM_HAS_IO_WAKEUP | PRM_HAS_VOLTAGE,
 	.init = omap44xx_prm_init,
+	.device_inst_offset = OMAP54XX_PRM_DEVICE_INST,
 };
 
 static const struct prcm_init_data dra7_prm_data = {
@@ -662,12 +668,14 @@ static const struct prcm_init_data dra7_prm_data = {
 	.index = CLK_MEMMAP_INDEX_PRM,
 	.features = PRM_HAS_IO_WAKEUP,
 	.init = omap44xx_prm_init,
+	.device_inst_offset = DRA7XX_PRM_DEVICE_INST,
 };
 
 static const struct prcm_init_data am4_prcm_data = {
 	.flags = 0,
 	.index = CLK_MEMMAP_INDEX_PRM,
 	.init = omap44xx_prm_init,
+	.device_inst_offset = AM43XX_PRM_DEVICE_INST,
 };
 
 static struct of_device_id omap_prcm_dt_match_table[] = {

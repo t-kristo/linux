@@ -706,6 +706,8 @@ int __init omap44xx_prm_init(const struct prcm_init_data *data)
 {
 	prm_features = data->features;
 
+	omap4_prminst_set_prm_dev_inst(data->device_inst_offset);
+
 	return prm_register(&omap44xx_prm_ll_data);
 }
 
