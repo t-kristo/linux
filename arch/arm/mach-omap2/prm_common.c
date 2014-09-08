@@ -34,6 +34,9 @@
 #include "prm3xxx.h"
 #include "prm33xx.h"
 #include "prm44xx.h"
+#include "prm54xx.h"
+#include "prm7xx.h"
+#include "prcm43xx.h"
 #include "common.h"
 #include "clock.h"
 #include "cm.h"
@@ -658,6 +661,25 @@ static struct omap_prcm_init_data am3_prm_data __initdata = {
 static struct omap_prcm_init_data omap4_prm_data __initdata = {
 	.index = TI_CLKM_PRM,
 	.init = omap44xx_prm_init,
+	.device_inst_offset = OMAP4430_PRM_DEVICE_INST,
+};
+
+static struct omap_prcm_init_data omap5_prm_data __initdata = {
+	.index = TI_CLKM_PRM,
+	.init = omap44xx_prm_init,
+	.device_inst_offset = OMAP54XX_PRM_DEVICE_INST,
+};
+
+static struct omap_prcm_init_data dra7_prm_data __initdata = {
+	.index = TI_CLKM_PRM,
+	.init = omap44xx_prm_init,
+	.device_inst_offset = DRA7XX_PRM_DEVICE_INST,
+};
+
+static struct omap_prcm_init_data am4_prm_data __initdata = {
+	.index = TI_CLKM_PRM,
+	.init = omap44xx_prm_init,
+	.device_inst_offset = AM43XX_PRM_DEVICE_INST,
 };
 
 static struct omap_prcm_init_data scrm_data __initdata = {
@@ -666,16 +688,16 @@ static struct omap_prcm_init_data scrm_data __initdata = {
 
 static const struct of_device_id omap_prcm_dt_match_table[] __initconst = {
 	{ .compatible = "ti,am3-prcm", .data = &am3_prm_data },
-	{ .compatible = "ti,am4-prcm", .data = &omap4_prm_data },
+	{ .compatible = "ti,am4-prcm", .data = &am4_prm_data },
 	{ .compatible = "ti,dm814-prcm", .data = &am3_prm_data },
 	{ .compatible = "ti,dm816-prcm", .data = &am3_prm_data },
 	{ .compatible = "ti,omap2-prcm", .data = &omap2_prm_data },
 	{ .compatible = "ti,omap3-prm", .data = &omap3_prm_data },
 	{ .compatible = "ti,omap4-prm", .data = &omap4_prm_data },
 	{ .compatible = "ti,omap4-scrm", .data = &scrm_data },
-	{ .compatible = "ti,omap5-prm", .data = &omap4_prm_data },
+	{ .compatible = "ti,omap5-prm", .data = &omap5_prm_data },
 	{ .compatible = "ti,omap5-scrm", .data = &scrm_data },
-	{ .compatible = "ti,dra7-prm", .data = &omap4_prm_data },
+	{ .compatible = "ti,dra7-prm", .data = &dra7_prm_data },
 	{ }
 };
 
