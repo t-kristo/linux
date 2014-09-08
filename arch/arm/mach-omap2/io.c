@@ -608,7 +608,6 @@ void __init am43xx_init_early(void)
 	of_prcm_base_init();
 	omap3xxx_check_revision();
 	am33xx_check_features();
-	omap44xx_prm_init();
 	omap4_cm_init();
 	am43xx_powerdomains_init();
 	am43xx_clockdomains_init();
@@ -637,7 +636,6 @@ void __init omap4430_init_early(void)
 	omap4xxx_check_features();
 	omap4_cm_init();
 	omap4_pm_init_early();
-	omap44xx_prm_init();
 	omap44xx_voltagedomains_init();
 	omap44xx_powerdomains_init();
 	omap44xx_clockdomains_init();
@@ -664,7 +662,6 @@ void __init omap5_init_early(void)
 				  OMAP2_L4_IO_ADDRESS(OMAP54XX_CTRL_BASE));
 	omap2_set_globals_prcm_mpu(OMAP2_L4_IO_ADDRESS(OMAP54XX_PRCM_MPU_BASE));
 	of_prcm_base_init();
-	omap44xx_prm_init();
 	omap5xxx_check_revision();
 	omap4_cm_init();
 	omap54xx_voltagedomains_init();
@@ -689,7 +686,6 @@ void __init dra7xx_init_early(void)
 				  OMAP2_L4_IO_ADDRESS(DRA7XX_CTRL_BASE));
 	omap2_set_globals_prcm_mpu(OMAP2_L4_IO_ADDRESS(OMAP54XX_PRCM_MPU_BASE));
 	of_prcm_base_init();
-	omap44xx_prm_init();
 	dra7xxx_check_revision();
 	omap4_cm_init();
 	dra7xx_powerdomains_init();

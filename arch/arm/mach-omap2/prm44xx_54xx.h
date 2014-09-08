@@ -34,7 +34,9 @@ extern u32 omap4_prm_vcvp_read(u8 offset);
 extern void omap4_prm_vcvp_write(u32 val, u8 offset);
 extern u32 omap4_prm_vcvp_rmw(u32 mask, u32 bits, u8 offset);
 
-extern int __init omap44xx_prm_init(void);
+struct prcm_init_data;
+
+extern int __init omap44xx_prm_init(const struct prcm_init_data *data);
 
 #endif
 

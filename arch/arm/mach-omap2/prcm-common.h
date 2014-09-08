@@ -525,7 +525,8 @@ struct prcm_init_data {
 	u32 flags;
 	u16 index;
 	u16 offset;
-	void *data;
+	u16 features;
+	int (*init)(const struct prcm_init_data *data);
 };
 
 enum {

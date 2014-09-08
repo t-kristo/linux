@@ -702,13 +702,9 @@ static struct prm_ll_data omap44xx_prm_ll_data = {
 	.vp_clear_txdone	= omap4_prm_vp_clear_txdone,
 };
 
-int __init omap44xx_prm_init(void)
+int __init omap44xx_prm_init(const struct prcm_init_data *data)
 {
-	if (cpu_is_omap44xx() || soc_is_omap54xx() || soc_is_dra7xx())
-		prm_features |= PRM_HAS_IO_WAKEUP;
-
-	if (!soc_is_dra7xx())
-		prm_features |= PRM_HAS_VOLTAGE;
+	prm_features = data->features;
 
 	return prm_register(&omap44xx_prm_ll_data);
 }

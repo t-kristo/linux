@@ -643,13 +643,40 @@ static const struct prcm_init_data omap3_prm_data = {
 	.offset = 0x800,
 };
 
+static const struct prcm_init_data omap4_prm_data = {
+	.flags = PRCM_REGISTER_CLOCKS,
+	.index = CLK_MEMMAP_INDEX_PRM,
+	.features = PRM_HAS_IO_WAKEUP | PRM_HAS_VOLTAGE,
+	.init = omap44xx_prm_init,
+};
+
+static const struct prcm_init_data omap5_prm_data = {
+	.flags = PRCM_REGISTER_CLOCKS,
+	.index = CLK_MEMMAP_INDEX_PRM,
+	.features = PRM_HAS_IO_WAKEUP | PRM_HAS_VOLTAGE,
+	.init = omap44xx_prm_init,
+};
+
+static const struct prcm_init_data dra7_prm_data = {
+	.flags = PRCM_REGISTER_CLOCKS,
+	.index = CLK_MEMMAP_INDEX_PRM,
+	.features = PRM_HAS_IO_WAKEUP,
+	.init = omap44xx_prm_init,
+};
+
+static const struct prcm_init_data am4_prcm_data = {
+	.flags = 0,
+	.index = CLK_MEMMAP_INDEX_PRM,
+	.init = omap44xx_prm_init,
+};
+
 static struct of_device_id omap_prcm_dt_match_table[] = {
 	{ .compatible = "ti,omap3-prm", .data = &omap3_prm_data },
-	{ .compatible = "ti,omap4-prm", .data = &prm_data },
-	{ .compatible = "ti,omap5-prm", .data = &prm_data },
-	{ .compatible = "ti,dra7-prm", .data = &prm_data },
+	{ .compatible = "ti,omap4-prm", .data = &omap4_prm_data },
+	{ .compatible = "ti,omap5-prm", .data = &omap5_prm_data },
+	{ .compatible = "ti,dra7-prm", .data = &dra7_prm_data },
 	{ .compatible = "ti,am3-prcm", .data = &prcm_data },
-	{ .compatible = "ti,am4-prcm", .data = &prcm_data },
+	{ .compatible = "ti,am4-prcm", .data = &am4_prcm_data },
 	{ .compatible = "ti,omap2-prcm", .data = &prcm_data },
 	{ .compatible = "ti,omap4-scrm", .data = &scrm_data },
 	{ .compatible = "ti,omap5-scrm", .data = &scrm_data },
@@ -680,11 +707,16 @@ int __init of_prcm_module_init(struct of_device_id *match_table)
 	struct device_node *np;
 	const struct of_device_id *match;
 	const struct prcm_init_data *data;
+	int ret = 0;
 
 	ti_clk_ll_ops = &omap_clk_ll_ops;
 
 	for_each_matching_node_and_match(np, match_table, &match) {
 		data = match->data;
+		if (data->init)
+			ret = data->init(data);
+		if (ret)
+			return ret;
 		if (!(data->flags & PRCM_REGISTER_CLOCKS))
 			continue;
 		ti_dt_clk_init_provider(np, data->index);
