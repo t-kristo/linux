@@ -193,17 +193,17 @@ int cm_unregister(struct cm_ll_data *cld)
 	return 0;
 }
 
-static const struct prcm_match_data cm_base_data = {
+static const struct prcm_init_data cm_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
 	.index = CLK_MEMMAP_INDEX_CM1,
 };
 
-static const struct prcm_match_data cm2_base_data = {
+static const struct prcm_init_data cm2_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
 	.index = CLK_MEMMAP_INDEX_CM2,
 };
 
-static const struct prcm_match_data omap3_cm_data = {
+static const struct prcm_init_data omap3_cm_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
 	.index = CLK_MEMMAP_INDEX_CM1,
 
@@ -213,14 +213,14 @@ static const struct prcm_match_data omap3_cm_data = {
 
 static struct of_device_id omap_cm_dt_match_table[] = {
 	{ .compatible = "ti,omap3-cm", .data = &omap3_cm_data },
-	{ .compatible = "ti,omap4-cm1", .data = &cm_base_data },
-	{ .compatible = "ti,omap4-cm2", .data = &cm2_base_data },
-	{ .compatible = "ti,omap5-cm-core-aon", .data = &cm_base_data },
-	{ .compatible = "ti,omap5-cm-core", .data = &cm2_base_data },
-	{ .compatible = "ti,dra7-cm-core-aon", .data = &cm_base_data },
-	{ .compatible = "ti,dra7-cm-core", .data = &cm2_base_data },
-	{ .compatible = "ti,am3-prcm", .data = &cm_base_data },
-	{ .compatible = "ti,am4-prcm", .data = &cm_base_data },
+	{ .compatible = "ti,omap4-cm1", .data = &cm_data },
+	{ .compatible = "ti,omap4-cm2", .data = &cm2_data },
+	{ .compatible = "ti,omap5-cm-core-aon", .data = &cm_data },
+	{ .compatible = "ti,omap5-cm-core", .data = &cm2_data },
+	{ .compatible = "ti,dra7-cm-core-aon", .data = &cm_data },
+	{ .compatible = "ti,dra7-cm-core", .data = &cm2_data },
+	{ .compatible = "ti,am3-prcm", .data = &cm_data },
+	{ .compatible = "ti,am4-prcm", .data = &cm_data },
 	{ }
 };
 
@@ -234,7 +234,7 @@ int __init of_cm_base_init(void)
 {
 	struct device_node *np;
 	const struct of_device_id *match;
-	const struct prcm_match_data *data;
+	const struct prcm_init_data *data;
 
 	for_each_matching_node_and_match(np, omap_cm_dt_match_table, &match) {
 		data = match->data;

@@ -620,22 +620,22 @@ int prm_unregister(struct prm_ll_data *pld)
 	return 0;
 }
 
-static const struct prcm_match_data prm_base_data = {
+static const struct prcm_init_data prm_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
 	.index = CLK_MEMMAP_INDEX_PRM,
 };
 
-static const struct prcm_match_data prcm_base_data = {
+static const struct prcm_init_data prcm_data = {
 	.flags = 0,
 	.index = CLK_MEMMAP_INDEX_PRM,
 };
 
-static const struct prcm_match_data scrm_base_data = {
+static const struct prcm_init_data scrm_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
 	.index = CLK_MEMMAP_INDEX_SCRM,
 };
 
-static const struct prcm_match_data omap3_prm_data = {
+static const struct prcm_init_data omap3_prm_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
 	.index = CLK_MEMMAP_INDEX_PRM,
 
@@ -645,14 +645,14 @@ static const struct prcm_match_data omap3_prm_data = {
 
 static struct of_device_id omap_prcm_dt_match_table[] = {
 	{ .compatible = "ti,omap3-prm", .data = &omap3_prm_data },
-	{ .compatible = "ti,omap4-prm", .data = &prm_base_data },
-	{ .compatible = "ti,omap5-prm", .data = &prm_base_data },
-	{ .compatible = "ti,dra7-prm", .data = &prm_base_data },
-	{ .compatible = "ti,am3-prcm", .data = &prcm_base_data },
-	{ .compatible = "ti,am4-prcm", .data = &prcm_base_data },
-	{ .compatible = "ti,omap2-prcm", .data = &prcm_base_data },
-	{ .compatible = "ti,omap4-scrm", .data = &scrm_base_data },
-	{ .compatible = "ti,omap5-scrm", .data = &scrm_base_data },
+	{ .compatible = "ti,omap4-prm", .data = &prm_data },
+	{ .compatible = "ti,omap5-prm", .data = &prm_data },
+	{ .compatible = "ti,dra7-prm", .data = &prm_data },
+	{ .compatible = "ti,am3-prcm", .data = &prcm_data },
+	{ .compatible = "ti,am4-prcm", .data = &prcm_data },
+	{ .compatible = "ti,omap2-prcm", .data = &prcm_data },
+	{ .compatible = "ti,omap4-scrm", .data = &scrm_data },
+	{ .compatible = "ti,omap5-scrm", .data = &scrm_data },
 	{ }
 };
 
@@ -679,7 +679,7 @@ int __init of_prcm_module_init(struct of_device_id *match_table)
 {
 	struct device_node *np;
 	const struct of_device_id *match;
-	const struct prcm_match_data *data;
+	const struct prcm_init_data *data;
 
 	ti_clk_ll_ops = &omap_clk_ll_ops;
 
@@ -706,7 +706,7 @@ static int of_prm_base_init(void)
 {
 	struct device_node *np;
 	const struct of_device_id *match;
-	const struct prcm_match_data *data;
+	const struct prcm_init_data *data;
 
 	for_each_matching_node_and_match(np, omap_prcm_dt_match_table, &match) {
 		data = match->data;

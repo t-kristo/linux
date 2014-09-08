@@ -521,10 +521,11 @@ struct of_device_id;
 
 #define PRCM_REGISTER_CLOCKS			0x1
 
-struct prcm_match_data {
+struct prcm_init_data {
 	u32 flags;
 	u16 index;
 	u16 offset;
+	void *data;
 };
 
 enum {
