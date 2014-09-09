@@ -132,7 +132,7 @@
 
 #ifndef __ASSEMBLER__
 
-extern int __init omap3xxx_prm_init(void);
+extern int __init omap3xxx_prm_init(u16 features);
 void omap3xxx_prm_iva_idle(void);
 void omap3_prm_reset_modem(void);
 int omap3xxx_prm_clear_global_cold_reset(void);

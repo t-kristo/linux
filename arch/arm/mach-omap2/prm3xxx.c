@@ -640,10 +640,9 @@ static struct prm_ll_data omap3xxx_prm_ll_data = {
 	.vp_clear_txdone = &omap3_prm_vp_clear_txdone,
 };
 
-int __init omap3xxx_prm_init(void)
+int __init omap3xxx_prm_init(u16 features)
 {
-	if (omap3_has_io_wakeup())
-		prm_features |= PRM_HAS_IO_WAKEUP;
+	prm_features |= features;
 
 	return prm_register(&omap3xxx_prm_ll_data);
 }

@@ -472,7 +472,7 @@ void __init omap3_init_early(void)
 		omap3_prm_legacy_regmap_init();
 	omap3xxx_check_revision();
 	omap3xxx_check_features();
-	omap3xxx_prm_init();
+	omap3xxx_prm_init(omap3_has_io_wakeup() ? PRM_HAS_IO_WAKEUP : 0);
 	omap3xxx_cm_init();
 	omap3xxx_voltagedomains_init();
 	omap3xxx_powerdomains_init();
