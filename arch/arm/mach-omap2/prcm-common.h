@@ -518,6 +518,8 @@ struct omap_prcm_irq_setup {
 	}
 
 struct of_device_id;
+struct regmap;
+struct device_node;
 
 #define PRCM_REGISTER_CLOCKS			0x1
 
@@ -531,10 +533,11 @@ struct prcm_init_data {
 };
 
 enum {
-	CLK_MEMMAP_INDEX_PRM = 0,
-	CLK_MEMMAP_INDEX_CM1,
-	CLK_MEMMAP_INDEX_CM2,
-	CLK_MEMMAP_INDEX_SCRM,
+	PRCM_REGMAP_INDEX_PRM = 0,
+	PRCM_REGMAP_INDEX_CM1,
+	PRCM_REGMAP_INDEX_CM2,
+	PRCM_REGMAP_INDEX_SCRM,
+	PRCM_MAX_REGMAPS,
 };
 
 extern void omap_prcm_irq_cleanup(void);
@@ -549,6 +552,10 @@ int of_cm_init(void);
 int of_prcm_base_init(void);
 int of_prcm_init(void);
 int of_scrm_base_init(void);
+int prcm_regmap_put(int id, struct regmap *map);
+struct regmap *prcm_regmap_get(int id);
+void prcm_add_iomap(struct device_node *np, void __iomem *mem,
+		    const struct prcm_init_data *data);
 
 # endif
 

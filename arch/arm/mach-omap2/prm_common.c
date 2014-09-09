@@ -27,6 +27,8 @@
 #include <linux/of_address.h>
 #include <linux/clk-provider.h>
 #include <linux/clk/ti.h>
+#include <linux/regmap.h>
+#include <linux/of_platform.h>
 
 #include "soc.h"
 #include "prm2xxx_3xxx.h"
@@ -67,6 +69,7 @@ static struct omap_prcm_irq_setup *prcm_irq_setup;
 
 /* prm_base: base virtual address of the PRM IP block */
 void __iomem *prm_base;
+void __iomem *scrm_base;
 
 u16 prm_features;
 
@@ -626,22 +629,22 @@ int prm_unregister(struct prm_ll_data *pld)
 
 static const struct prcm_init_data prm_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
-	.index = CLK_MEMMAP_INDEX_PRM,
+	.index = PRCM_REGMAP_INDEX_PRM,
 };
 
 static const struct prcm_init_data prcm_data = {
 	.flags = 0,
-	.index = CLK_MEMMAP_INDEX_PRM,
+	.index = PRCM_REGMAP_INDEX_PRM,
 };
 
 static const struct prcm_init_data scrm_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
-	.index = CLK_MEMMAP_INDEX_SCRM,
+	.index = PRCM_REGMAP_INDEX_SCRM,
 };
 
 static const struct prcm_init_data omap3_prm_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
-	.index = CLK_MEMMAP_INDEX_PRM,
+	.index = PRCM_REGMAP_INDEX_PRM,
 
 	/* IVA2 offset is -0x800, need to get this to positive */
 	.offset = 0x800,
@@ -649,7 +652,7 @@ static const struct prcm_init_data omap3_prm_data = {
 
 static const struct prcm_init_data omap4_prm_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
-	.index = CLK_MEMMAP_INDEX_PRM,
+	.index = PRCM_REGMAP_INDEX_PRM,
 	.features = PRM_HAS_IO_WAKEUP | PRM_HAS_VOLTAGE,
 	.init = omap44xx_prm_init,
 	.device_inst_offset = OMAP4430_PRM_DEVICE_INST,
@@ -657,7 +660,7 @@ static const struct prcm_init_data omap4_prm_data = {
 
 static const struct prcm_init_data omap5_prm_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
-	.index = CLK_MEMMAP_INDEX_PRM,
+	.index = PRCM_REGMAP_INDEX_PRM,
 	.features = PRM_HAS_IO_WAKEUP | PRM_HAS_VOLTAGE,
 	.init = omap44xx_prm_init,
 	.device_inst_offset = OMAP54XX_PRM_DEVICE_INST,
@@ -665,7 +668,7 @@ static const struct prcm_init_data omap5_prm_data = {
 
 static const struct prcm_init_data dra7_prm_data = {
 	.flags = PRCM_REGISTER_CLOCKS,
-	.index = CLK_MEMMAP_INDEX_PRM,
+	.index = PRCM_REGMAP_INDEX_PRM,
 	.features = PRM_HAS_IO_WAKEUP,
 	.init = omap44xx_prm_init,
 	.device_inst_offset = DRA7XX_PRM_DEVICE_INST,
@@ -673,7 +676,7 @@ static const struct prcm_init_data dra7_prm_data = {
 
 static const struct prcm_init_data am4_prcm_data = {
 	.flags = 0,
-	.index = CLK_MEMMAP_INDEX_PRM,
+	.index = PRCM_REGMAP_INDEX_PRM,
 	.init = omap44xx_prm_init,
 	.device_inst_offset = AM43XX_PRM_DEVICE_INST,
 };
@@ -691,24 +694,109 @@ static struct of_device_id omap_prcm_dt_match_table[] = {
 	{ }
 };
 
-static struct clk_hw_omap memmap_dummy_ck = {
-	.flags = MEMMAP_ADDRESSING,
-};
-
 static u32 prm_clk_readl(void __iomem *reg)
 {
-	return omap2_clk_readl(&memmap_dummy_ck, reg);
+	struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
+	u32 val;
+
+	regmap_read(clk_regmaps[r->index], r->offset, &val);
+
+	return val;
 }
 
 static void prm_clk_writel(u32 val, void __iomem *reg)
 {
-	omap2_clk_writel(val, &memmap_dummy_ck, reg);
+	struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
+	regmap_write(clk_regmaps[r->index], r->offset, val);
 }
 
 static struct ti_clk_ll_ops omap_clk_ll_ops = {
 	.clk_readl = prm_clk_readl,
 	.clk_writel = prm_clk_writel,
 };
+
+static LIST_HEAD(prcm_early_devs);
+
+struct prcm_early_dev {
+	struct device_node *node;
+	struct platform_device *dev;
+	struct list_head link;
+};
+
+struct prcm_iomap {
+	void __iomem *mem;
+	struct device_node *np;
+	struct regmap *regmap;
+	const struct prcm_init_data *data;
+	int usecount;
+};
+
+static struct prcm_iomap prcm_iomaps[PRCM_MAX_REGMAPS];
+
+static struct regmap_config prcm_regmap_config = {
+	.reg_bits = 32,
+	.reg_stride = 4,
+	.val_bits = 32,
+};
+
+void prcm_add_iomap(struct device_node *np, void __iomem *mem,
+		    const struct prcm_init_data *data)
+{
+	struct prcm_iomap *iomap = &prcm_iomaps[data->index];
+
+	if (iomap->data)
+		pr_warn("WARNING: multiple prcm compatible mods, %d\n",
+			data->index);
+
+	iomap->np = np;
+	iomap->mem = mem;
+	iomap->data = data;
+}
+
+static void prcm_build_regmap(int id)
+{
+	struct platform_device *pdev;
+	struct prcm_early_dev *edev;
+	struct prcm_iomap *iomap = &prcm_iomaps[id];
+
+	pdev = platform_device_alloc(iomap->np->name, 0);
+	dev_set_name(&pdev->dev, "%s", pdev->name);
+	edev = kzalloc(sizeof(*edev), GFP_KERNEL);
+	edev->dev = pdev;
+	edev->node = iomap->np;
+	list_add(&edev->link, &prcm_early_devs);
+	iomap->regmap = regmap_init_mmio(&pdev->dev, iomap->mem,
+					 &prcm_regmap_config);
+}
+
+struct regmap *prcm_regmap_get(int id)
+{
+	if (id < 0 || id >= PRCM_MAX_REGMAPS)
+		return ERR_PTR(-EINVAL);
+
+	if (prcm_iomaps[id].usecount)
+		return ERR_PTR(-EBUSY);
+
+	prcm_iomaps[id].usecount++;
+
+	if (!prcm_iomaps[id].regmap)
+		prcm_build_regmap(id);
+
+	return prcm_iomaps[id].regmap;
+}
+
+int prcm_regmap_put(int id, struct regmap *map)
+{
+	if (id < 0 || id >= PRCM_MAX_REGMAPS)
+		return -EINVAL;
+
+	if (!prcm_iomaps[id].usecount)
+		return -EBUSY;
+
+	prcm_iomaps[id].usecount--;
+
+	return 0;
+}
 
 int __init of_prcm_module_init(struct of_device_id *match_table) 
 {
@@ -727,6 +815,7 @@ int __init of_prcm_module_init(struct of_device_id *match_table)
 			return ret;
 		if (!(data->flags & PRCM_REGISTER_CLOCKS))
 			continue;
+		clk_regmaps[data->index] = prcm_regmap_get(data->index);
 		ti_dt_clk_init_provider(np, data->index);
 	}
 
@@ -747,17 +836,19 @@ static int of_prm_base_init(void)
 	struct device_node *np;
 	const struct of_device_id *match;
 	const struct prcm_init_data *data;
+	void __iomem *mem;
 
 	for_each_matching_node_and_match(np, omap_prcm_dt_match_table, &match) {
 		data = match->data;
-		if (clk_memmaps[data->index])
-			pr_warn("WARNING: multiple prcm compatible mods, %d\n",
-				data->index);
 
-		clk_memmaps[data->index] = of_iomap(np, 0);
+		mem = of_iomap(np, 0);
 
-		if (data->index == CLK_MEMMAP_INDEX_PRM)
-			prm_base = clk_memmaps[data->index] + data->offset;
+		if (data->index == PRCM_REGMAP_INDEX_PRM)
+			prm_base = mem + data->offset;
+		if (data->index == PRCM_REGMAP_INDEX_SCRM)
+			scrm_base = mem + data->offset;
+
+		prcm_add_iomap(np, mem, data);
 	}
 
 	return 0;
