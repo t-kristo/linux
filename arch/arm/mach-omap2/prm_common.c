@@ -30,7 +30,6 @@
 #include <linux/regmap.h>
 #include <linux/of_platform.h>
 
-#include "soc.h"
 #include "prm2xxx_3xxx.h"
 #include "prm2xxx.h"
 #include "prm3xxx.h"
@@ -41,8 +40,6 @@
 #include "prcm43xx.h"
 #include "prminst44xx.h"
 #include "cm44xx.h"
-#include "common.h"
-#include "clock.h"
 
 /*
  * OMAP_PRCM_MAX_NR_PENDING_REG: maximum number of PRM_IRQ*_MPU regs

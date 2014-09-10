@@ -19,9 +19,6 @@
 #include <linux/irq.h>
 #include <linux/of_irq.h>
 
-#include "soc.h"
-#include "common.h"
-#include "vp.h"
 #include "powerdomain.h"
 #include "prm3xxx.h"
 #include "prm2xxx_3xxx.h"
@@ -47,7 +44,7 @@ static struct omap_prcm_irq_setup omap3_prcm_irq_setup = {
 	.nr_regs		= 1,
 	.irqs			= omap3_prcm_irqs,
 	.nr_irqs		= ARRAY_SIZE(omap3_prcm_irqs),
-	.irq			= 11 + OMAP_INTC_START,
+	.irq			= 11 + NR_IRQS,
 	.read_pending_irqs	= &omap3xxx_prm_read_pending_irqs,
 	.ocp_barrier		= &omap3xxx_prm_ocp_barrier,
 	.save_and_clear_irqen	= &omap3xxx_prm_save_and_clear_irqen,

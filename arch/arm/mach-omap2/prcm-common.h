@@ -564,6 +564,7 @@ void prcm_add_iomap(struct device_node *np, void __iomem *mem,
 int prcm_probe_early_devs(struct platform_device *pdev);
 void prcm_clk_writel(u32 val, void __iomem *reg);
 u32 prcm_clk_readl(void __iomem *reg);
+void omap_pcs_legacy_init(int irq, void (*rearm)(void));
 
 # endif
 

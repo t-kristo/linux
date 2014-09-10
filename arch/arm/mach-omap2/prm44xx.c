@@ -19,16 +19,13 @@
 #include <linux/io.h>
 #include <linux/of_irq.h>
 
-
-#include "soc.h"
-#include "iomap.h"
-#include "common.h"
-#include "vp.h"
 #include "prm44xx.h"
 #include "prm-regbits-44xx.h"
 #include "prcm44xx.h"
 #include "prminst44xx.h"
 #include "powerdomain.h"
+
+#define OMAP44XX_IRQ_GIC_START		32
 
 /* Static data */
 
