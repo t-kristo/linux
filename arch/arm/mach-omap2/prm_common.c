@@ -73,6 +73,8 @@ void __iomem *scrm_base;
 
 u16 prm_features;
 
+struct regmap *prcm_regmaps[PRCM_MAX_REGMAPS];
+
 /*
  * prm_ll_data: function pointers to SoC-specific implementations of
  * common PRM functions
@@ -716,25 +718,25 @@ static struct of_device_id omap_prcm_dt_match_table[] = {
 	{ }
 };
 
-static u32 prm_clk_readl(void __iomem *reg)
+u32 prcm_clk_readl(void __iomem *reg)
 {
 	struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
 	u32 val;
 
-	regmap_read(clk_regmaps[r->index], r->offset, &val);
+	regmap_read(prcm_regmaps[r->index], r->offset, &val);
 
 	return val;
 }
 
-static void prm_clk_writel(u32 val, void __iomem *reg)
+void prcm_clk_writel(u32 val, void __iomem *reg)
 {
 	struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
-	regmap_write(clk_regmaps[r->index], r->offset, val);
+	regmap_write(prcm_regmaps[r->index], r->offset, val);
 }
 
 static struct ti_clk_ll_ops omap_clk_ll_ops = {
-	.clk_readl = prm_clk_readl,
-	.clk_writel = prm_clk_writel,
+	.clk_readl = prcm_clk_readl,
+	.clk_writel = prcm_clk_writel,
 };
 
 static LIST_HEAD(prcm_early_devs);
@@ -841,7 +843,7 @@ int __init of_prcm_module_init(struct of_device_id *match_table)
 			return ret;
 		if (!(data->flags & PRCM_REGISTER_CLOCKS))
 			continue;
-		clk_regmaps[data->index] = prcm_regmap_get(data->index);
+		prcm_regmaps[data->index] = prcm_regmap_get(data->index);
 		ti_dt_clk_init_provider(np, data->index);
 	}
 

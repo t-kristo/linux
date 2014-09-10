@@ -562,6 +562,8 @@ struct regmap *prcm_regmap_get(int id);
 void prcm_add_iomap(struct device_node *np, void __iomem *mem,
 		    const struct prcm_init_data *data, int id);
 int prcm_probe_early_devs(struct platform_device *pdev);
+void prcm_clk_writel(u32 val, void __iomem *reg);
+u32 prcm_clk_readl(void __iomem *reg);
 
 # endif
 
