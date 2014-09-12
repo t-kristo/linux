@@ -116,6 +116,12 @@
 		cm1: cm1@4a004000 {
 			compatible = "ti,omap4-cm1";
 			reg = <0x4a004000 0x2000>;
+			assigned-clocks = <&abe_dpll_refclk_mux_ck>,
+					  <&dpll_usb_ck>,
+					  <&dpll_abe_ck>;
+			assigned-clock-parents = <&sys_32k_ck>;
+			assigned-clock-rates = <0>, <960000000>, <98304000>;
+
 
 			cm1_clocks: clocks {
 				#address-cells = <1>;
