@@ -928,6 +928,18 @@ int prcm_probe_early_devs(struct platform_device *pdev)
 static int __init prm_probe(struct platform_device *pdev)
 {
 	int ret;
+	struct device *dev = &pdev->dev;
+	const struct of_device_id *of_id;
+	struct prcm_init_data *data;
+
+	of_id = of_match_device(omap_prcm_dt_match_table, dev);
+	if (!of_id)
+		return -EINVAL;
+
+	data = (struct prcm_init_data *)of_id->data;
+
+	if (data->index != PRCM_REGMAP_INDEX_PRM)
+		return 0;
 
 	ret = prcm_probe_early_devs(pdev);
 	if (ret)
