@@ -24,6 +24,7 @@
 #include <linux/io.h>
 #include <linux/bitops.h>
 #include <linux/clk-private.h>
+#include <linux/of_address.h>
 #include <asm/cpu.h>
 
 #include <trace/events/power.h>
@@ -73,30 +74,74 @@ struct ti_clk_features ti_clk_features;
 static bool clkdm_control = true;
 
 static LIST_HEAD(clk_hw_omap_clocks);
-void __iomem *clk_memmaps[CLK_MAX_MEMMAPS];
+static void __iomem *clk_memmaps[CLK_MAX_MEMMAPS];
+
+static void clk_memmap_writel(u32 val, void __iomem *reg)
+{
+	struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
+
+	writel_relaxed(val, clk_memmaps[r->index] + r->offset);
+}
+
+static u32 clk_memmap_readl(void __iomem *reg)
+{
+	struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
+
+	return readl_relaxed(clk_memmaps[r->index] + r->offset);
+}
 
 void omap2_clk_writel(u32 val, struct clk_hw_omap *clk, void __iomem *reg)
 {
-	if (clk->flags & MEMMAP_ADDRESSING) {
-		struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
-		writel_relaxed(val, clk_memmaps[r->index] + r->offset);
-	} else {
+	if (clk->flags & MEMMAP_ADDRESSING)
+		clk_memmap_writel(val, reg);
+	else
 		writel_relaxed(val, reg);
-	}
 }
 
 u32 omap2_clk_readl(struct clk_hw_omap *clk, void __iomem *reg)
 {
 	u32 val;
 
-	if (clk->flags & MEMMAP_ADDRESSING) {
-		struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
-		val = readl_relaxed(clk_memmaps[r->index] + r->offset);
-	} else {
+	if (clk->flags & MEMMAP_ADDRESSING)
+		val = clk_memmap_readl(reg);
+	else
 		val = readl_relaxed(reg);
-	}
 
 	return val;
+}
+
+static struct ti_clk_ll_ops omap_clk_ll_ops = {
+	.clk_readl = clk_memmap_readl,
+	.clk_writel = clk_memmap_writel,
+};
+
+/**
+ * omap2_clk_provider_init - initialize a clock provider
+ * @match_table: DT device table to match for devices to init
+ *
+ * Initializes a clock provider module (CM/PRM etc.), allocating the
+ * memory mapping, allocating the mapping index and initializing the
+ * low level driver infrastructure. Returns 0 in success, -ENOMEM in
+ * failure.
+ */
+int __init omap2_clk_provider_init(const struct of_device_id *match_table)
+{
+	struct device_node *np;
+	void __iomem *mem;
+	static int memmap_index;
+
+	ti_clk_ll_ops = &omap_clk_ll_ops;
+
+	for_each_matching_node(np, match_table) {
+		mem = of_iomap(np, 0);
+		if (!mem)
+			return -ENOMEM;
+		clk_memmaps[memmap_index] = mem;
+		ti_dt_clk_init_provider(np, memmap_index);
+		memmap_index++;
+	}
+
+	return 0;
 }
 
 /*

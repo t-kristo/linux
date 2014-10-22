@@ -590,41 +590,9 @@ static const struct of_device_id omap_prcm_dt_match_table[] = {
 	{ }
 };
 
-static struct clk_hw_omap memmap_dummy_ck = {
-	.flags = MEMMAP_ADDRESSING,
-};
-
-static u32 prm_clk_readl(void __iomem *reg)
-{
-	return omap2_clk_readl(&memmap_dummy_ck, reg);
-}
-
-static void prm_clk_writel(u32 val, void __iomem *reg)
-{
-	omap2_clk_writel(val, &memmap_dummy_ck, reg);
-}
-
-static struct ti_clk_ll_ops omap_clk_ll_ops = {
-	.clk_readl = prm_clk_readl,
-	.clk_writel = prm_clk_writel,
-};
-
 int __init of_prcm_init(void)
 {
-	struct device_node *np;
-	void __iomem *mem;
-	int memmap_index = 0;
-
-	ti_clk_ll_ops = &omap_clk_ll_ops;
-
-	for_each_matching_node(np, omap_prcm_dt_match_table) {
-		mem = of_iomap(np, 0);
-		clk_memmaps[memmap_index] = mem;
-		ti_dt_clk_init_provider(np, memmap_index);
-		memmap_index++;
-	}
-
-	return 0;
+	return omap2_clk_provider_init(omap_prcm_dt_match_table);
 }
 
 static int __init prm_late_init(void)
