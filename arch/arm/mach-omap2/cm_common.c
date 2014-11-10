@@ -16,6 +16,7 @@
 #include <linux/errno.h>
 #include <linux/bug.h>
 #include <linux/of.h>
+#include <linux/of_address.h>
 
 #include "cm2xxx.h"
 #include "cm3xxx.h"
@@ -215,14 +216,22 @@ int cm_unregister(struct cm_ll_data *cld)
 	return 0;
 }
 
+static const struct omap_prcm_init_data cm_data = {
+	.index = CLK_MEMMAP_INDEX_CM1,
+};
+
+static const struct omap_prcm_init_data cm2_data = {
+	.index = CLK_MEMMAP_INDEX_CM2,
+};
+
 static struct of_device_id omap_cm_dt_match_table[] = {
-	{ .compatible = "ti,omap3-cm" },
-	{ .compatible = "ti,omap4-cm1" },
-	{ .compatible = "ti,omap4-cm2" },
-	{ .compatible = "ti,omap5-cm-core-aon" },
-	{ .compatible = "ti,omap5-cm-core" },
-	{ .compatible = "ti,dra7-cm-core-aon" },
-	{ .compatible = "ti,dra7-cm-core" },
+	{ .compatible = "ti,omap3-cm", .data = &cm_data },
+	{ .compatible = "ti,omap4-cm1", .data = &cm_data },
+	{ .compatible = "ti,omap4-cm2", .data = &cm2_data },
+	{ .compatible = "ti,omap5-cm-core-aon", .data = &cm_data },
+	{ .compatible = "ti,omap5-cm-core", .data = &cm2_data },
+	{ .compatible = "ti,dra7-cm-core-aon", .data = &cm_data },
+	{ .compatible = "ti,dra7-cm-core", .data = &cm2_data },
 	{ }
 };
 
@@ -234,5 +243,23 @@ static struct of_device_id omap_cm_dt_match_table[] = {
  */
 int __init omap_cm_init(void)
 {
-	return omap2_clk_provider_init(omap_cm_dt_match_table);
+	struct device_node *np;
+	const struct of_device_id *match;
+	const struct omap_prcm_init_data *data;
+	void __iomem *mem;
+	int ret;
+
+	for_each_matching_node_and_match(np, omap_cm_dt_match_table, &match) {
+		data = match->data;
+
+		mem = of_iomap(np, 0);
+		if (!mem)
+			return -ENOMEM;
+
+		ret = omap2_clk_provider_init(np, data->index, mem);
+		if (ret)
+			return ret;
+	}
+
+	return 0;
 }
