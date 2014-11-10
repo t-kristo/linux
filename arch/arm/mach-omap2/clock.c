@@ -117,29 +117,27 @@ static struct ti_clk_ll_ops omap_clk_ll_ops = {
 
 /**
  * omap2_clk_provider_init - initialize a clock provider
- * @match_table: DT device table to match for devices to init
+ * @np: device node for initializing the clock provider
+ * @index: memory map index for the clock provider
+ * @mem: iomem pointer for the memory map
  *
- * Initializes a clock provider module (CM/PRM etc.), allocating the
- * memory mapping, allocating the mapping index and initializing the
- * low level driver infrastructure. Returns 0 in success, -ENOMEM in
- * failure.
+ * Initializes a clock provider module (CM/PRM etc.), registering
+ * the iomap and initializing the low level driver infrastructure.
+ * Returns 0 in success, -EINVAL if multiple registration is attempted.
  */
-int __init omap2_clk_provider_init(const struct of_device_id *match_table)
+int __init omap2_clk_provider_init(struct device_node *np, int index,
+				   void __iomem *mem)
 {
-	struct device_node *np;
-	void __iomem *mem;
-	static int memmap_index;
-
 	ti_clk_ll_ops = &omap_clk_ll_ops;
 
-	for_each_matching_node(np, match_table) {
-		mem = of_iomap(np, 0);
-		if (!mem)
-			return -ENOMEM;
-		clk_memmaps[memmap_index] = mem;
-		ti_dt_clk_init_provider(np, memmap_index);
-		memmap_index++;
+	if (clk_memmaps[index]) {
+		pr_err("%s: duplicate registration for index %d!\n", __func__,
+		       index);
+		return -EINVAL;
 	}
+
+	clk_memmaps[index] = mem;
+	ti_dt_clk_init_provider(np, index);
 
 	return 0;
 }

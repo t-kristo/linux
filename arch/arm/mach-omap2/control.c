@@ -14,6 +14,7 @@
 
 #include <linux/kernel.h>
 #include <linux/io.h>
+#include <linux/of_address.h>
 
 #include "soc.h"
 #include "iomap.h"
@@ -613,11 +614,19 @@ void __init omap3_ctrl_init(void)
 }
 #endif /* CONFIG_ARCH_OMAP3 && CONFIG_PM */
 
+struct control_init_data {
+	int index;
+};
+
+static const struct control_init_data ctrl_data = {
+	.index = CLK_MEMMAP_INDEX_SCRM,
+};
+
 static struct of_device_id omap_scrm_dt_match_table[] = {
-	{ .compatible = "ti,am3-scrm" },
-	{ .compatible = "ti,am4-scrm" },
-	{ .compatible = "ti,omap2-scrm" },
-	{ .compatible = "ti,omap3-scrm" },
+	{ .compatible = "ti,am3-scrm", .data = &ctrl_data },
+	{ .compatible = "ti,am4-scrm", .data = &ctrl_data },
+	{ .compatible = "ti,omap2-scrm", .data = &ctrl_data },
+	{ .compatible = "ti,omap3-scrm", .data = &ctrl_data },
 	{ }
 };
 
@@ -629,5 +638,23 @@ static struct of_device_id omap_scrm_dt_match_table[] = {
  */
 int __init omap_control_init(void)
 {
-	return omap2_clk_provider_init(omap_scrm_dt_match_table);
+	struct device_node *np;
+	const struct of_device_id *match;
+	const struct control_init_data *data;
+	void __iomem *mem;
+	int ret;
+
+	for_each_matching_node_and_match(np, omap_scrm_dt_match_table, &match) {
+		data = match->data;
+
+		mem = of_iomap(np, 0);
+		if (!mem)
+			return -ENOMEM;
+
+		ret = omap2_clk_provider_init(np, data->index, mem);
+		if (ret)
+			return ret;
+	}
+
+	return 0;
 }

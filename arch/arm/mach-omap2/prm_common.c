@@ -624,16 +624,24 @@ int prm_unregister(struct prm_ll_data *pld)
 	return 0;
 }
 
-static const struct of_device_id omap_prcm_dt_match_table[] = {
-	{ .compatible = "ti,am3-prcm" },
-	{ .compatible = "ti,am4-prcm" },
-	{ .compatible = "ti,omap2-prcm" },
-	{ .compatible = "ti,omap3-prm" },
-	{ .compatible = "ti,omap4-prm" },
-	{ .compatible = "ti,omap4-scrm" },
-	{ .compatible = "ti,omap5-prm" },
-	{ .compatible = "ti,omap5-scrm" },
-	{ .compatible = "ti,dra7-prm" },
+static const struct omap_prcm_init_data prm_data = {
+	.index = CLK_MEMMAP_INDEX_PRM,
+};
+
+static const struct omap_prcm_init_data scrm_data = {
+	.index = CLK_MEMMAP_INDEX_SCRM,
+};
+
+static struct of_device_id omap_prcm_dt_match_table[] = {
+	{ .compatible = "ti,am3-prcm", .data = &prm_data },
+	{ .compatible = "ti,am4-prcm", .data = &prm_data },
+	{ .compatible = "ti,omap2-prcm", .data = &prm_data },
+	{ .compatible = "ti,omap3-prm", .data = &prm_data },
+	{ .compatible = "ti,omap4-prm", .data = &prm_data },
+	{ .compatible = "ti,omap4-scrm", .data = &scrm_data },
+	{ .compatible = "ti,omap5-prm", .data = &prm_data },
+	{ .compatible = "ti,omap5-scrm", .data = &scrm_data },
+	{ .compatible = "ti,dra7-prm", .data = &prm_data },
 	{ }
 };
 
@@ -645,11 +653,23 @@ static const struct of_device_id omap_prcm_dt_match_table[] = {
  */
 int __init omap_prcm_init(void)
 {
+	struct device_node *np;
+	const struct of_device_id *match;
+	const struct omap_prcm_init_data *data;
+	void __iomem *mem;
 	int ret;
 
-	ret = omap2_clk_provider_init(omap_prcm_dt_match_table);
-	if (ret)
-		return ret;
+	for_each_matching_node_and_match(np, omap_prcm_dt_match_table, &match) {
+		data = match->data;
+
+		mem = of_iomap(np, 0);
+		if (!mem)
+			return -ENOMEM;
+
+		ret = omap2_clk_provider_init(np, data->index, mem);
+		if (ret)
+			return ret;
+	}
 
 	return omap_cm_init();
 }

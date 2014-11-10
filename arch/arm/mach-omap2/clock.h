@@ -235,6 +235,13 @@ struct ti_clk_features {
 
 #define TI_CLK_DPLL_HAS_FREQSEL		(1 << 0)
 
+enum {
+	CLK_MEMMAP_INDEX_PRM = 0,
+	CLK_MEMMAP_INDEX_CM1,
+	CLK_MEMMAP_INDEX_CM2,
+	CLK_MEMMAP_INDEX_SCRM,
+};
+
 extern struct ti_clk_features ti_clk_features;
 
 extern const struct clkops clkops_omap2_dflt_wait;
@@ -274,7 +281,8 @@ extern void omap2_clkops_disable_clkdm(struct clk_hw *hw);
 
 extern void omap_clocks_register(struct omap_clk *oclks, int cnt);
 
-int __init omap2_clk_provider_init(const struct of_device_id *match_table);
+int __init omap2_clk_provider_init(struct device_node *np, int index,
+				   void __iomem *mem);
 
 void __init ti_clk_init_features(void);
 #endif
