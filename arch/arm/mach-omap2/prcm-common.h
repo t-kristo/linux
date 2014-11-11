@@ -522,9 +522,13 @@ struct of_device_id;
 /**
  * struct omap_prcm_init_data - PRCM driver init data
  * @index: clock memory mapping index to be used
+ * @mem: IO mem pointer for this module
+ * @offset: module base address offset from the IO base
  */
 struct omap_prcm_init_data {
 	int index;
+	void __iomem *mem;
+	s16 offset;
 };
 
 extern void omap_prcm_irq_cleanup(void);
