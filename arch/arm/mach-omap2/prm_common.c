@@ -624,11 +624,21 @@ int prm_unregister(struct prm_ll_data *pld)
 	return 0;
 }
 
-static const struct omap_prcm_init_data prm_data = {
+static struct omap_prcm_init_data prm_data = {
 	.index = CLK_MEMMAP_INDEX_PRM,
 };
 
-static const struct omap_prcm_init_data scrm_data = {
+static struct omap_prcm_init_data omap3_prm_data = {
+	.index = CLK_MEMMAP_INDEX_PRM,
+
+	/*
+	 * IVA2 offset is negative value, must offset the cm_base address
+	 * by this to get it to positive
+	 */
+	.offset = -OMAP3430_IVA2_MOD,
+};
+
+static struct omap_prcm_init_data scrm_data = {
 	.index = CLK_MEMMAP_INDEX_SCRM,
 };
 
@@ -636,7 +646,7 @@ static struct of_device_id omap_prcm_dt_match_table[] = {
 	{ .compatible = "ti,am3-prcm", .data = &prm_data },
 	{ .compatible = "ti,am4-prcm", .data = &prm_data },
 	{ .compatible = "ti,omap2-prcm", .data = &prm_data },
-	{ .compatible = "ti,omap3-prm", .data = &prm_data },
+	{ .compatible = "ti,omap3-prm", .data = &omap3_prm_data },
 	{ .compatible = "ti,omap4-prm", .data = &prm_data },
 	{ .compatible = "ti,omap4-scrm", .data = &scrm_data },
 	{ .compatible = "ti,omap5-prm", .data = &prm_data },
@@ -644,6 +654,36 @@ static struct of_device_id omap_prcm_dt_match_table[] = {
 	{ .compatible = "ti,dra7-prm", .data = &prm_data },
 	{ }
 };
+
+/**
+ * omap2_prm_base_init - initialize iomappings for the PRM driver
+ *
+ * Detects and initializes the iomappings for the PRM driver, based
+ * on the DT data. Returns 0 in success, negative error value
+ * otherwise.
+ */
+int __init omap2_prm_base_init(void)
+{
+	struct device_node *np;
+	const struct of_device_id *match;
+	struct omap_prcm_init_data *data;
+	void __iomem *mem;
+
+	for_each_matching_node_and_match(np, omap_prcm_dt_match_table, &match) {
+		data = (struct omap_prcm_init_data *)match->data;
+
+		mem = of_iomap(np, 0);
+		if (!mem)
+			return -ENOMEM;
+
+		if (data->index == CLK_MEMMAP_INDEX_PRM)
+			prm_base = mem + data->offset;
+
+		data->mem = mem;
+	}
+
+	return 0;
+}
 
 /**
  * omap_prcm_init - low level init for the PRCM drivers
@@ -656,17 +696,12 @@ int __init omap_prcm_init(void)
 	struct device_node *np;
 	const struct of_device_id *match;
 	const struct omap_prcm_init_data *data;
-	void __iomem *mem;
 	int ret;
 
 	for_each_matching_node_and_match(np, omap_prcm_dt_match_table, &match) {
 		data = match->data;
 
-		mem = of_iomap(np, 0);
-		if (!mem)
-			return -ENOMEM;
-
-		ret = omap2_clk_provider_init(np, data->index, mem);
+		ret = omap2_clk_provider_init(np, data->index, data->mem);
 		if (ret)
 			return ret;
 	}
