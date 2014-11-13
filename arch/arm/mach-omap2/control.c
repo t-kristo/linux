@@ -595,6 +595,7 @@ void __init omap3_ctrl_init(void)
 
 struct control_init_data {
 	int index;
+	void __iomem *mem;
 };
 
 static const struct control_init_data ctrl_data = {
@@ -610,6 +611,34 @@ static struct of_device_id omap_scrm_dt_match_table[] = {
 };
 
 /**
+ * omap2_control_base_init - initialize iomappings for the control driver
+ *
+ * Detects and initializes the iomappings for the control driver, based
+ * on the DT data. Returns 0 in success, negative error value
+ * otherwise.
+ */
+int __init omap2_control_base_init(void)
+{
+	struct device_node *np;
+	const struct of_device_id *match;
+	struct control_init_data *data;
+	void __iomem *mem;
+
+	for_each_matching_node_and_match(np, omap_scrm_dt_match_table, &match) {
+		data = (struct control_init_data *)match->data;
+
+		mem = of_iomap(np, 0);
+		if (!mem)
+			return -ENOMEM;
+
+		omap2_ctrl_base = mem;
+		data->mem = mem;
+	}
+
+	return 0;
+}
+
+/**
  * omap_control_init - low level init for the control driver
  *
  * Initializes the low level clock infrastructure for control driver.
@@ -620,17 +649,12 @@ int __init omap_control_init(void)
 	struct device_node *np;
 	const struct of_device_id *match;
 	const struct control_init_data *data;
-	void __iomem *mem;
 	int ret;
 
 	for_each_matching_node_and_match(np, omap_scrm_dt_match_table, &match) {
 		data = match->data;
 
-		mem = of_iomap(np, 0);
-		if (!mem)
-			return -ENOMEM;
-
-		ret = omap2_clk_provider_init(np, data->index, mem);
+		ret = omap2_clk_provider_init(np, data->index, data->mem);
 		if (ret)
 			return ret;
 	}
