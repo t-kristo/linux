@@ -33,7 +33,6 @@
 #define PADCONF_SAVE_DONE		0x1
 
 static void __iomem *omap2_ctrl_base;
-static void __iomem *omap4_ctrl_pad_base;
 
 #if defined(CONFIG_ARCH_OMAP3) && defined(CONFIG_PM)
 struct omap3_scratchpad {
@@ -136,13 +135,10 @@ static struct omap3_control_regs control_context;
 #endif /* CONFIG_ARCH_OMAP3 && CONFIG_PM */
 
 #define OMAP_CTRL_REGADDR(reg)		(omap2_ctrl_base + (reg))
-#define OMAP4_CTRL_PAD_REGADDR(reg)	(omap4_ctrl_pad_base + (reg))
 
-void __init omap2_set_globals_control(void __iomem *ctrl,
-				      void __iomem *ctrl_pad)
+void __init omap2_set_globals_control(void __iomem *ctrl)
 {
 	omap2_ctrl_base = ctrl;
-	omap4_ctrl_pad_base = ctrl_pad;
 }
 
 void __iomem *omap_ctrl_base_get(void)
@@ -178,23 +174,6 @@ void omap_ctrl_writew(u16 val, u16 offset)
 void omap_ctrl_writel(u32 val, u16 offset)
 {
 	writel_relaxed(val, OMAP_CTRL_REGADDR(offset));
-}
-
-/*
- * On OMAP4 control pad are not addressable from control
- * core base. So the common omap_ctrl_read/write APIs breaks
- * Hence export separate APIs to manage the omap4 pad control
- * registers. This APIs will work only for OMAP4
- */
-
-u32 omap4_ctrl_pad_readl(u16 offset)
-{
-	return readl_relaxed(OMAP4_CTRL_PAD_REGADDR(offset));
-}
-
-void omap4_ctrl_pad_writel(u32 val, u16 offset)
-{
-	writel_relaxed(val, OMAP4_CTRL_PAD_REGADDR(offset));
 }
 
 #ifdef CONFIG_ARCH_OMAP3
