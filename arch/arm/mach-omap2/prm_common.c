@@ -590,7 +590,13 @@ static const struct of_device_id omap_prcm_dt_match_table[] = {
 	{ }
 };
 
-int __init of_prcm_init(void)
+/**
+ * omap_prcm_init - low level init for the PRCM drivers
+ *
+ * Initializes the low level clock infrastructure for PRCM drivers.
+ * Returns 0 in success, negative error value in failure.
+ */
+int __init omap_prcm_init(void)
 {
 	return omap2_clk_provider_init(omap_prcm_dt_match_table);
 }
