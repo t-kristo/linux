@@ -20,6 +20,7 @@
 
 #include "cm2xxx.h"
 #include "cm3xxx.h"
+#include "cm33xx.h"
 #include "cm44xx.h"
 #include "clock.h"
 
@@ -37,6 +38,7 @@ void __iomem *cm_base;
 void __iomem *cm2_base;
 
 #define CM_NO_CLOCKS		0x1
+#define CM_SINGLE_INSTANCE	0x2
 
 /**
  * omap2_set_globals_cm - set the CM/CM2 base addresses (for early use)
@@ -218,21 +220,26 @@ int cm_unregister(struct cm_ll_data *cld)
 	return 0;
 }
 
-static struct omap_prcm_init_data cm_data = {
+static struct omap_prcm_init_data cm_data __initdata = {
 	.index = TI_CLKM_CM,
+	.init = omap4_cm_init,
 };
 
-static struct omap_prcm_init_data cm2_data = {
+static struct omap_prcm_init_data cm2_data __initdata = {
 	.index = TI_CLKM_CM2,
+	.init = omap4_cm_init,
 };
 
-static struct omap_prcm_init_data omap2_prcm_data = {
+static struct omap_prcm_init_data omap2_prcm_data __initdata = {
 	.index = TI_CLKM_CM,
-	.flags = CM_NO_CLOCKS,
+	.init = omap2xxx_cm_init,
+	.flags = CM_NO_CLOCKS | CM_SINGLE_INSTANCE,
 };
 
-static struct omap_prcm_init_data omap3_cm_data = {
+static struct omap_prcm_init_data omap3_cm_data __initdata = {
 	.index = TI_CLKM_CM,
+	.init = omap3xxx_cm_init,
+	.flags = CM_SINGLE_INSTANCE,
 
 	/*
 	 * IVA2 offset is a negative value, must offset the cm_base address
@@ -241,17 +248,19 @@ static struct omap_prcm_init_data omap3_cm_data = {
 	.offset = -OMAP3430_IVA2_MOD,
 };
 
-static struct omap_prcm_init_data am3_prcm_data = {
+static struct omap_prcm_init_data am3_prcm_data __initdata = {
 	.index = TI_CLKM_CM,
-	.flags = CM_NO_CLOCKS,
+	.flags = CM_NO_CLOCKS | CM_SINGLE_INSTANCE,
+	.init = am33xx_cm_init,
 };
 
-static struct omap_prcm_init_data am4_prcm_data = {
+static struct omap_prcm_init_data am4_prcm_data __initdata = {
 	.index = TI_CLKM_CM,
-	.flags = CM_NO_CLOCKS,
+	.flags = CM_NO_CLOCKS | CM_SINGLE_INSTANCE,
+	.init = omap4_cm_init,
 };
 
-static const struct of_device_id omap_cm_dt_match_table[] = {
+static const struct of_device_id omap_cm_dt_match_table[] __initconst = {
 	{ .compatible = "ti,omap2-prcm", .data = &omap2_prcm_data },
 	{ .compatible = "ti,omap3-cm", .data = &omap3_cm_data },
 	{ .compatible = "ti,omap4-cm1", .data = &cm_data },
@@ -293,6 +302,12 @@ int __init omap2_cm_base_init(void)
 			cm2_base = mem + data->offset;
 
 		data->mem = mem;
+
+		data->np = np;
+
+		if (data->init && (data->flags & CM_SINGLE_INSTANCE ||
+				   (cm_base && cm2_base)))
+			data->init(data);
 	}
 
 	return 0;
