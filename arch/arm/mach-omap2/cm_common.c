@@ -20,6 +20,7 @@
 
 #include "cm2xxx.h"
 #include "cm3xxx.h"
+#include "cm33xx.h"
 #include "cm44xx.h"
 #include "clock.h"
 
@@ -216,16 +217,20 @@ int cm_unregister(struct cm_ll_data *cld)
 	return 0;
 }
 
-static struct omap_prcm_init_data cm_data = {
+static struct omap_prcm_init_data cm_data __initdata = {
 	.index = CLK_MEMMAP_INDEX_CM1,
+	.init = omap4_cm_init,
 };
 
-static struct omap_prcm_init_data cm2_data = {
+static struct omap_prcm_init_data cm2_data __initdata = {
 	.index = CLK_MEMMAP_INDEX_CM2,
+	.init = omap4_cm_init,
 };
 
-static struct omap_prcm_init_data omap3_cm_data = {
+static struct omap_prcm_init_data omap3_cm_data __initdata = {
 	.index = CLK_MEMMAP_INDEX_CM1,
+	.init = omap3xxx_cm_init,
+	.flags = CM_SINGLE_INSTANCE,
 
 	/*
 	 * IVA2 offset is negative value, must offset the cm_base address
@@ -234,7 +239,19 @@ static struct omap_prcm_init_data omap3_cm_data = {
 	.offset = -OMAP3430_IVA2_MOD,
 };
 
-static struct of_device_id omap_cm_dt_match_table[] = {
+static struct omap_prcm_init_data am3_prcm_data __initdata = {
+	.index = CLK_MEMMAP_INDEX_CM1,
+	.flags = CM_NO_CLOCKS | CM_SINGLE_INSTANCE,
+	.init = am33xx_cm_init,
+};
+
+static struct omap_prcm_init_data am4_prcm_data __initdata = {
+	.index = CLK_MEMMAP_INDEX_CM2,
+	.flags = CM_NO_CLOCKS | CM_SINGLE_INSTANCE,
+	.init = omap4_cm_init,
+};
+
+static struct of_device_id omap_cm_dt_match_table[] __initdata = {
 	{ .compatible = "ti,omap3-cm", .data = &omap3_cm_data },
 	{ .compatible = "ti,omap4-cm1", .data = &cm_data },
 	{ .compatible = "ti,omap4-cm2", .data = &cm2_data },
@@ -242,6 +259,8 @@ static struct of_device_id omap_cm_dt_match_table[] = {
 	{ .compatible = "ti,omap5-cm-core", .data = &cm2_data },
 	{ .compatible = "ti,dra7-cm-core-aon", .data = &cm_data },
 	{ .compatible = "ti,dra7-cm-core", .data = &cm2_data },
+	{ .compatible = "ti,am3-prcm", .data = &am3_prcm_data },
+	{ .compatible = "ti,am4-prcm", .data = &am4_prcm_data },
 	{ }
 };
 
@@ -273,6 +292,12 @@ int __init omap2_cm_base_init(void)
 			cm2_base = mem + data->offset;
 
 		data->mem = mem;
+
+		data->np = np;
+
+		if (data->init && (data->flags & CM_SINGLE_INSTANCE ||
+				   (cm_base && cm2_base)))
+			data->init(data);
 	}
 
 	return 0;
@@ -293,6 +318,9 @@ int __init omap_cm_init(void)
 
 	for_each_matching_node_and_match(np, omap_cm_dt_match_table, &match) {
 		data = match->data;
+
+		if (data->flags & CM_NO_CLOCKS)
+			continue;
 
 		ret = omap2_clk_provider_init(np, data->index, data->mem);
 		if (ret)

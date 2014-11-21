@@ -28,6 +28,9 @@ extern void __iomem *cm2_base;
 extern void omap2_set_globals_cm(void __iomem *cm, void __iomem *cm2);
 # endif
 
+#define CM_NO_CLOCKS			0x1
+#define CM_SINGLE_INSTANCE		0x2
+
 /*
  * MAX_MODULE_DISABLE_TIME: max duration in microseconds to wait for
  * the PRCM to request that a module enter the inactive state in the

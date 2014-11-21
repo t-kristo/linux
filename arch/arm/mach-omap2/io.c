@@ -387,7 +387,6 @@ void __init omap2420_init_early(void)
 	omap2_control_base_init();
 	omap2xxx_check_revision();
 	omap2_prcm_base_init();
-	omap2xxx_cm_init();
 	omap2xxx_voltagedomains_init();
 	omap242x_powerdomains_init();
 	omap242x_clockdomains_init();
@@ -414,7 +413,6 @@ void __init omap2430_init_early(void)
 	omap2_control_base_init();
 	omap2xxx_check_revision();
 	omap2_prcm_base_init();
-	omap2xxx_cm_init();
 	omap2xxx_voltagedomains_init();
 	omap243x_powerdomains_init();
 	omap243x_clockdomains_init();
@@ -454,8 +452,11 @@ void __init omap3_init_early(void)
 	omap3xxx_check_revision();
 	omap3xxx_check_features();
 	omap2_prcm_base_init();
-	omap3xxx_prm_init(NULL);
-	omap3xxx_cm_init();
+	/* XXX: remove these once OMAP3 is DT only */
+	if (!of_have_populated_dt()) {
+		omap3xxx_prm_init(NULL);
+		omap3xxx_cm_init(NULL);
+	}
 	omap3xxx_voltagedomains_init();
 	omap3xxx_powerdomains_init();
 	omap3xxx_clockdomains_init();
@@ -570,7 +571,6 @@ void __init am33xx_init_early(void)
 	omap3xxx_check_revision();
 	am33xx_check_features();
 	omap2_prcm_base_init();
-	am33xx_cm_init();
 	am33xx_powerdomains_init();
 	am33xx_clockdomains_init();
 	am33xx_hwmod_init();
@@ -593,7 +593,6 @@ void __init am43xx_init_early(void)
 	omap3xxx_check_revision();
 	am33xx_check_features();
 	omap2_prcm_base_init();
-	omap4_cm_init();
 	am43xx_powerdomains_init();
 	am43xx_clockdomains_init();
 	am43xx_hwmod_init();
@@ -618,7 +617,6 @@ void __init omap4430_init_early(void)
 	omap4xxx_check_revision();
 	omap4xxx_check_features();
 	omap2_prcm_base_init();
-	omap4_cm_init();
 	omap4_pm_init_early();
 	omap44xx_voltagedomains_init();
 	omap44xx_powerdomains_init();
@@ -647,7 +645,6 @@ void __init omap5_init_early(void)
 	omap4_pm_init_early();
 	omap2_prcm_base_init();
 	omap5xxx_check_revision();
-	omap4_cm_init();
 	omap54xx_voltagedomains_init();
 	omap54xx_powerdomains_init();
 	omap54xx_clockdomains_init();
@@ -673,7 +670,6 @@ void __init dra7xx_init_early(void)
 	omap4_pm_init_early();
 	omap2_prcm_base_init();
 	dra7xxx_check_revision();
-	omap4_cm_init();
 	dra7xx_powerdomains_init();
 	dra7xx_clockdomains_init();
 	dra7xx_hwmod_init();

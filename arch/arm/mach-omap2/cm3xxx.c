@@ -671,9 +671,8 @@ static struct cm_ll_data omap3xxx_cm_ll_data = {
 	.wait_module_ready	= &omap3xxx_cm_wait_module_ready,
 };
 
-int __init omap3xxx_cm_init(void)
+int __init omap3xxx_cm_init(const struct omap_prcm_init_data *data)
 {
-	omap2_cm_base_init();
 	return cm_register(&omap3xxx_cm_ll_data);
 }
 
