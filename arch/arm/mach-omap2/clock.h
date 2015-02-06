@@ -280,8 +280,10 @@ extern void omap2_clkops_disable_clkdm(struct clk_hw *hw);
 
 extern void omap_clocks_register(struct omap_clk *oclks, int cnt);
 
+struct regmap;
+
 int __init omap2_clk_provider_init(struct device_node *np, int index,
-				   void __iomem *mem);
+				   struct regmap *syscon, void __iomem *mem);
 
 void __init ti_clk_init_features(void);
 #endif

@@ -24,6 +24,7 @@
 #include <linux/io.h>
 #include <linux/bitops.h>
 #include <linux/clk-private.h>
+#include <linux/regmap.h>
 #include <linux/of_address.h>
 #include <asm/cpu.h>
 
@@ -74,20 +75,23 @@ struct ti_clk_features ti_clk_features;
 static bool clkdm_control = true;
 
 static LIST_HEAD(clk_hw_omap_clocks);
-static void __iomem *clk_memmaps[CLK_MAX_MEMMAPS];
+static struct regmap *clk_memmaps[CLK_MAX_MEMMAPS];
 
 static void clk_memmap_writel(u32 val, void __iomem *reg)
 {
 	struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
 
-	writel_relaxed(val, clk_memmaps[r->index] + r->offset);
+	regmap_write(clk_memmaps[r->index], r->offset, val);
 }
 
 static u32 clk_memmap_readl(void __iomem *reg)
 {
+	u32 val;
 	struct clk_omap_reg *r = (struct clk_omap_reg *)&reg;
 
-	return readl_relaxed(clk_memmaps[r->index] + r->offset);
+	regmap_read(clk_memmaps[r->index], r->offset, &val);
+
+	return val;
 }
 
 void omap2_clk_writel(u32 val, struct clk_hw_omap *clk, void __iomem *reg)
@@ -115,18 +119,25 @@ static struct ti_clk_ll_ops omap_clk_ll_ops = {
 	.clk_writel = clk_memmap_writel,
 };
 
+static struct regmap_config clk_regmap_config = {
+	.reg_bits = 32,
+	.reg_stride = 4,
+	.val_bits = 32,
+};
+
 /**
  * omap2_clk_provider_init - initialize a clock provider
  * @np: device node for initializing the clock provider
  * @index: memory map index for the clock provider
- * @mem: iomem pointer for the memory map
+ * @syscon: syscon regmap pointer
+ * @mem: iomem pointer for the memory map, only used if @syscon is not provided
  *
  * Initializes a clock provider module (CM/PRM etc.), registering
  * the iomap and initializing the low level driver infrastructure.
  * Returns 0 in success, -EINVAL if multiple registration is attempted.
  */
 int __init omap2_clk_provider_init(struct device_node *np, int index,
-				   void __iomem *mem)
+				   struct regmap *syscon, void __iomem *mem)
 {
 	ti_clk_ll_ops = &omap_clk_ll_ops;
 
@@ -136,7 +147,10 @@ int __init omap2_clk_provider_init(struct device_node *np, int index,
 		return -EINVAL;
 	}
 
-	clk_memmaps[index] = mem;
+	if (!syscon)
+		syscon = regmap_init_mmio(NULL, mem, &clk_regmap_config);
+
+	clk_memmaps[index] = syscon;
 	ti_dt_clk_init_provider(np, index);
 
 	return 0;
