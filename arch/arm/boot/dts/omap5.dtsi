@@ -182,6 +182,16 @@
 			};
 		};
 
+		ctrl_gen_core: ctrl_gen_core@4a002000 {
+			compatible = "ti,omap5-ctrl-gen-core", "syscon";
+			reg = <0x4a002000 0x800>;
+		};
+
+		ctrl_pad_core: ctrl_pad_core@4a002800 {
+			compatible = "ti,omap5-ctrl-pad-core", "syscon";
+			reg = <0x4a002800 0x800>;
+		};
+
 		counter32k: counter@4ae04000 {
 			compatible = "ti,omap-counter32k";
 			reg = <0x4ae04000 0x40>;
@@ -209,15 +219,10 @@
 			pinctrl-single,function-mask = <0x7fff>;
 		};
 
-		omap5_padconf_global: tisyscon@4a002da0 {
-			compatible = "syscon";
-			reg = <0x4A002da0 0xec>;
-		};
-
 		pbias_regulator: pbias_regulator {
 			compatible = "ti,pbias-omap";
-			reg = <0x60 0x4>;
-			syscon = <&omap5_padconf_global>;
+			reg = <0x600 0x4>;
+			syscon = <&ctrl_pad_core>;
 			pbias_mmc_reg: pbias_mmc_omap5 {
 				regulator-name = "pbias_mmc_omap5";
 				regulator-min-microvolt = <1800000>;

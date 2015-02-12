@@ -17,6 +17,8 @@ Required properties:
 		"ti,omap3-scrm"
 		"ti,omap4-ctrl-gen-core"
 		"ti,omap4-ctrl-pad-core"
+		"ti,omap5-ctrl-gen-core"
+		"ti,omap5-ctrl-pad-core"
 - reg:		Contains Control Module register address range
 		(base address and length)
 
