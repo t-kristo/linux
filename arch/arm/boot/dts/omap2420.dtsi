@@ -28,7 +28,7 @@
 		};
 
 		scrm: scrm@48000000 {
-			compatible = "ti,omap2-scrm";
+			compatible = "ti,omap2-scrm", "syscon";
 			reg = <0x48000000 0x1000>;
 
 			scrm_clocks: clocks {
