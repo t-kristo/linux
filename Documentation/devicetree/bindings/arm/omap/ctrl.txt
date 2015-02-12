@@ -1,0 +1,55 @@
+OMAP Control Module bindings
+
+Control Module contains miscellaneous features under it based on SoC type.
+Pincontrol is one common feature, and typically some clock nodes are also
+under control module. Syscon is used to share register level access to
+drivers external to control module driver itself.
+
+See [1] for documentation about clock/clockdomain nodes.
+
+[1] Documentation/devicetree/bindings/clock/ti/*
+
+Required properties:
+- compatible:	Must be one of:
+		"ti,am3-scrm"
+		"ti,am4-scrm"
+		"ti,omap2-scrm"
+		"ti,omap3-scrm"
+		"ti,omap4-ctrl-gen-core"
+		"ti,omap4-ctrl-pad-core"
+- reg:		Contains Control Module register address range
+		(base address and length)
+
+Optional properties:
+- clocks:	clocks for this module
+- clockdomains:	clockdomains for this module
+
+Examples:
+
+scrm: scrm@48002000 {
+	compatible = "ti,omap3-scrm", "syscon";
+	reg = <0x48002000 0x1000>;
+
+	scrm_clocks: clocks {
+		#address-cells = <1>;
+		#size-cells = <0>;
+	};
+
+	scrm_clockdomains: clockdomains {
+	};
+}
+
+&scrm_clocks {
+	mcbsp5_mux_fck: mcbsp5_mux_fck {
+		#clock-cells = <0>;
+		compatible = "ti,composite-mux-clock";
+		clocks = <&core_96m_fck>, <&mcbsp_clks>;
+		ti,bit-shift = <4>;
+		reg = <0x02d8>;
+	};
+};
+
+ctrl_gen_core: ctrl_gen_core@4a002000 {
+	compatible = "ti,omap4-ctrl-gen-core", "syscon";
+	reg = <0x4a002000 0x1000>;
+};
