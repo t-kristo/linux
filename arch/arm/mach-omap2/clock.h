@@ -241,6 +241,7 @@ enum {
 	CLK_MEMMAP_INDEX_CM1,
 	CLK_MEMMAP_INDEX_CM2,
 	CLK_MEMMAP_INDEX_SCRM,
+	CLK_MEMMAP_INDEX_CTRL,
 };
 
 extern struct ti_clk_features ti_clk_features;

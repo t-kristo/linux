@@ -15,6 +15,8 @@
 #include <linux/kernel.h>
 #include <linux/io.h>
 #include <linux/of_address.h>
+#include <linux/regmap.h>
+#include <linux/mfd/syscon.h>
 
 #include "soc.h"
 #include "iomap.h"
@@ -34,6 +36,7 @@
 
 static void __iomem *omap2_ctrl_base;
 static void __iomem *omap4_ctrl_pad_base;
+static struct regmap *omap2_ctrl_syscon;
 
 #if defined(CONFIG_ARCH_OMAP3) && defined(CONFIG_PM)
 struct omap3_scratchpad {
@@ -135,7 +138,6 @@ struct omap3_control_regs {
 static struct omap3_control_regs control_context;
 #endif /* CONFIG_ARCH_OMAP3 && CONFIG_PM */
 
-#define OMAP_CTRL_REGADDR(reg)		(omap2_ctrl_base + (reg))
 #define OMAP4_CTRL_PAD_REGADDR(reg)	(omap4_ctrl_pad_base + (reg))
 
 void __init omap2_set_globals_control(void __iomem *ctrl,
@@ -147,32 +149,71 @@ void __init omap2_set_globals_control(void __iomem *ctrl,
 
 u8 omap_ctrl_readb(u16 offset)
 {
-	return readb_relaxed(OMAP_CTRL_REGADDR(offset));
+	u32 val;
+	u8 byte_offset = offset & 0x3;
+
+	val = omap_ctrl_readl(offset);
+
+	return (val >> (byte_offset * 8)) & 0xff;
 }
 
 u16 omap_ctrl_readw(u16 offset)
 {
-	return readw_relaxed(OMAP_CTRL_REGADDR(offset));
+	u32 val;
+	u16 byte_offset = offset & 0x2;
+
+	val = omap_ctrl_readl(offset);
+
+	return (val >> (byte_offset * 8)) & 0xffff;
 }
 
 u32 omap_ctrl_readl(u16 offset)
 {
-	return readl_relaxed(OMAP_CTRL_REGADDR(offset));
+	u32 val;
+
+	offset &= 0xfffc;
+	if (!omap2_ctrl_syscon)
+		val = readl_relaxed(omap2_ctrl_base + offset);
+	else
+		regmap_read(omap2_ctrl_syscon, offset, &val);
+
+	return val;
 }
 
 void omap_ctrl_writeb(u8 val, u16 offset)
 {
-	writeb_relaxed(val, OMAP_CTRL_REGADDR(offset));
+	u32 tmp;
+	u8 byte_offset = offset & 0x3;
+
+	tmp = omap_ctrl_readl(offset);
+
+	tmp &= 0xffffffff ^ (0xff << (byte_offset * 8));
+	tmp |= val << (byte_offset * 8);
+
+	omap_ctrl_writel(tmp, offset);
 }
 
 void omap_ctrl_writew(u16 val, u16 offset)
 {
-	writew_relaxed(val, OMAP_CTRL_REGADDR(offset));
+	u32 tmp;
+	u8 byte_offset = offset & 0x2;
+
+	tmp = omap_ctrl_readl(offset);
+
+	tmp &= 0xffffffff ^ (0xffff << (byte_offset * 8));
+	tmp |= val << (byte_offset * 8);
+
+	omap_ctrl_writel(tmp, offset);
 }
 
 void omap_ctrl_writel(u32 val, u16 offset)
 {
-	writel_relaxed(val, OMAP_CTRL_REGADDR(offset));
+	offset &= 0xfffc;
+	if (!omap2_ctrl_syscon) {
+		pr_err("%s: early write: %04x\n", __func__, offset);
+		return;
+	}
+	regmap_write(omap2_ctrl_syscon, offset, val);
 }
 
 /*
@@ -611,11 +652,10 @@ void __init omap3_ctrl_init(void)
 
 struct control_init_data {
 	int index;
-	void __iomem *mem;
 };
 
 static const struct control_init_data ctrl_data = {
-	.index = CLK_MEMMAP_INDEX_SCRM,
+	.index = CLK_MEMMAP_INDEX_CTRL,
 };
 
 static struct of_device_id omap_scrm_dt_match_table[] = {
@@ -637,18 +677,14 @@ int __init omap2_control_base_init(void)
 {
 	struct device_node *np;
 	const struct of_device_id *match;
-	struct control_init_data *data;
-	void __iomem *mem;
+	const struct control_init_data *data;
 
 	for_each_matching_node_and_match(np, omap_scrm_dt_match_table, &match) {
-		data = (struct control_init_data *)match->data;
+		data = match->data;
 
-		mem = of_iomap(np, 0);
-		if (!mem)
+		omap2_ctrl_base = of_iomap(np, 0);
+		if (!omap2_ctrl_base)
 			return -ENOMEM;
-
-		omap2_ctrl_base = mem;
-		data->mem = mem;
 	}
 
 	return 0;
@@ -666,13 +702,26 @@ int __init omap_control_init(void)
 	const struct of_device_id *match;
 	const struct control_init_data *data;
 	int ret;
+	struct regmap *syscon;
 
 	for_each_matching_node_and_match(np, omap_scrm_dt_match_table, &match) {
 		data = match->data;
 
-		ret = omap2_clk_provider_init(np, data->index, NULL, data->mem);
-		if (ret)
-			return ret;
+		syscon = syscon_node_to_regmap(np);
+		if (IS_ERR(syscon))
+			return PTR_ERR(syscon);
+
+		if (data->index == CLK_MEMMAP_INDEX_CTRL) {
+			omap2_ctrl_syscon = syscon;
+
+			ret = omap2_clk_provider_init(np, data->index, syscon,
+						      NULL);
+			if (ret)
+				return ret;
+
+			iounmap(omap2_ctrl_base);
+			omap2_ctrl_base = NULL;
+		}
 	}
 
 	return 0;

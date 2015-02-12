@@ -215,7 +215,7 @@ struct ti_dt_clk {
 	}
 
 /* Maximum number of clock memmaps */
-#define CLK_MAX_MEMMAPS			4
+#define CLK_MAX_MEMMAPS			5
 
 typedef void (*ti_of_clk_init_cb_t)(struct clk_hw *, struct device_node *);
 
