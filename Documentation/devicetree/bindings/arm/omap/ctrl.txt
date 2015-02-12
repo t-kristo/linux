@@ -20,6 +20,7 @@ Required properties:
 		"ti,omap2-scrm"
 		"ti,omap3-scrm"
 		"ti,omap4-ctrl"
+		"ti,omap5-ctrl"
 - reg:		Contains Control Module register address range
 		(base address and length)
 
