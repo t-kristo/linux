@@ -122,8 +122,8 @@
 		};
 
 		scrm: scrm@48002000 {
-			compatible = "ti,omap3-scrm";
-			reg = <0x48002000 0x2000>;
+			compatible = "ti,omap3-scrm", "syscon";
+			reg = <0x48002000 0x1000>;
 
 			scrm_clocks: clocks {
 				#address-cells = <1>;
@@ -181,15 +181,10 @@
 			pinctrl-single,function-mask = <0xff1f>;
 		};
 
-		omap3_scm_general: tisyscon@48002270 {
-			compatible = "syscon";
-			reg = <0x48002270 0x2f0>;
-		};
-
 		pbias_regulator: pbias_regulator {
 			compatible = "ti,pbias-omap";
-			reg = <0x2b0 0x4>;
-			syscon = <&omap3_scm_general>;
+			reg = <0x520 0x4>;
+			syscon = <&scrm>;
 			pbias_mmc_reg: pbias_mmc_omap2430 {
 				regulator-name = "pbias_mmc_omap2430";
 				regulator-min-microvolt = <1800000>;
