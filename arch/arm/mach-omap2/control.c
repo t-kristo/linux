@@ -35,8 +35,8 @@
 #define PADCONF_SAVE_DONE		0x1
 
 static void __iomem *omap2_ctrl_base;
-static void __iomem *omap4_ctrl_pad_base;
 static struct regmap *omap2_ctrl_syscon;
+static struct regmap *omap4_ctrl_pad_syscon;
 
 #if defined(CONFIG_ARCH_OMAP3) && defined(CONFIG_PM)
 struct omap3_scratchpad {
@@ -138,13 +138,10 @@ struct omap3_control_regs {
 static struct omap3_control_regs control_context;
 #endif /* CONFIG_ARCH_OMAP3 && CONFIG_PM */
 
-#define OMAP4_CTRL_PAD_REGADDR(reg)	(omap4_ctrl_pad_base + (reg))
-
 void __init omap2_set_globals_control(void __iomem *ctrl,
 				      void __iomem *ctrl_pad)
 {
 	omap2_ctrl_base = ctrl;
-	omap4_ctrl_pad_base = ctrl_pad;
 }
 
 u8 omap_ctrl_readb(u16 offset)
@@ -225,12 +222,15 @@ void omap_ctrl_writel(u32 val, u16 offset)
 
 u32 omap4_ctrl_pad_readl(u16 offset)
 {
-	return readl_relaxed(OMAP4_CTRL_PAD_REGADDR(offset));
+	u32 val;
+
+	regmap_read(omap4_ctrl_pad_syscon, offset, &val);
+	return val;
 }
 
 void omap4_ctrl_pad_writel(u32 val, u16 offset)
 {
-	writel_relaxed(val, OMAP4_CTRL_PAD_REGADDR(offset));
+	regmap_write(omap4_ctrl_pad_syscon, offset, val);
 }
 
 #ifdef CONFIG_ARCH_OMAP3
@@ -658,11 +658,30 @@ static const struct control_init_data ctrl_data = {
 	.index = CLK_MEMMAP_INDEX_CTRL,
 };
 
+static const struct control_init_data omap4_ctrl_gen_core_data = {
+	.index = CLK_MEMMAP_INDEX_CTRL,
+};
+
+static const struct control_init_data omap4_ctrl_pad_core_data = {
+};
+
 static struct of_device_id omap_scrm_dt_match_table[] = {
 	{ .compatible = "ti,am3-scrm", .data = &ctrl_data },
 	{ .compatible = "ti,am4-scrm", .data = &ctrl_data },
 	{ .compatible = "ti,omap2-scrm", .data = &ctrl_data },
 	{ .compatible = "ti,omap3-scrm", .data = &ctrl_data },
+	{ .compatible = "ti,omap4-ctrl-gen-core",
+	  .data = &omap4_ctrl_gen_core_data },
+	{ .compatible = "ti,omap4-ctrl-pad-core",
+	  .data = &omap4_ctrl_pad_core_data },
+	{ .compatible = "ti,omap5-ctrl-gen-core",
+	  .data = &omap4_ctrl_gen_core_data },
+	{ .compatible = "ti,omap5-ctrl-pad-core",
+	  .data = &omap4_ctrl_pad_core_data },
+	{ .compatible = "ti,dra7-ctrl-gen-core",
+	  .data = &omap4_ctrl_gen_core_data },
+	{ .compatible = "ti,dra7-ctrl-pad-core",
+	  .data = &omap4_ctrl_pad_core_data },
 	{ }
 };
 
@@ -681,6 +700,13 @@ int __init omap2_control_base_init(void)
 
 	for_each_matching_node_and_match(np, omap_scrm_dt_match_table, &match) {
 		data = match->data;
+
+		/*
+		 * Only setup omap2_ctrl_base for base index, omap4+ has
+		 * padconf mapping also
+		 */
+		if (data->index != CLK_MEMMAP_INDEX_CTRL)
+			continue;
 
 		omap2_ctrl_base = of_iomap(np, 0);
 		if (!omap2_ctrl_base)
@@ -711,6 +737,10 @@ int __init omap_control_init(void)
 		if (IS_ERR(syscon))
 			return PTR_ERR(syscon);
 
+		/*
+		 * Setup appropriate syscon mapping; omap4+ is currently
+		 * using two of these, separate ones for generic + padconf
+		 */
 		if (data->index == CLK_MEMMAP_INDEX_CTRL) {
 			omap2_ctrl_syscon = syscon;
 
@@ -721,6 +751,8 @@ int __init omap_control_init(void)
 
 			iounmap(omap2_ctrl_base);
 			omap2_ctrl_base = NULL;
+		} else {
+			omap4_ctrl_pad_syscon = syscon;
 		}
 	}
 
