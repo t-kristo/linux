@@ -649,6 +649,9 @@ static const struct of_device_id omap_scrm_dt_match_table[] = {
 	{ .compatible = "ti,am4-scrm", .data = &ctrl_data },
 	{ .compatible = "ti,omap2-scrm", .data = &omap2_ctrl_data },
 	{ .compatible = "ti,omap3-scrm", .data = &omap2_ctrl_data },
+	{ .compatible = "ti,omap4-ctrl", .data = &ctrl_data },
+	{ .compatible = "ti,omap5-ctrl", .data = &ctrl_data },
+	{ .compatible = "ti,dra7-ctrl", .data = &ctrl_data },
 	{ }
 };
 
