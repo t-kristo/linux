@@ -22,6 +22,8 @@ Required properties:
 		"ti,omap3-scrm-wkup"
 		"ti,omap4-ctrl"
 		"ti,omap4-ctrl-wkup"
+		"ti,omap5-ctrl"
+		"ti,omap5-ctrl-wkup"
 - reg:		Contains Control Module register address range
 		(base address and length)
 
