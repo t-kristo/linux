@@ -18,6 +18,7 @@ Required properties:
 		"ti,omap3-prm"
 		"ti,omap3-cm"
 		"ti,omap3-scrm"
+		"ti,omap3-scrm-wkup"
 		"ti,omap4-cm1"
 		"ti,omap4-prm"
 		"ti,omap4-cm2"
