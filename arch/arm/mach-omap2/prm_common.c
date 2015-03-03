@@ -37,6 +37,7 @@
 #include "clock.h"
 #include "cm.h"
 #include "control.h"
+#include "clockdomain.h"
 
 /*
  * OMAP_PRCM_MAX_NR_PENDING_REG: maximum number of PRM_IRQ*_MPU regs
@@ -623,6 +624,8 @@ static void prm_clk_writel(u32 val, void __iomem *reg)
 static struct ti_clk_ll_ops omap_clk_ll_ops = {
 	.clk_readl = prm_clk_readl,
 	.clk_writel = prm_clk_writel,
+	.clkdm_clk_enable = clkdm_clk_enable,
+	.clkdm_clk_disable = clkdm_clk_disable,
 };
 
 int __init of_prcm_init(void)
