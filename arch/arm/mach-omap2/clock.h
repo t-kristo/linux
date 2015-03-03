@@ -204,8 +204,5 @@ extern const struct clk_hw_omap_ops clkhwops_apll96;
 
 extern void __iomem *clk_memmaps[];
 
-extern int omap2_clkops_enable_clkdm(struct clk_hw *hw);
-extern void omap2_clkops_disable_clkdm(struct clk_hw *hw);
-
 void __init ti_clk_init_features(void);
 #endif
