@@ -203,42 +203,52 @@
 			};
 		};
 
+		scm: scm@4a002000 {
+			compatible = "ti,dra7-ctrl", "simple-bus";
+			reg = <0x4a002000 0x1400>,
+			      <0x4a003400 0x600>,
+			      <0x4ae0c000 0x600>;
+			#address-cells = <2>;
+			#size-cells = <1>;
+			ranges = <0 0 0x4a002000 0x1400>,
+				 <1 0 0x4a003400 0x600>,
+				 <2 0 0x4ae0c000 0x600>;
+
+			scm_conf: tisyscon@0,0 {
+				compatible = "syscon";
+				reg = <0 0x0 0x1400>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+			};
+
+			dra7_pmx_core: pinmux@1,0 {
+				compatible = "ti,dra7-padconf",
+					     "pinctrl-single";
+				reg = <1 0x0 0x0464>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				#interrupt-cells = <1>;
+				interrupt-controller;
+				pinctrl-single,register-width = <32>;
+				pinctrl-single,function-mask = <0x3fffffff>;
+			};
+		};
+
 		counter32k: counter@4ae04000 {
 			compatible = "ti,omap-counter32k";
 			reg = <0x4ae04000 0x40>;
 			ti,hwmods = "counter_32k";
 		};
 
-		dra7_ctrl_core: ctrl_core@4a002000 {
-			compatible = "syscon";
-			reg = <0x4a002000 0x6d0>;
-		};
-
-		dra7_ctrl_general: tisyscon@4a002e00 {
-			compatible = "syscon";
-			reg = <0x4a002e00 0x7c>;
-		};
-
 		pbias_regulator: pbias_regulator {
 			compatible = "ti,pbias-omap";
-			reg = <0 0x4>;
-			syscon = <&dra7_ctrl_general>;
+			reg = <0xe00 0x4>;
+			syscon = <&scm_conf>;
 			pbias_mmc_reg: pbias_mmc_omap5 {
 				regulator-name = "pbias_mmc_omap5";
 				regulator-min-microvolt = <1800000>;
 				regulator-max-microvolt = <3000000>;
 			};
-		};
-
-		dra7_pmx_core: pinmux@4a003400 {
-			compatible = "ti,dra7-padconf", "pinctrl-single";
-			reg = <0x4a003400 0x0464>;
-			#address-cells = <1>;
-			#size-cells = <0>;
-			#interrupt-cells = <1>;
-			interrupt-controller;
-			pinctrl-single,register-width = <32>;
-			pinctrl-single,function-mask = <0x3fffffff>;
 		};
 
 		sdma: dma-controller@4a056000 {
@@ -1410,7 +1420,7 @@
 			compatible = "ti,dra7-d_can";
 			ti,hwmods = "dcan1";
 			reg = <0x4ae3c000 0x2000>;
-			syscon-raminit = <&dra7_ctrl_core 0x558 0>;
+			syscon-raminit = <&scm_conf 0x558 0>;
 			interrupts = <GIC_SPI 222 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&dcan1_sys_clk_mux>;
 			status = "disabled";
@@ -1420,7 +1430,7 @@
 			compatible = "ti,dra7-d_can";
 			ti,hwmods = "dcan2";
 			reg = <0x48480000 0x2000>;
-			syscon-raminit = <&dra7_ctrl_core 0x558 1>;
+			syscon-raminit = <&scm_conf 0x558 1>;
 			interrupts = <GIC_SPI 225 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&sys_clkin1>;
 			status = "disabled";

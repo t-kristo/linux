@@ -182,36 +182,60 @@
 			};
 		};
 
+		scm: scm@4a002000 {
+			compatible = "ti,omap5-ctrl", "simple-bus";
+			reg = <0x4a002000 0x800>,
+			      <0x4a002800 0x800>,
+			      <0x4ae0c000 0x800>,
+			      <0x4ae0c800 0x800>;
+			#address-cells = <2>;
+			#size-cells = <1>;
+			ranges = <0 0 0x4a002000 0x800>,
+				 <1 0 0x4a002800 0x800>,
+				 <2 0 0x4ae0c000 0x800>,
+				 <3 0 0x4ae0c800 0x800>;
+
+			scm_conf: tisyscon@0,0 {
+				compatible = "syscon";
+				reg = <0 0x0 0x800>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+			};
+
+			omap5_pmx_core: pinmux@1,40 {
+				compatible = "ti,omap5-padconf",
+					     "pinctrl-single";
+				reg = <1 0x40 0x01b6>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				#interrupt-cells = <1>;
+				interrupt-controller;
+				pinctrl-single,register-width = <16>;
+				pinctrl-single,function-mask = <0x7fff>;
+			};
+
+			omap5_pmx_wkup: pinmux@3,40 {
+				compatible = "ti,omap5-padconf",
+					     "pinctrl-single";
+				reg = <3 0x40 0x0038>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				#interrupt-cells = <1>;
+				interrupt-controller;
+				pinctrl-single,register-width = <16>;
+				pinctrl-single,function-mask = <0x7fff>;
+			};
+
+			omap5_padconf_global: omap5_padconf_global@1,5a0 {
+				compatible = "syscon";
+				reg = <1 0x5a0 0xec>;
+			};
+		};
+
 		counter32k: counter@4ae04000 {
 			compatible = "ti,omap-counter32k";
 			reg = <0x4ae04000 0x40>;
 			ti,hwmods = "counter_32k";
-		};
-
-		omap5_pmx_core: pinmux@4a002840 {
-			compatible = "ti,omap5-padconf", "pinctrl-single";
-			reg = <0x4a002840 0x01b6>;
-			#address-cells = <1>;
-			#size-cells = <0>;
-			#interrupt-cells = <1>;
-			interrupt-controller;
-			pinctrl-single,register-width = <16>;
-			pinctrl-single,function-mask = <0x7fff>;
-		};
-		omap5_pmx_wkup: pinmux@4ae0c840 {
-			compatible = "ti,omap5-padconf", "pinctrl-single";
-			reg = <0x4ae0c840 0x0038>;
-			#address-cells = <1>;
-			#size-cells = <0>;
-			#interrupt-cells = <1>;
-			interrupt-controller;
-			pinctrl-single,register-width = <16>;
-			pinctrl-single,function-mask = <0x7fff>;
-		};
-
-		omap5_padconf_global: tisyscon@4a002da0 {
-			compatible = "syscon";
-			reg = <0x4A002da0 0xec>;
 		};
 
 		pbias_regulator: pbias_regulator {

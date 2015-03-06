@@ -73,7 +73,11 @@ void omap2_clk_writel(u32 val, struct clk_hw_omap *clk, void __iomem *reg);
 
 extern u16 cpu_mask;
 
-extern void __iomem *clk_memmaps[];
+struct regmap;
+
+int __init omap2_clk_provider_init(struct device_node *np, int index,
+				   struct regmap *syscon, void __iomem *mem);
+void __init omap2_clk_legacy_provider_init(int index, void __iomem *mem);
 
 void __init ti_clk_init_features(void);
 #endif

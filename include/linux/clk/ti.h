@@ -188,14 +188,14 @@ struct clk_hw_omap {
 /* DPLL Type and DCO Selection Flags */
 #define DPLL_J_TYPE		0x1
 
-/* Maximum number of clock memmaps */
-#define CLK_MAX_MEMMAPS			4
-
 /* Static memmap indices */
 enum {
 	TI_CLKM_CM = 0,
+	TI_CLKM_CM2,
 	TI_CLKM_PRM,
 	TI_CLKM_SCRM,
+	TI_CLKM_CTRL,
+	CLK_MAX_MEMMAPS
 };
 
 /**
