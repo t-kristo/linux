@@ -264,6 +264,7 @@ static int __init omap_dm_timer_init_one(struct omap_dm_timer *timer,
 		oh_name = name;
 	}
 
+	pr_info("%s: %s\n", __func__, oh_name);
 	oh = omap_hwmod_lookup(oh_name);
 	if (!oh)
 		return -ENODEV;
@@ -422,6 +423,7 @@ static int __init __maybe_unused omap2_sync32k_clocksource_init(void)
 	/*
 	 * First check hwmod data is available for sync32k counter
 	 */
+	pr_info("%s: %s\n", __func__, oh_name);
 	oh = omap_hwmod_lookup(oh_name);
 	if (!oh || oh->slaves_cnt == 0)
 		return -ENODEV;
@@ -709,7 +711,7 @@ static int __init omap_timer_init(struct omap_hwmod *oh, void *unused)
 	struct platform_device *pdev;
 	struct omap_timer_capability_dev_attr *timer_dev_attr;
 
-	pr_debug("%s: %s\n", __func__, oh->name);
+	pr_info("%s: %s\n", __func__, oh->name);
 
 	/* on secure device, do not register secure timer */
 	timer_dev_attr = oh->dev_attr;
