@@ -3175,6 +3175,8 @@ struct omap_hwmod *omap_hwmod_lookup(const char *name)
 
 	oh = _lookup(name);
 
+	pr_info("%s: %s = %08x\n", __func__, name, (u32)oh);
+
 	return oh;
 }
 
