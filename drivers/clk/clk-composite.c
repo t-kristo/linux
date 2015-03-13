@@ -187,6 +187,20 @@ static void clk_composite_disable(struct clk_hw *hw)
 	gate_ops->disable(gate_hw);
 }
 
+static void clk_composite_disable_unused(struct clk_hw *hw)
+{
+	struct clk_composite *composite = to_clk_composite(hw);
+	const struct clk_ops *gate_ops = composite->gate_ops;
+	struct clk_hw *gate_hw = composite->gate_hw;
+
+	__clk_hw_set_clk(gate_hw, hw);
+
+	if (gate_ops->disable_unused)
+		gate_ops->disable_unused(gate_hw);
+	else
+		gate_ops->disable(gate_hw);
+}
+
 struct clk *clk_register_composite(struct device *dev, const char *name,
 			const char **parent_names, int num_parents,
 			struct clk_hw *mux_hw, const struct clk_ops *mux_ops,
@@ -267,6 +281,8 @@ struct clk *clk_register_composite(struct device *dev, const char *name,
 		clk_composite_ops->is_enabled = clk_composite_is_enabled;
 		clk_composite_ops->enable = clk_composite_enable;
 		clk_composite_ops->disable = clk_composite_disable;
+		clk_composite_ops->disable_unused =
+			clk_composite_disable_unused;
 	}
 
 	init.ops = clk_composite_ops;
