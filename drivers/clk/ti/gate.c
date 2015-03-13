@@ -41,6 +41,7 @@ static const struct clk_ops omap_gate_clk_ops = {
 	.init		= &omap2_init_clk_clkdm,
 	.enable		= &omap2_dflt_clk_enable,
 	.disable	= &omap2_dflt_clk_disable,
+	.disable_unused	= &omap2_dflt_clk_disable_ll,
 	.is_enabled	= &omap2_dflt_clk_is_enabled,
 };
 
@@ -48,6 +49,7 @@ static const struct clk_ops omap_gate_clk_hsdiv_restore_ops = {
 	.init		= &omap2_init_clk_clkdm,
 	.enable		= &omap36xx_gate_clk_enable_with_hsdiv_restore,
 	.disable	= &omap2_dflt_clk_disable,
+	.disable_unused	= &omap2_dflt_clk_disable_ll,
 	.is_enabled	= &omap2_dflt_clk_is_enabled,
 };
 

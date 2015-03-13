@@ -345,15 +345,12 @@ err:
 }
 
 /**
- * omap2_dflt_clk_disable - disable a clock in the hardware
+ * omap2_dflt_clk_disable_ll - low level disable a clock in the hardware
  * @hw: struct clk_hw * of the clock to disable
  *
- * Disable the clock @hw in the hardware, and call into the OMAP
- * clockdomain code to "disable" the corresponding clockdomain if all
- * clocks/hwmods in that clockdomain are now disabled.  No return
- * value.
+ * Disable the clock @hw in the hardware. No return value.
  */
-void omap2_dflt_clk_disable(struct clk_hw *hw)
+void omap2_dflt_clk_disable_ll(struct clk_hw *hw)
 {
 	struct clk_hw_omap *clk;
 	u32 v;
@@ -376,6 +373,24 @@ void omap2_dflt_clk_disable(struct clk_hw *hw)
 		v &= ~(1 << clk->enable_bit);
 	omap2_clk_writel(v, clk, clk->enable_reg);
 	/* No OCP barrier needed here since it is a disable operation */
+}
+
+/**
+ * omap2_dflt_clk_disable - disable a clock in the hardware
+ * @hw: struct clk_hw * of the clock to disable
+ *
+ * Disable the clock @hw in the hardware, and call into the OMAP
+ * clockdomain code to "disable" the corresponding clockdomain if all
+ * clocks/hwmods in that clockdomain are now disabled.  No return
+ * value.
+ */
+void omap2_dflt_clk_disable(struct clk_hw *hw)
+{
+	struct clk_hw_omap *clk;
+
+	clk = to_clk_hw_omap(hw);
+
+	omap2_dflt_clk_disable_ll(hw);
 
 	if (clkdm_control && clk->clkdm)
 		clkdm_clk_disable(clk->clkdm, hw->clk);

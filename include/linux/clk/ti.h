@@ -306,6 +306,7 @@ int omap3_dpll4_set_rate(struct clk_hw *clk, unsigned long rate,
 int omap3_dpll4_set_rate_and_parent(struct clk_hw *hw, unsigned long rate,
 				    unsigned long parent_rate, u8 index);
 int omap2_dflt_clk_enable(struct clk_hw *hw);
+void omap2_dflt_clk_disable_ll(struct clk_hw *hw);
 void omap2_dflt_clk_disable(struct clk_hw *hw);
 int omap2_dflt_clk_is_enabled(struct clk_hw *hw);
 void omap3_clk_lock_dpll5(void);

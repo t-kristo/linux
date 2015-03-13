@@ -57,6 +57,7 @@ static const struct clk_ops ti_composite_divider_ops = {
 static const struct clk_ops ti_composite_gate_ops = {
 	.enable		= &omap2_dflt_clk_enable,
 	.disable	= &omap2_dflt_clk_disable,
+	.disable_unused	= &omap2_dflt_clk_disable_ll,
 	.is_enabled	= &omap2_dflt_clk_is_enabled,
 };
 
