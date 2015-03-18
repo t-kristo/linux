@@ -1232,7 +1232,7 @@ static int _get_addr_space_by_name(struct omap_hwmod *oh, const char *name,
  * Intended to be called during hwmod registration only. No return
  * value.
  */
-static void __init _save_mpu_port_index(struct omap_hwmod *oh)
+static void _save_mpu_port_index(struct omap_hwmod *oh)
 {
 	struct omap_hwmod_ocp_if *os = NULL;
 	struct list_head *p;
@@ -1285,7 +1285,8 @@ static struct omap_hwmod_ocp_if *_find_mpu_rt_port(struct omap_hwmod *oh)
  * Returns a pointer to the struct omap_hwmod_addr_space record representing
  * the register target MPU address space; or returns NULL upon error.
  */
-static struct omap_hwmod_addr_space * __init _find_mpu_rt_addr_space(struct omap_hwmod *oh)
+static struct omap_hwmod_addr_space
+*_find_mpu_rt_addr_space(struct omap_hwmod *oh)
 {
 	struct omap_hwmod_ocp_if *os;
 	struct omap_hwmod_addr_space *mem;
@@ -2372,8 +2373,8 @@ static int of_dev_hwmod_lookup(struct device_node *np,
  * Returns 0 on success, -EINVAL if an invalid hwmod is passed, and
  * -ENXIO on absent or invalid register target address space.
  */
-static int __init _init_mpu_rt_base(struct omap_hwmod *oh, void *data,
-				    int index, struct device_node *np)
+static int _init_mpu_rt_base(struct omap_hwmod *oh, void *data,
+			     int index, struct device_node *np)
 {
 	struct omap_hwmod_addr_space *mem;
 	void __iomem *va_start = NULL;
@@ -2429,7 +2430,7 @@ static int __init _init_mpu_rt_base(struct omap_hwmod *oh, void *data,
  * upon success or if the hwmod isn't registered or if the hwmod's
  * address space is not defined, or -EINVAL upon failure.
  */
-static int __init _init(struct omap_hwmod *oh, void *data)
+static int _init(struct omap_hwmod *oh, void *data)
 {
 	int r, index;
 	struct device_node *np = NULL;
@@ -2487,7 +2488,7 @@ static int __init _init(struct omap_hwmod *oh, void *data)
  * a stub; implementing this properly requires iclk autoidle usecounting in
  * the clock code.   No return value.
  */
-static void __init _setup_iclk_autoidle(struct omap_hwmod *oh)
+static void _setup_iclk_autoidle(struct omap_hwmod *oh)
 {
 	struct omap_hwmod_ocp_if *os;
 	struct list_head *p;
@@ -2522,7 +2523,7 @@ static void __init _setup_iclk_autoidle(struct omap_hwmod *oh)
  * reset.  Returns 0 upon success or a negative error code upon
  * failure.
  */
-static int __init _setup_reset(struct omap_hwmod *oh)
+static int _setup_reset(struct omap_hwmod *oh)
 {
 	int r;
 
@@ -2583,7 +2584,7 @@ static int __init _setup_reset(struct omap_hwmod *oh)
  *
  * No return value.
  */
-static void __init _setup_postsetup(struct omap_hwmod *oh)
+static void _setup_postsetup(struct omap_hwmod *oh)
 {
 	u8 postsetup_state;
 
@@ -2631,7 +2632,7 @@ static void __init _setup_postsetup(struct omap_hwmod *oh)
  * affects the IP block hardware, or system integration hardware
  * associated with the IP block.  Returns 0.
  */
-static int __init _setup(struct omap_hwmod *oh, void *data)
+static int _setup(struct omap_hwmod *oh, void *data)
 {
 	if (oh->_state != _HWMOD_STATE_INITIALIZED)
 		return 0;
@@ -2683,7 +2684,7 @@ static int __init _setup(struct omap_hwmod *oh, void *data)
  * that the copy process would be relatively complex due to the large number
  * of substructures.
  */
-static int __init _register(struct omap_hwmod *oh)
+static int _register(struct omap_hwmod *oh)
 {
 	if (!oh || !oh->name || !oh->class || !oh->class->name ||
 	    (oh->_state != _HWMOD_STATE_UNKNOWN))
@@ -2725,8 +2726,8 @@ static int __init _register(struct omap_hwmod *oh)
  * 'supplemental' allocations will be logged when debugging is
  * enabled.  Returns 0.
  */
-static int __init _alloc_links(struct omap_hwmod_link **ml,
-			       struct omap_hwmod_link **sl)
+static int _alloc_links(struct omap_hwmod_link **ml,
+			struct omap_hwmod_link **sl)
 {
 	unsigned int sz;
 
@@ -2762,7 +2763,7 @@ static int __init _alloc_links(struct omap_hwmod_link **ml,
  * locking in this code.  Changes to this assumption will require
  * additional locking.  Returns 0.
  */
-static int __init _add_link(struct omap_hwmod_ocp_if *oi)
+static int _add_link(struct omap_hwmod_ocp_if *oi)
 {
 	struct omap_hwmod_link *ml, *sl;
 
@@ -2795,7 +2796,7 @@ static int __init _add_link(struct omap_hwmod_ocp_if *oi)
  * should be marked __initdata and freed after init.  This would allow
  * unneeded omap_hwmods to be freed on multi-OMAP configurations.
  */
-static int __init _register_link(struct omap_hwmod_ocp_if *oi)
+static int _register_link(struct omap_hwmod_ocp_if *oi)
 {
 	struct omap_hwmod *oh;
 
@@ -3244,7 +3245,7 @@ static void __init *memblock_alloc(int size)
  * -ENOMEM if the link memory area can't be allocated, or 0 upon
  * success.
  */
-int __init omap_hwmod_register_links(struct omap_hwmod_ocp_if **ois)
+int omap_hwmod_register_links(struct omap_hwmod_ocp_if **ois)
 {
 	int r, i;
 
@@ -3285,7 +3286,7 @@ int __init omap_hwmod_register_links(struct omap_hwmod_ocp_if **ois)
  * to the MPU.  Intended to be called only by omap_hwmod_setup*().  No
  * return value.
  */
-static void __init _ensure_mpu_hwmod_is_setup(struct omap_hwmod *oh)
+static void _ensure_mpu_hwmod_is_setup(struct omap_hwmod *oh)
 {
 	if (!mpu_oh || mpu_oh->_state == _HWMOD_STATE_UNKNOWN)
 		pr_err("omap_hwmod: %s: MPU initiator hwmod %s not yet registered\n",
@@ -3305,7 +3306,7 @@ static void __init _ensure_mpu_hwmod_is_setup(struct omap_hwmod *oh)
  * registered omap_hwmod.  Also calls _setup() on each hwmod.  Returns
  * -EINVAL upon error or 0 upon success.
  */
-int __init omap_hwmod_setup_one(const char *oh_name)
+int omap_hwmod_setup_one(const char *oh_name)
 {
 	struct omap_hwmod *oh;
 
@@ -3333,7 +3334,7 @@ int __init omap_hwmod_setup_one(const char *oh_name)
  * names to struct clk pointers for each registered omap_hwmod.  Also
  * calls _setup() on each hwmod.  Returns 0 upon success.
  */
-static int __init omap_hwmod_setup_all(void)
+int omap_hwmod_setup_all(void)
 {
 	_ensure_mpu_hwmod_is_setup(NULL);
 
