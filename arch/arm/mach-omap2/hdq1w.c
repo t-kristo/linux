@@ -75,6 +75,7 @@ int omap_hdq1w_reset(struct omap_hwmod *oh)
 
 	return 0;
 }
+EXPORT_SYMBOL(omap_hdq1w_reset);
 
 #ifndef CONFIG_OF
 static int __init omap_init_hdq(void)
