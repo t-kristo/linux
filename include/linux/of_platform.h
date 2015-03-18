@@ -63,10 +63,19 @@ extern struct platform_device *of_find_device_by_node(struct device_node *np);
 extern struct platform_device *of_platform_device_create(struct device_node *np,
 						   const char *bus_id,
 						   struct device *parent);
+extern struct platform_device *of_platform_device_create_pdata(
+						struct device_node *np,
+						const char *bus_id,
+						void *platform_data,
+						struct device *parent);
 
 extern int of_platform_bus_probe(struct device_node *root,
 				 const struct of_device_id *matches,
 				 struct device *parent);
+
+extern const struct of_dev_auxdata *of_dev_lookup(
+					const struct of_dev_auxdata *lookup,
+					struct device_node *np);
 #ifdef CONFIG_OF_ADDRESS
 extern int of_platform_populate(struct device_node *root,
 				const struct of_device_id *matches,
