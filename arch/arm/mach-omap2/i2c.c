@@ -107,6 +107,7 @@ int omap_i2c_reset(struct omap_hwmod *oh)
 
 	return 0;
 }
+EXPORT_SYMBOL(omap_i2c_reset);
 
 static int __init omap_i2c_nr_ports(void)
 {
