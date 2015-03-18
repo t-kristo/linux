@@ -451,11 +451,102 @@ static void pdata_quirks_check(struct pdata_init *quirks)
 	}
 }
 
-void __init pdata_quirks_init(const struct of_device_id *omap_dt_match_table)
+struct bus_entry {
+	struct platform_device *dev;
+	struct device_node *bus;
+	struct list_head link;
+};
+
+static LIST_HEAD(bus_list);
+
+static struct platform_device *omap_pdata_bus_create(struct device_node *bus,
+			   const struct of_device_id *bus_match,
+			   struct device *parent)
 {
-	omap_sdrc_init(NULL, NULL);
+	const struct of_dev_auxdata *auxdata;
+	struct device_node *child;
+	struct platform_device *dev;
+	const char *oh_name;
+	const char *bus_id = NULL;
+	void *platform_data = NULL;
+	int i;
+	int count;
+
+	if (!of_get_property(bus, "compatible", NULL))
+		return NULL;
+
+	auxdata = of_dev_lookup(omap_auxdata_lookup, bus);
+	if (auxdata) {
+		bus_id = auxdata->name;
+		platform_data = auxdata->platform_data;
+	}
+
+	/* check hwmod availability */
+	count = of_property_count_strings(bus, "ti,hwmods");
+	for (i = 0; i < count; i++) {
+		of_property_read_string_index(bus, "ti,hwmods", i, &oh_name);
+		if (!omap_hwmod_lookup(oh_name)) {
+			pr_info("%s: hwmod %s not ready yet, skipping.\n",
+				__func__, oh_name);
+			return NULL;
+		}
+	}
+
+	dev = of_platform_device_create_pdata(bus, bus_id, platform_data,
+					      parent);
+
+	if (!dev || !of_match_node(bus_match, bus))
+		return NULL;
+
+	for_each_child_of_node(bus, child) {
+		omap_pdata_bus_create(child, bus_match, &dev->dev);
+	}
+
+	of_node_set_flag(bus, OF_POPULATED_BUS);
+
+	return dev;
+}
+
+void omap_pdata_quirks_init(const struct of_device_id *omap_dt_match_table)
+{
+	struct bus_entry *entry;
+	struct bus_entry *tmp;
+	struct device_node *child;
+
+	//omap_sdrc_init(NULL, NULL);
 	pdata_quirks_check(auxdata_quirks);
-	of_platform_populate(NULL, omap_dt_match_table,
-			     omap_auxdata_lookup, NULL);
+	//of_platform_populate(NULL, omap_dt_match_table,
+	//                   omap_auxdata_lookup, NULL);
+        
+	list_for_each_entry_safe(entry, tmp, &bus_list, link) {
+		for_each_child_of_node(entry->bus, child) {
+			omap_pdata_bus_create(child, omap_dt_match_table,
+					      &entry->dev->dev);
+		}
+
+		list_del(&entry->link);
+		kfree(entry);
+	}
+
 	pdata_quirks_check(pdata_quirks);
+}
+EXPORT_SYMBOL(omap_pdata_quirks_init);
+
+void omap_pdata_quirks_init_early(const struct of_device_id *bus_match)
+{
+	struct device_node *bus;
+	struct bus_entry *entry;
+	struct platform_device *dev;
+
+	//pdata_quirks_check(auxdata_quirks);
+
+	for_each_matching_node(bus, bus_match) {
+		dev = omap_pdata_bus_create(bus, bus_match, NULL);
+		entry = kzalloc(sizeof(*entry), GFP_KERNEL);
+		entry->bus = bus;
+		entry->dev = dev;
+		list_add(&entry->link, &bus_list);
+	}
+
+	//pdata_quirks_check(pdata_quirks);
 }
