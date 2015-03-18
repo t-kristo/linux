@@ -59,6 +59,7 @@ int omap2_wd_timer_disable(struct omap_hwmod *oh)
 
 	return 0;
 }
+EXPORT_SYMBOL(omap2_wd_timer_disable);
 
 /**
  * omap2_wdtimer_reset - reset and disable the WDTIMER IP block
@@ -102,6 +103,7 @@ int omap2_wd_timer_reset(struct omap_hwmod *oh)
 	return (c == MAX_MODULE_SOFTRESET_WAIT) ? -ETIMEDOUT :
 		omap2_wd_timer_disable(oh);
 }
+EXPORT_SYMBOL(omap2_wd_timer_reset);
 
 static int __init omap_init_wdt(void)
 {
