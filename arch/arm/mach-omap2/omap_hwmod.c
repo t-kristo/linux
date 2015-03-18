@@ -3234,6 +3234,11 @@ static void __init *memblock_alloc(int size)
 	return memblock_virt_alloc(size, 0);
 }
 
+static void *kzalloc_alloc(int size)
+{
+	return kzalloc(size, GFP_KERNEL);
+}
+
 /**
  * omap_hwmod_register_links - register an array of hwmod links
  * @ois: pointer to an array of omap_hwmod_ocp_if to register
@@ -3275,6 +3280,14 @@ int omap_hwmod_register_links(struct omap_hwmod_ocp_if **ois)
 
 	return 0;
 }
+
+int omap_hwmod_register_links_late(struct omap_hwmod_ocp_if **ois)
+{
+	soc_ops.memalloc = kzalloc_alloc;
+
+	return omap_hwmod_register_links(ois);
+}
+EXPORT_SYMBOL(omap_hwmod_register_links_late);
 
 /**
  * _ensure_mpu_hwmod_is_setup - ensure the MPU SS hwmod is init'ed and set up
@@ -3344,6 +3357,7 @@ int omap_hwmod_setup_all(void)
 	return 0;
 }
 omap_core_initcall(omap_hwmod_setup_all);
+EXPORT_SYMBOL(omap_hwmod_setup_all);
 
 /**
  * omap_hwmod_enable - enable an omap_hwmod
