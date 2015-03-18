@@ -2797,6 +2797,8 @@ static int _add_link(struct omap_hwmod_ocp_if *oi)
  */
 static int _register_link(struct omap_hwmod_ocp_if *oi)
 {
+	struct omap_hwmod *oh;
+
 	if (!oi || !oi->master || !oi->slave || !oi->user)
 		return -EINVAL;
 
