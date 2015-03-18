@@ -376,7 +376,7 @@ EXPORT_SYMBOL(omap_hwmod_init_postsetup);
 static void __init __maybe_unused omap_common_late_init(void)
 {
 	omap_mux_late_init();
-	omap2_common_pm_late_init();
+	//omap2_common_pm_late_init();
 	omap_soc_device_init();
 }
 
@@ -507,7 +507,7 @@ void __init am35xx_init_early(void)
 void __init omap3_init_late(void)
 {
 	omap_common_late_init();
-	omap3_pm_init();
+	//omap3_pm_init();
 	omap2_clk_enable_autoidle_all();
 }
 
