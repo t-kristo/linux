@@ -461,7 +461,7 @@ void __init omap3_init_early(void)
 	omap3xxx_voltagedomains_init();
 	omap3xxx_powerdomains_init();
 	omap3xxx_clockdomains_init();
-	omap3xxx_hwmod_init();
+	omap3xxx_hwmod_early_init();
 	omap_hwmod_init_postsetup();
 	if (!of_have_populated_dt()) {
 		omap3_prcm_legacy_iomaps_init();
