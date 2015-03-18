@@ -752,6 +752,11 @@ extern int ti81xx_hwmod_init(void);
 extern int dra7xx_hwmod_init(void);
 int am43xx_hwmod_init(void);
 
-extern int __init omap_hwmod_register_links(struct omap_hwmod_ocp_if **ois);
+int omap_hwmod_register_links(struct omap_hwmod_ocp_if **ois);
+int omap_hwmod_register_links_late(struct omap_hwmod_ocp_if **ios);
+
+int omap_hwmod_setup_all(void);
+
+void omap_hwmod_init_postsetup(void);
 
 #endif
