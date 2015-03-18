@@ -556,6 +556,7 @@ int omap_dss_reset(struct omap_hwmod *oh)
 
 	return r;
 }
+EXPORT_SYMBOL(omap_dss_reset);
 
 void __init omapdss_early_init_of(void)
 {
