@@ -193,6 +193,7 @@ struct omap_hwmod_soc_ops {
 	int (*init_clkdm)(struct omap_hwmod *oh);
 	void (*update_context_lost)(struct omap_hwmod *oh);
 	int (*get_context_lost)(struct omap_hwmod *oh);
+	void * (*memalloc)(int size);
 };
 
 /* soc_ops: adapts the omap_hwmod code to the currently-booted SoC */
@@ -2738,7 +2739,8 @@ static int __init _alloc_links(struct omap_hwmod_link **ml,
 	sz = sizeof(struct omap_hwmod_link) * LINKS_PER_OCP_IF;
 
 	*sl = NULL;
-	*ml = memblock_virt_alloc(sz, 0);
+
+	*ml = soc_ops.memalloc(sz);
 
 	*sl = (void *)(*ml) + sizeof(struct omap_hwmod_link);
 
@@ -2855,7 +2857,7 @@ static int __init _alloc_linkspace(struct omap_hwmod_ocp_if **ois)
 	pr_debug("omap_hwmod: %s: allocating %d byte linkspace (%d links)\n",
 		 __func__, sz, max_ls);
 
-	linkspace = memblock_virt_alloc(sz, 0);
+	linkspace = soc_ops.memalloc(sz);
 
 	return 0;
 }
@@ -3206,6 +3208,11 @@ int omap_hwmod_for_each(int (*fn)(struct omap_hwmod *oh, void *data),
 	}
 
 	return ret;
+}
+
+static void __init *memblock_alloc(int size)
+{
+	return memblock_virt_alloc(size, 0);
 }
 
 /**
@@ -3927,6 +3934,8 @@ void __init omap_hwmod_init(void)
 	} else {
 		WARN(1, "omap_hwmod: unknown SoC type\n");
 	}
+
+	soc_ops.memalloc = memblock_alloc;
 
 	inited = true;
 }
