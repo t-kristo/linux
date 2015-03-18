@@ -299,6 +299,15 @@ config OMAP4_ERRATA_I688
 	  In MPU case, L3 T2ASYNC FIFO and DDR T2ASYNC FIFO needs to be drained.
 	  IO barrier ensure that there is no synchronisation loss on initiators
 	  operating on both interconnect port simultaneously.
+
+config OMAP_HWMOD_DATA_MODULES
+	bool "OMAP hardware module data built to modules"
+	default n
+	help
+	  Select whether hwmod data shall be built as modules, or built
+	  in to kernel. By default, this option is n, which means all the
+	  hwmod data will be built-in to kernel image.
+
 endmenu
 
 endif
