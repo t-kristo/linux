@@ -153,7 +153,7 @@ static struct omap2_mcspi_device_config p54spi_mcspi_config = {
 	.turbo_mode	= 0,
 };
 
-static struct spi_board_info n800_spi_board_info[] __initdata = {
+static struct spi_board_info n800_spi_board_info[] = {
 	{
 		.modalias	= "p54spi",
 		.bus_num	= 2,
@@ -569,11 +569,11 @@ static int n8x0_menelaus_late_init(struct device *dev)
 }
 #endif
 
-struct menelaus_platform_data n8x0_menelaus_platform_data __initdata = {
+struct menelaus_platform_data n8x0_menelaus_platform_data = {
 	.late_init = n8x0_menelaus_late_init,
 };
 
-struct aic3x_pdata n810_aic33_data __initdata = {
+struct aic3x_pdata n810_aic33_data = {
 	.gpio_reset = 118,
 };
 
@@ -593,7 +593,7 @@ omap_late_initcall(n8x0_late_initcall);
  * Legacy init pdata init for n8x0. Note that we want to follow the
  * I2C bus numbering starting at 0 for device tree like other omaps.
  */
-void * __init n8x0_legacy_init(void)
+void * n8x0_legacy_init(void)
 {
 	board_check_revision();
 	spi_register_board_info(n800_spi_board_info,
