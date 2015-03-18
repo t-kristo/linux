@@ -218,7 +218,7 @@ static void of_dma_deconfigure(struct device *dev)
  * Returns pointer to created platform device, or NULL if a device was not
  * registered.  Unavailable devices will not get registered.
  */
-static struct platform_device *of_platform_device_create_pdata(
+struct platform_device *of_platform_device_create_pdata(
 					struct device_node *np,
 					const char *bus_id,
 					void *platform_data,
@@ -345,7 +345,7 @@ static struct amba_device *of_amba_device_create(struct device_node *node,
 /**
  * of_devname_lookup() - Given a device node, lookup the preferred Linux name
  */
-static const struct of_dev_auxdata *of_dev_lookup(const struct of_dev_auxdata *lookup,
+const struct of_dev_auxdata *of_dev_lookup(const struct of_dev_auxdata *lookup,
 				 struct device_node *np)
 {
 	struct resource res;
