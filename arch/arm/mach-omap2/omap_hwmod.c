@@ -2810,11 +2810,27 @@ static int __init _register_link(struct omap_hwmod_ocp_if *oi)
 	 * Register the connected hwmods, if they haven't been
 	 * registered already
 	 */
-	if (oi->master->_state != _HWMOD_STATE_REGISTERED)
-		_register(oi->master);
+	if (oi->master->_state != _HWMOD_STATE_REGISTERED) {
+		oh = _lookup(oi->master->name);
+		if (oh) {
+			pr_debug("%s: remapping %s to %08x\n", __func__,
+				 oh->name, (u32)oh);
+			oi->master = oh;
+		} else {
+			_register(oi->master);
+		}
+	}
 
-	if (oi->slave->_state != _HWMOD_STATE_REGISTERED)
-		_register(oi->slave);
+	if (oi->slave->_state != _HWMOD_STATE_REGISTERED) {
+		oh = _lookup(oi->slave->name);
+		if (oh) {
+			pr_debug("%s: remapping %s to %08x\n", __func__,
+				 oh->name, (u32)oh);
+			oi->slave = oh;
+		} else {
+			_register(oi->slave);
+		}
+	}
 
 	_add_link(oi);
 
