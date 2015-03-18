@@ -163,7 +163,7 @@ int omap_pm_get_dev_context_loss_count(struct device *dev)
 #endif
 
 /* Should be called before clk framework init */
-int __init omap_pm_if_early_init(void)
+int omap_pm_if_early_init(void)
 {
 	return 0;
 }

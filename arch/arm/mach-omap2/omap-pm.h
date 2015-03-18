@@ -40,7 +40,7 @@
  * framework starts.  The "_if_" is to avoid name collisions with the
  * PM idle-loop code.
  */
-int __init omap_pm_if_early_init(void);
+int omap_pm_if_early_init(void);
 
 /**
  * omap_pm_if_init - OMAP PM init code called after clock fw init
