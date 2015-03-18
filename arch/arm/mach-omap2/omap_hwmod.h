@@ -746,6 +746,7 @@ extern int omap_hwmod_aess_preprogram(struct omap_hwmod *oh);
  */
 extern int omap2420_hwmod_init(void);
 extern int omap2430_hwmod_init(void);
+int omap3xxx_hwmod_early_init(void);
 extern int omap3xxx_hwmod_init(void);
 extern int omap44xx_hwmod_init(void);
 extern int omap54xx_hwmod_init(void);
