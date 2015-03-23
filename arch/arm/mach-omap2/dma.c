@@ -225,12 +225,23 @@ static int __init omap2_system_dma_init_dev(struct omap_hwmod *oh, void *unused)
 	struct platform_device			*pdev;
 	struct omap_system_dma_plat_info	p;
 	struct omap_dma_dev_attr		*d;
-	struct resource				*mem;
+	struct resource				mem;
 	char					*name = "omap_dma_system";
+	int					r;
 
 	p = dma_plat_info;
 	p.dma_attr = (struct omap_dma_dev_attr *)oh->dev_attr;
 	p.errata = configure_dma_errata();
+
+	r = omap_hwmod_get_resource_byname(oh, IORESOURCE_MEM, NULL, &mem);
+	if (r)
+		return -ENXIO;
+
+	dma_base = ioremap(mem.start, mem.end - mem.start);
+	if (!dma_base) {
+		pr_err("%s: ioremap fail\n", __func__);
+		return -ENOMEM;
+	}
 
 	pdev = omap_device_build(name, 0, oh, &p, sizeof(p));
 	if (IS_ERR(pdev)) {
@@ -241,18 +252,6 @@ static int __init omap2_system_dma_init_dev(struct omap_hwmod *oh, void *unused)
 
 	omap_dma_dev_info.res = pdev->resource;
 	omap_dma_dev_info.num_res = pdev->num_resources;
-
-	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-	if (!mem) {
-		dev_err(&pdev->dev, "%s: no mem resource\n", __func__);
-		return -EINVAL;
-	}
-
-	dma_base = ioremap(mem->start, resource_size(mem));
-	if (!dma_base) {
-		dev_err(&pdev->dev, "%s: ioremap fail\n", __func__);
-		return -ENOMEM;
-	}
 
 	d = oh->dev_attr;
 
