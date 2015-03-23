@@ -517,7 +517,7 @@ void omap_pdata_quirks_init(const struct of_device_id *omap_dt_match_table)
 	pdata_quirks_check(auxdata_quirks);
 	//of_platform_populate(NULL, omap_dt_match_table,
 	//                   omap_auxdata_lookup, NULL);
-        
+
 	list_for_each_entry_safe(entry, tmp, &bus_list, link) {
 		for_each_child_of_node(entry->bus, child) {
 			omap_pdata_bus_create(child, omap_dt_match_table,
@@ -529,6 +529,8 @@ void omap_pdata_quirks_init(const struct of_device_id *omap_dt_match_table)
 	}
 
 	pdata_quirks_check(pdata_quirks);
+
+	omap2_system_dma_init();
 }
 EXPORT_SYMBOL(omap_pdata_quirks_init);
 
