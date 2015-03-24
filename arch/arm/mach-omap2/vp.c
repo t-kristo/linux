@@ -35,7 +35,7 @@ static u32 _vp_set_init_voltage(struct voltagedomain *voltdm, u32 volt)
 }
 
 /* Generic voltage init functions */
-void __init omap_vp_init(struct voltagedomain *voltdm)
+void omap_vp_init(struct voltagedomain *voltdm)
 {
 	struct omap_vp_instance *vp = voltdm->vp;
 	u32 val, sys_clk_rate, timeout, waittime;
