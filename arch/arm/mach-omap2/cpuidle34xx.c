@@ -323,7 +323,7 @@ static struct cpuidle_driver omap3_idle_driver = {
  * Registers the OMAP3 specific cpuidle driver to the cpuidle
  * framework with the valid set of states.
  */
-int __init omap3_idle_init(void)
+int omap3_idle_init(void)
 {
 	mpu_pd = pwrdm_lookup("mpu_pwrdm");
 	core_pd = pwrdm_lookup("core_pwrdm");
