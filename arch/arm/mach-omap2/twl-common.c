@@ -34,7 +34,7 @@
 #include "voltage.h"
 #include "mux.h"
 
-static struct i2c_board_info __initdata pmic_i2c_board_info = {
+static struct i2c_board_info pmic_i2c_board_info = {
 	.addr		= 0x48,
 	.flags		= I2C_CLIENT_WAKE,
 };
@@ -85,7 +85,7 @@ void __init omap4_pmic_init(const char *pmic_type,
 }
 #endif
 
-void __init omap_pmic_late_init(void)
+void omap_pmic_late_init(void)
 {
 	/* Init the OMAP TWL parameters (if PMIC has been registerd) */
 	if (!pmic_i2c_board_info.irq)
