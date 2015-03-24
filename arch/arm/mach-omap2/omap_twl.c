@@ -218,7 +218,7 @@ static struct omap_voltdm_pmic omap4_core_pmic = {
 	.uv_to_vsel		= twl6030_uv_to_vsel,
 };
 
-int __init omap4_twl_init(void)
+int omap4_twl_init(void)
 {
 	struct voltagedomain *voltdm;
 
@@ -237,7 +237,7 @@ int __init omap4_twl_init(void)
 	return 0;
 }
 
-int __init omap3_twl_init(void)
+int omap3_twl_init(void)
 {
 	struct voltagedomain *voltdm;
 
