@@ -538,11 +538,13 @@ void omap_pdata_quirks_init(const struct of_device_id *omap_dt_match_table)
 }
 EXPORT_SYMBOL(omap_pdata_quirks_init);
 
-void omap_pdata_quirks_init_early(const struct of_device_id *bus_match)
+void __init omap_pdata_quirks_init_early(const struct of_device_id *bus_match)
 {
 	struct device_node *bus;
 	struct bus_entry *entry;
 	struct platform_device *dev;
+
+	omap_sdrc_init(NULL, NULL);
 
 	//pdata_quirks_check(auxdata_quirks);
 
