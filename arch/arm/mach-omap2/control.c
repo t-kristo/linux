@@ -602,7 +602,7 @@ static void __init omap3_ctrl_setup_d2d_padconf(void)
  * Initializes system control module. This sets up the sysconfig autoidle,
  * and sets up modem and iva2 so that they can be idled properly.
  */
-void __init omap3_ctrl_init(void)
+void omap3_ctrl_init(void)
 {
 	omap_ctrl_writel(OMAP3430_AUTOIDLE_MASK, OMAP2_CONTROL_SYSCONFIG);
 
