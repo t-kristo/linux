@@ -513,6 +513,8 @@ void omap_pdata_quirks_init(const struct of_device_id *omap_dt_match_table)
 	struct bus_entry *tmp;
 	struct device_node *child;
 
+	omapdss_early_init_of();
+
 	//omap_sdrc_init(NULL, NULL);
 	pdata_quirks_check(auxdata_quirks);
 	//of_platform_populate(NULL, omap_dt_match_table,
@@ -531,6 +533,8 @@ void omap_pdata_quirks_init(const struct of_device_id *omap_dt_match_table)
 	pdata_quirks_check(pdata_quirks);
 
 	omap2_system_dma_init();
+
+	omapdss_init_of();
 }
 EXPORT_SYMBOL(omap_pdata_quirks_init);
 
