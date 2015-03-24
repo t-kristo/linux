@@ -230,7 +230,7 @@ int omap_voltage_register_pmic(struct voltagedomain *voltdm,
  * system boot to init the voltage controller and
  * voltage processors.
  */
-int __init omap_voltage_late_init(void)
+int omap_voltage_late_init(void)
 {
 	struct voltagedomain *voltdm;
 
