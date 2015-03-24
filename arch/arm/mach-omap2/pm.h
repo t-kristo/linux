@@ -16,8 +16,8 @@
 #include "powerdomain.h"
 
 #ifdef CONFIG_CPU_IDLE
-extern int __init omap3_idle_init(void);
-extern int __init omap4_idle_init(void);
+extern int omap3_idle_init(void);
+extern int omap4_idle_init(void);
 #else
 static inline int omap3_idle_init(void)
 {
