@@ -32,8 +32,8 @@
 static bool sr_enable_on_init;
 
 /* Read EFUSE values from control registers for OMAP3430 */
-static void __init sr_set_nvalues(struct omap_volt_data *volt_data,
-				struct omap_sr_data *sr_data)
+static void sr_set_nvalues(struct omap_volt_data *volt_data,
+			   struct omap_sr_data *sr_data)
 {
 	struct omap_sr_nvalue_table *nvalue_table;
 	int i, j, count = 0;
@@ -93,7 +93,7 @@ static void __init sr_set_nvalues(struct omap_volt_data *volt_data,
 	sr_data->nvalue_count = j;
 }
 
-static int __init sr_dev_init(struct omap_hwmod *oh, void *user)
+static int sr_dev_init(struct omap_hwmod *oh, void *user)
 {
 	struct omap_sr_data *sr_data;
 	struct platform_device *pdev;
@@ -171,7 +171,7 @@ void __init omap_enable_smartreflex_on_init(void)
 	sr_enable_on_init = true;
 }
 
-int __init omap_devinit_smartreflex(void)
+int omap_devinit_smartreflex(void)
 {
 	return omap_hwmod_for_each_by_class("smartreflex", sr_dev_init, NULL);
 }
