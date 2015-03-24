@@ -346,12 +346,12 @@ static struct platform_device omap_vout_device = {
 	.id		= -1,
 };
 
-int __init omap_init_vout(void)
+int omap_init_vout(void)
 {
 	return platform_device_register(&omap_vout_device);
 }
 #else
-int __init omap_init_vout(void) { return 0; }
+int omap_init_vout(void) { return 0; }
 #endif
 
 /*-------------------------------------------------------------------------*/
