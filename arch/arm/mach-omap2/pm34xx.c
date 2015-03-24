@@ -408,7 +408,7 @@ int omap3_pm_set_suspend_state(struct powerdomain *pwrdm, int state)
 	return -EINVAL;
 }
 
-static int __init pwrdms_setup(struct powerdomain *pwrdm, void *unused)
+static int pwrdms_setup(struct powerdomain *pwrdm, void *unused)
 {
 	struct power_state *pwrst;
 
@@ -458,7 +458,7 @@ static void __init pm_errata_configure(void)
 	}
 }
 
-int __init omap3_pm_init(void)
+int omap3_pm_init(void)
 {
 	struct power_state *pwrst, *tmp;
 	struct clockdomain *neon_clkdm, *mpu_clkdm, *per_clkdm, *wkup_clkdm;
