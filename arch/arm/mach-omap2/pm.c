@@ -108,7 +108,7 @@ static void __init omap2_init_processor_devices(void)
 	}
 }
 
-int __init omap_pm_clkdms_setup(struct clockdomain *clkdm, void *unused)
+int omap_pm_clkdms_setup(struct clockdomain *clkdm, void *unused)
 {
 	/* XXX The usecount test is racy */
 	if ((clkdm->flags & CLKDM_CAN_ENABLE_AUTO) &&
@@ -128,7 +128,7 @@ int __init omap_pm_clkdms_setup(struct clockdomain *clkdm, void *unused)
  * opp entry and sets the voltage domain to the voltage specified
  * in the opp entry
  */
-static int __init omap2_set_init_voltage(char *vdd_name, char *clk_name,
+static int omap2_set_init_voltage(char *vdd_name, char *clk_name,
 					 const char *oh_name)
 {
 	struct voltagedomain *voltdm;
@@ -296,7 +296,7 @@ static int __init omap2_common_pm_init(void)
 }
 omap_postcore_initcall(omap2_common_pm_init);
 
-int __init omap2_common_pm_late_init(void)
+int omap2_common_pm_late_init(void)
 {
 	if (of_have_populated_dt()) {
 		omap3_twl_init();
