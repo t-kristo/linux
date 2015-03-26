@@ -534,12 +534,16 @@ void omap_pdata_quirks_init(const struct of_device_id *omap_dt_match_table)
 
 	pdata_quirks_check(pdata_quirks);
 
+	omapdss_init_of();
+
+#ifdef CONFIG_OMAP_HWMOD_DATA_MODULES
 	omap2_common_pm_late_init();
 
 	if (cpu_is_omap34xx())
 		omap3_pm_init();
 
-	omapdss_init_of();
+	omap2_clk_enable_autoidle_all();
+#endif
 }
 EXPORT_SYMBOL(omap_pdata_quirks_init);
 

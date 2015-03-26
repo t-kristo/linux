@@ -3607,7 +3607,7 @@ static int __init omap3_hwmod_data_driver_init(void)
 	/*return platform_driver_probe(&omap3_hwmod_data_driver,
 				     omap3_hwmod_data_probe);*/
 }
-module_init(omap3_hwmod_data_driver_init);
+arch_initcall(omap3_hwmod_data_driver_init);
 
 static void __exit omap3_hwmod_data_driver_exit(void)
 {
