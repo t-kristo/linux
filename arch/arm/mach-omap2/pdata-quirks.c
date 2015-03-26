@@ -515,6 +515,8 @@ void omap_pdata_quirks_init(const struct of_device_id *omap_dt_match_table)
 
 	omapdss_early_init_of();
 
+	omap2_system_dma_init();
+
 	//omap_sdrc_init(NULL, NULL);
 	pdata_quirks_check(auxdata_quirks);
 	//of_platform_populate(NULL, omap_dt_match_table,
@@ -531,8 +533,6 @@ void omap_pdata_quirks_init(const struct of_device_id *omap_dt_match_table)
 	}
 
 	pdata_quirks_check(pdata_quirks);
-
-	omap2_system_dma_init();
 
 	omap2_common_pm_late_init();
 
