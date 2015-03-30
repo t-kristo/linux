@@ -254,7 +254,7 @@ err:
 	return ERR_PTR(r);
 }
 
-static enum omapdss_version __init omap_display_get_version(void)
+static enum omapdss_version omap_display_get_version(void)
 {
 	if (cpu_is_omap24xx())
 		return OMAPDSS_VER_OMAP24xx;
@@ -557,12 +557,12 @@ int omap_dss_reset(struct omap_hwmod *oh)
 	return r;
 }
 
-void __init omapdss_early_init_of(void)
+void omapdss_early_init_of(void)
 {
 
 }
 
-struct device_node * __init omapdss_find_dss_of_node(void)
+struct device_node *omapdss_find_dss_of_node(void)
 {
 	struct device_node *node;
 
@@ -585,7 +585,7 @@ struct device_node * __init omapdss_find_dss_of_node(void)
 	return NULL;
 }
 
-int __init omapdss_init_of(void)
+int omapdss_init_of(void)
 {
 	int r;
 	enum omapdss_version ver;
