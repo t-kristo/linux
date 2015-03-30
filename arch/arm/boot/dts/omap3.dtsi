@@ -79,13 +79,17 @@
 	 * hierarchy.
 	 */
 	ocp {
-		compatible = "ti,omap3-l3-smx", "simple-bus";
-		reg = <0x68000000 0x10000>;
-		interrupts = <9 10>;
+		compatible = "simple-bus", "ti,omap3-l3";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
-		ti,hwmods = "l3_main";
+
+		l3_smx: l3_smx@68000000 {
+			compatible = "ti,omap3-l3-smx";
+			reg = <0x68000000 0x10000>;
+			interrupts = <9 10>;
+			ti,hwmods = "l3_main";
+		};
 
 		aes: aes@480c5000 {
 			compatible = "ti,omap3-aes";
