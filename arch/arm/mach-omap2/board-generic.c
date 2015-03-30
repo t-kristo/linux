@@ -42,6 +42,11 @@ static void __init omap_generic_init(void)
 	omapdss_init_of();
 }
 
+static void __init __maybe_unused omap_generic_modular_init(void)
+{
+	omap_pdata_quirks_early_init(omap_dt_match_table);
+}
+
 #ifdef CONFIG_SOC_OMAP2420
 static const char *const omap242x_boards_compat[] __initconst = {
 	"ti,omap2420",
