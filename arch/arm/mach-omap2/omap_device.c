@@ -507,10 +507,10 @@ void omap_device_delete(struct omap_device *od)
  * information.  Returns ERR_PTR(-EINVAL) if @oh is NULL; otherwise,
  * passes along the return value of omap_device_build_ss().
  */
-struct platform_device __init *omap_device_build(const char *pdev_name,
-						 int pdev_id,
-						 struct omap_hwmod *oh,
-						 void *pdata, int pdata_len)
+struct platform_device *omap_device_build(const char *pdev_name,
+					  int pdev_id,
+					  struct omap_hwmod *oh,
+					  void *pdata, int pdata_len)
 {
 	struct omap_hwmod *ohs[] = { oh };
 
@@ -535,11 +535,11 @@ struct platform_device __init *omap_device_build(const char *pdev_name,
  * platform_device record.  Returns an ERR_PTR() on error, or passes
  * along the return value of omap_device_register().
  */
-struct platform_device __init *omap_device_build_ss(const char *pdev_name,
-						    int pdev_id,
-						    struct omap_hwmod **ohs,
-						    int oh_cnt, void *pdata,
-						    int pdata_len)
+struct platform_device *omap_device_build_ss(const char *pdev_name,
+					     int pdev_id,
+					     struct omap_hwmod **ohs,
+					     int oh_cnt, void *pdata,
+					     int pdata_len)
 {
 	int ret = -ENOMEM;
 	struct platform_device *pdev;
