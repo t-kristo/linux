@@ -351,26 +351,6 @@ static int __init _omap2_init_reprogram_sdrc(void)
 	return v;
 }
 
-static int _set_hwmod_postsetup_state(struct omap_hwmod *oh, void *data)
-{
-	return omap_hwmod_set_postsetup_state(oh, *(u8 *)data);
-}
-
-static void __init omap_hwmod_init_postsetup(void)
-{
-	u8 postsetup_state;
-
-	/* Set the default postsetup state for all hwmods */
-#ifdef CONFIG_PM
-	postsetup_state = _HWMOD_STATE_IDLE;
-#else
-	postsetup_state = _HWMOD_STATE_ENABLED;
-#endif
-	omap_hwmod_for_each(_set_hwmod_postsetup_state, &postsetup_state);
-
-	omap_pm_if_early_init();
-}
-
 static void __init __maybe_unused omap_common_late_init(void)
 {
 	omap_mux_late_init();

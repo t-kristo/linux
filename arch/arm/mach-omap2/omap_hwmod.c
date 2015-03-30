@@ -3879,6 +3879,44 @@ ohsps_unlock:
 }
 
 /**
+ * _set_hwmod_postsetup_state - set postsetup state for a single hwmod
+ * @oh: hwmod to set postsetup state for
+ * @data: postsetup state
+ *
+ * Wrapper function for setting the postsetup state for a single hwmod.
+ * Forces return value to zero, so that we don't bail out with an error
+ * value returned from omap_hwmod_set_postsetup_state(); with hwmod data
+ * split to module + early init portions, the postsetup init will be
+ * called twice for some hwmods, but we still want to setup the state for
+ * all and not abort with the first hwmod complaining about its postsetup
+ * state being set already. Returns 0 always.
+ */
+static int _set_hwmod_postsetup_state(struct omap_hwmod *oh, void *data)
+{
+	omap_hwmod_set_postsetup_state(oh, *(u8 *)data);
+	return 0;
+}
+
+/**
+ * omap_hwmod_init_postsetup - initialize postsetup state for all hwmods
+ *
+ * Sets the hwmod postsetup state for all hwmods based on PM configuration.
+ */
+void omap_hwmod_init_postsetup(void)
+{
+	u8 postsetup_state;
+
+	/* Set the default postsetup state for all hwmods */
+#ifdef CONFIG_PM
+	postsetup_state = _HWMOD_STATE_IDLE;
+#else
+	postsetup_state = _HWMOD_STATE_ENABLED;
+#endif
+	omap_hwmod_for_each(_set_hwmod_postsetup_state, &postsetup_state);
+}
+EXPORT_SYMBOL(omap_hwmod_init_postsetup);
+
+/**
  * omap_hwmod_get_context_loss_count - get lost context count
  * @oh: struct omap_hwmod *
  *
