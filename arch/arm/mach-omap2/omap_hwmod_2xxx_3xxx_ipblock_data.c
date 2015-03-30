@@ -275,7 +275,7 @@ struct omap_hwmod_class_sysconfig omap2_hdq1w_sysc = {
 struct omap_hwmod_class omap2_hdq1w_class = {
 	.name	= "hdq1w",
 	.sysc	= &omap2_hdq1w_sysc,
-	.reset	= &omap_hdq1w_reset,
+	//.reset	= &omap_hdq1w_reset,
 };
 
 struct omap_hwmod_irq_info omap2_hdq1w_mpu_irqs[] = {
