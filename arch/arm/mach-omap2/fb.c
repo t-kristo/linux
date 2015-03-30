@@ -65,7 +65,7 @@ static const struct resource omap3_vrfb_resources[] = {
 	DEFINE_RES_MEM_NAMED(0xfc000000u, 0x4000000, "vrfb-area-11"),
 };
 
-int __init omap_init_vrfb(void)
+int omap_init_vrfb(void)
 {
 	struct platform_device *pdev;
 	const struct resource *res;
@@ -87,7 +87,7 @@ int __init omap_init_vrfb(void)
 	return PTR_RET(pdev);
 }
 #else
-int __init omap_init_vrfb(void) { return 0; }
+int omap_init_vrfb(void) { return 0; }
 #endif
 
 #if defined(CONFIG_FB_OMAP2) || defined(CONFIG_FB_OMAP2_MODULE)
@@ -106,10 +106,10 @@ static struct platform_device omap_fb_device = {
 	.num_resources = 0,
 };
 
-int __init omap_init_fb(void)
+int omap_init_fb(void)
 {
 	return platform_device_register(&omap_fb_device);
 }
 #else
-int __init omap_init_fb(void) { return 0; }
+int omap_init_fb(void) { return 0; }
 #endif

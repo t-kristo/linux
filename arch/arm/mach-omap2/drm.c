@@ -41,7 +41,7 @@ static struct platform_device omap_drm_device = {
 	.id = 0,
 };
 
-int __init omap_init_drm(void)
+int omap_init_drm(void)
 {
 	platform_data.omaprev = GET_OMAP_TYPE;
 
@@ -49,5 +49,5 @@ int __init omap_init_drm(void)
 
 }
 #else
-int __init omap_init_drm(void) { return 0; }
+int omap_init_drm(void) { return 0; }
 #endif
