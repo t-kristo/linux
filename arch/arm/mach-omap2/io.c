@@ -487,8 +487,10 @@ void __init am35xx_init_early(void)
 void __init omap3_init_late(void)
 {
 	omap_common_late_init();
+#ifndef CONFIG_OMAP_HWMOD_DATA_MODULES
 	omap3_pm_init();
 	omap2_clk_enable_autoidle_all();
+#endif
 }
 
 void __init omap3430_init_late(void)
