@@ -354,7 +354,9 @@ static int __init _omap2_init_reprogram_sdrc(void)
 static void __init __maybe_unused omap_common_late_init(void)
 {
 	omap_mux_late_init();
+#ifndef CONFIG_OMAP_HWMOD_DATA_MODULES
 	omap2_common_pm_late_init();
+#endif
 	omap_soc_device_init();
 }
 
