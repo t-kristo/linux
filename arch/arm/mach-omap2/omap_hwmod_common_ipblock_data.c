@@ -30,7 +30,7 @@ static struct omap_hwmod_class_sysconfig omap2_dss_sysc = {
 struct omap_hwmod_class omap2_dss_hwmod_class = {
 	.name	= "dss",
 	.sysc	= &omap2_dss_sysc,
-	.reset	= omap_dss_reset,
+	//.reset	= omap_dss_reset,
 };
 
 /*
