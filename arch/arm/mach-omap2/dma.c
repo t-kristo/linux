@@ -204,7 +204,7 @@ static unsigned configure_dma_errata(void)
 	return errata;
 }
 
-static struct omap_system_dma_plat_info dma_plat_info __initdata = {
+static struct omap_system_dma_plat_info dma_plat_info = {
 	.reg_map	= reg_map,
 	.channel_stride	= 0x60,
 	.show_dma_caps	= omap2_show_dma_caps,
@@ -220,7 +220,7 @@ static struct platform_device_info omap_dma_dev_info = {
 };
 
 /* One time initializations */
-static int __init omap2_system_dma_init_dev(struct omap_hwmod *oh, void *unused)
+static int omap2_system_dma_init_dev(struct omap_hwmod *oh, void *unused)
 {
 	struct platform_device			*pdev;
 	struct omap_system_dma_plat_info	p;
@@ -270,7 +270,7 @@ static int __init omap2_system_dma_init_dev(struct omap_hwmod *oh, void *unused)
 	return 0;
 }
 
-static int __init omap2_system_dma_init(void)
+int omap2_system_dma_init(void)
 {
 	struct platform_device *pdev;
 	int res;

@@ -324,5 +324,7 @@ int omap_clk_init(void);
 int omapdss_init_of(void);
 void omapdss_early_init_of(void);
 
+void omap2_system_dma_init(void);
+
 #endif /* __ASSEMBLER__ */
 #endif /* __ARCH_ARM_MACH_OMAP2PLUS_COMMON_H */
