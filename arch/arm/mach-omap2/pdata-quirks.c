@@ -27,6 +27,8 @@
 #include "omap-secure.h"
 #include "soc.h"
 #include "clock.h"
+#include "hdq1w.h"
+#include "wd_timer.h"
 
 struct pdata_init {
 	const char *compatible;
@@ -335,6 +337,14 @@ void omap_pcs_legacy_init(int irq, void (*rearm)(void))
 	pcs_pdata.rearm = rearm;
 }
 
+static void *omap3_hwmod_pointers[] = {
+	[OMAP3_HWMOD_PTR_DSS_RESET] = omap_dss_reset,
+	[OMAP3_HWMOD_PTR_HDQ1W_RESET] = omap_hdq1w_reset,
+	[OMAP3_HWMOD_PTR_I2C_RESET] = omap_i2c_reset,
+	[OMAP3_HWMOD_PTR_WD_TIMER_DIS] = omap2_wd_timer_disable,
+	[OMAP3_HWMOD_PTR_WD_TIMER_RESET] = omap2_wd_timer_reset,
+};
+
 /*
  * GPIOs for TWL are initialized by the I2C bus and need custom
  * handing until DSS has device tree bindings.
@@ -378,6 +388,7 @@ struct of_dev_auxdata omap_auxdata_lookup[] = {
 	OF_DEV_AUXDATA("ti,omap3-padconf", 0x48002a00, "48002a00.pinmux", &pcs_pdata),
 	OF_DEV_AUXDATA("ti,omap2-iommu", 0x5d000000, "5d000000.mmu",
 		       &omap3_iommu_pdata),
+	OF_DEV_AUXDATA("ti,omap3-l3", 0x0, "ocp", &omap3_hwmod_pointers),
 	/* Only on am3517 */
 	OF_DEV_AUXDATA("ti,davinci_mdio", 0x5c030000, "davinci_mdio.0", NULL),
 	OF_DEV_AUXDATA("ti,am3517-emac", 0x5c000000, "davinci_emac.0",

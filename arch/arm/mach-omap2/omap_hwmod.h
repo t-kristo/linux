@@ -691,6 +691,14 @@ struct omap_hwmod {
 	struct omap_hwmod		*parent_hwmod;
 };
 
+enum {
+	OMAP3_HWMOD_PTR_DSS_RESET = 0,
+	OMAP3_HWMOD_PTR_HDQ1W_RESET,
+	OMAP3_HWMOD_PTR_I2C_RESET,
+	OMAP3_HWMOD_PTR_WD_TIMER_DIS,
+	OMAP3_HWMOD_PTR_WD_TIMER_RESET,
+};
+
 struct omap_hwmod *omap_hwmod_lookup(const char *name);
 int omap_hwmod_for_each(int (*fn)(struct omap_hwmod *oh, void *data),
 			void *data);
