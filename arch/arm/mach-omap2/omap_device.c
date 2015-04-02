@@ -197,6 +197,8 @@ static int _omap_device_notifier_call(struct notifier_block *nb,
 	struct platform_device *pdev = to_platform_device(dev);
 	struct omap_device *od;
 
+	pr_info("%s: %s: %d\n", __func__, dev_name(dev), event);
+
 	switch (event) {
 	case BUS_NOTIFY_DEL_DEVICE:
 		if (pdev->archdata.od)
