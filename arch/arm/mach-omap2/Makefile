@@ -233,6 +233,7 @@ obj-$(CONFIG_SOC_DRA7XX)		+= omap_hwmod_7xx_data.o
 
 ifeq ($(CONFIG_OMAP_HWMOD_DATA_MODULES),)
 obj-$(CONFIG_ARCH_OMAP3)		+= omap_hwmod_3xxx_late_data.o
+obj-$(CONFIG_SOC_AM33XX)		+= omap_hwmod_33xx_late_data.o
 else
 obj-m					+= omap_hwmod_3xxx_data.o
 omap_hwmod_3xxx_data-objs := \
@@ -241,6 +242,9 @@ omap_hwmod_3xxx_data-objs := \
 	omap_hwmod_2xxx_3xxx_ipblock_data.o \
 	omap_hwmod_2xxx_3xxx_interconnect_data.o \
 	omap_hwmod_3xxx_late_data.o
+obj-m					+= omap_hwmod_33xx_data.o
+omap_hwmod_33xx_data-objs := \
+	omap_hwmod_33xx_late_data.o
 endif
 
 # EMU peripherals

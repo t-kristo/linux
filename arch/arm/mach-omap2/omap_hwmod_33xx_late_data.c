@@ -19,6 +19,8 @@
 #include "omap_hwmod.h"
 #include <linux/platform_data/gpio-omap.h>
 #include <linux/platform_data/spi-omap2-mcspi.h>
+#include <linux/module.h>
+#include <linux/platform_device.h>
 
 #include "omap_hwmod_common_data.h"
 
@@ -482,22 +484,6 @@ static struct omap_hwmod_ocp_if am33xx_l3_main__lcdc = {
 	.user		= OCP_USER_MPU,
 };
 
-/* l4 wkup -> timer1 */
-static struct omap_hwmod_ocp_if am33xx_l4_wkup__timer1 = {
-	.master		= &am33xx_l4_wkup_hwmod,
-	.slave		= &am33xx_timer1_hwmod,
-	.clk		= "dpll_core_m4_div2_ck",
-	.user		= OCP_USER_MPU,
-};
-
-/* l4 wkup -> uart1 */
-static struct omap_hwmod_ocp_if am33xx_l4_wkup__uart1 = {
-	.master		= &am33xx_l4_wkup_hwmod,
-	.slave		= &am33xx_uart1_hwmod,
-	.clk		= "dpll_core_m4_div2_ck",
-	.user		= OCP_USER_MPU,
-};
-
 /* l4 wkup -> wd_timer1 */
 static struct omap_hwmod_ocp_if am33xx_l4_wkup__wd_timer1 = {
 	.master		= &am33xx_l4_wkup_hwmod,
@@ -553,7 +539,6 @@ static struct omap_hwmod_ocp_if am33xx_l4_per__rng = {
 
 static struct omap_hwmod_ocp_if *am33xx_hwmod_ocp_ifs[] __initdata = {
 	&am33xx_l3_main__emif,
-	&am33xx_mpu__l3_main,
 	&am33xx_mpu__prcm,
 	&am33xx_l3_s__l4_ls,
 	&am33xx_l3_s__l4_wkup,
@@ -570,8 +555,6 @@ static struct omap_hwmod_ocp_if *am33xx_hwmod_ocp_ifs[] __initdata = {
 	&am33xx_l4_wkup__control,
 	&am33xx_l4_wkup__smartreflex0,
 	&am33xx_l4_wkup__smartreflex1,
-	&am33xx_l4_wkup__uart1,
-	&am33xx_l4_wkup__timer1,
 	&am33xx_l4_wkup__rtc,
 	&am33xx_l4_wkup__i2c1,
 	&am33xx_l4_wkup__gpio0,
@@ -591,18 +574,12 @@ static struct omap_hwmod_ocp_if *am33xx_hwmod_ocp_ifs[] __initdata = {
 	&am33xx_l4_ls__mmc0,
 	&am33xx_l4_ls__mmc1,
 	&am33xx_l3_s__mmc2,
-	&am33xx_l4_ls__timer2,
 	&am33xx_l4_ls__timer3,
 	&am33xx_l4_ls__timer4,
 	&am33xx_l4_ls__timer5,
 	&am33xx_l4_ls__timer6,
 	&am33xx_l4_ls__timer7,
 	&am33xx_l3_main__tpcc,
-	&am33xx_l4_ls__uart2,
-	&am33xx_l4_ls__uart3,
-	&am33xx_l4_ls__uart4,
-	&am33xx_l4_ls__uart5,
-	&am33xx_l4_ls__uart6,
 	&am33xx_l4_ls__spinlock,
 	&am33xx_l4_ls__elm,
 	&am33xx_l4_ls__epwmss0,
@@ -637,6 +614,74 @@ static struct omap_hwmod_ocp_if *am33xx_hwmod_ocp_ifs[] __initdata = {
 int __init am33xx_hwmod_init(void)
 {
 	omap_hwmod_am33xx_reg();
-	omap_hwmod_init();
-	return omap_hwmod_register_links(am33xx_hwmod_ocp_ifs);
+	return omap_hwmod_register_links_late(am33xx_hwmod_ocp_ifs);
 }
+
+static const struct of_device_id am33xx_hwmod_data_match[] = {
+	{ .compatible = "ti,am3-l3" },
+	{ },
+};
+
+static int __init am33xx_hwmod_data_probe(struct platform_device *pdev)
+{
+	void **hwmod_ptrs;
+
+	hwmod_ptrs = dev_get_platdata(&pdev->dev);
+
+	/*omap2_dss_hwmod_class.reset = hwmod_ptrs[OMAP3_HWMOD_PTR_DSS_RESET];
+        omap2_hdq1w_class.reset = hwmod_ptrs[OMAP3_HWMOD_PTR_HDQ1W_RESET];
+        i2c_class.reset = hwmod_ptrs[OMAP3_HWMOD_PTR_I2C_RESET];
+        omap3xxx_wd_timer_hwmod_class.pre_shutdown =
+                hwmod_ptrs[OMAP3_HWMOD_PTR_WD_TIMER_DIS];
+        omap3xxx_wd_timer_hwmod_class.reset =
+                hwmod_ptrs[OMAP3_HWMOD_PTR_WD_TIMER_RESET];*/
+
+	pr_info("am33xx_hwmod_init()\n");
+
+	am33xx_hwmod_init();
+
+	omap_hwmod_init_postsetup();
+
+	pr_info("omap_hwmod_setup_all()\n");
+
+	omap_hwmod_setup_all();
+
+	pr_info("pdata_quirks_init()\n");
+
+	omap_pdata_quirks_late_init(am33xx_hwmod_data_match);
+
+	return 0;
+}
+
+static int am33xx_hwmod_data_remove(struct platform_device *pdev)
+{
+	return -EBUSY;
+}
+
+MODULE_DEVICE_TABLE(of, am33xx_hwmod_data_match);
+
+static struct platform_driver am33xx_hwmod_data_driver = {
+	.remove = am33xx_hwmod_data_remove,
+	.driver = {
+		.name = "am33xx-hwmod-data",
+		.of_match_table = am33xx_hwmod_data_match,
+	},
+};
+
+static int __init am33xx_hwmod_data_driver_init(void)
+{
+	return platform_driver_probe(&am33xx_hwmod_data_driver,
+				     am33xx_hwmod_data_probe);
+}
+arch_initcall(am33xx_hwmod_data_driver_init);
+
+static void __exit am33xx_hwmod_data_driver_exit(void)
+{
+	platform_driver_unregister(&am33xx_hwmod_data_driver);
+}
+module_exit(am33xx_hwmod_data_driver_exit);
+
+MODULE_ALIAS("platform:am33xx-hwmod-data");
+MODULE_AUTHOR("Tero Kristo <t-kristo@ti.com");
+MODULE_DESCRIPTION("AM33xx hwmod data driver");
+MODULE_LICENSE("GPL v2");
