@@ -153,6 +153,8 @@ extern struct omap_hwmod_class am33xx_timer_hwmod_class;
 extern struct omap_hwmod_class am33xx_epwmss_hwmod_class;
 extern struct omap_hwmod_class am33xx_ehrpwm_hwmod_class;
 extern struct omap_hwmod_class am33xx_spi_hwmod_class;
+extern struct omap_hwmod_class am33xx_i2c_class;
+extern struct omap_hwmod_class am33xx_wd_timer_hwmod_class;
 
 extern struct omap_gpio_dev_attr gpio_dev_attr;
 extern struct omap2_mcspi_dev_attr mcspi_attrib;

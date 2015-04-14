@@ -689,11 +689,11 @@ static struct omap_hwmod_class_sysconfig am33xx_i2c_sysc = {
 	.sysc_fields	= &omap_hwmod_sysc_type1,
 };
 
-static struct omap_hwmod_class i2c_class = {
+struct omap_hwmod_class am33xx_i2c_class = {
 	.name		= "i2c",
 	.sysc		= &am33xx_i2c_sysc,
 	.rev		= OMAP_I2C_IP_VERSION_2,
-	.reset		= &omap_i2c_reset,
+	.reset		= NULL, /* omap_i2c_reset */
 };
 
 static struct omap_i2c_dev_attr i2c_dev_attr = {
@@ -703,7 +703,7 @@ static struct omap_i2c_dev_attr i2c_dev_attr = {
 /* i2c1 */
 struct omap_hwmod am33xx_i2c1_hwmod = {
 	.name		= "i2c1",
-	.class		= &i2c_class,
+	.class		= &am33xx_i2c_class,
 	.clkdm_name	= "l4_wkup_clkdm",
 	.flags		= HWMOD_16BIT_REG | HWMOD_SET_DEFAULT_CLOCKACT,
 	.main_clk	= "dpll_per_m2_div4_wkupdm_ck",
@@ -718,7 +718,7 @@ struct omap_hwmod am33xx_i2c1_hwmod = {
 /* i2c1 */
 struct omap_hwmod am33xx_i2c2_hwmod = {
 	.name		= "i2c2",
-	.class		= &i2c_class,
+	.class		= &am33xx_i2c_class,
 	.clkdm_name	= "l4ls_clkdm",
 	.flags		= HWMOD_16BIT_REG | HWMOD_SET_DEFAULT_CLOCKACT,
 	.main_clk	= "dpll_per_m2_div4_ck",
@@ -733,7 +733,7 @@ struct omap_hwmod am33xx_i2c2_hwmod = {
 /* i2c3 */
 struct omap_hwmod am33xx_i2c3_hwmod = {
 	.name		= "i2c3",
-	.class		= &i2c_class,
+	.class		= &am33xx_i2c_class,
 	.clkdm_name	= "l4ls_clkdm",
 	.flags		= HWMOD_16BIT_REG | HWMOD_SET_DEFAULT_CLOCKACT,
 	.main_clk	= "dpll_per_m2_div4_ck",
@@ -1300,10 +1300,10 @@ static struct omap_hwmod_class_sysconfig wdt_sysc = {
 	.sysc_fields	= &omap_hwmod_sysc_type1,
 };
 
-static struct omap_hwmod_class am33xx_wd_timer_hwmod_class = {
+struct omap_hwmod_class am33xx_wd_timer_hwmod_class = {
 	.name		= "wd_timer",
 	.sysc		= &wdt_sysc,
-	.pre_shutdown	= &omap2_wd_timer_disable,
+	.pre_shutdown	= NULL /* omap2_wd_timer_disable */
 };
 
 /*
