@@ -57,32 +57,36 @@
 		cache-level = <2>;
 	};
 
-	am43xx_control_module: control_module@4a002000 {
-		compatible = "syscon";
-		reg = <0x44e10000 0x7f4>;
-	};
-
-	am43xx_pinmux: pinmux@44e10800 {
-		compatible = "ti,am437-padconf", "pinctrl-single";
-		reg = <0x44e10800 0x31c>;
-		#address-cells = <1>;
-		#size-cells = <0>;
-		#interrupt-cells = <1>;
-		interrupt-controller;
-		pinctrl-single,register-width = <32>;
-		pinctrl-single,function-mask = <0xffffffff>;
-	};
-
 	ocp {
-		compatible = "ti,am4372-l3-noc", "simple-bus";
+		compatible = "ti,am4-l3", "simple-bus";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
-		ti,hwmods = "l3_main";
-		reg = <0x44000000 0x400000
-		       0x44800000 0x400000>;
-		interrupts = <GIC_SPI 9 IRQ_TYPE_LEVEL_HIGH>,
-			     <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
+
+		l3_noc: l3_noc@44000000 {
+			compatible = "ti,am4372-l3-noc";
+			reg = <0x44000000 0x400000
+			       0x44800000 0x400000>;
+			interrupts = <GIC_SPI 9 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
+			ti,hwmods = "l3_main";
+		};
+
+		am43xx_control_module: control_module@4a002000 {
+			compatible = "syscon";
+			reg = <0x44e10000 0x7f4>;
+		};
+
+		am43xx_pinmux: pinmux@44e10800 {
+			compatible = "ti,am437-padconf", "pinctrl-single";
+			reg = <0x44e10800 0x31c>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			#interrupt-cells = <1>;
+			interrupt-controller;
+			pinctrl-single,register-width = <32>;
+			pinctrl-single,function-mask = <0xffffffff>;
+		};
 
 		prcm: prcm@44df0000 {
 			compatible = "ti,am4-prcm";
