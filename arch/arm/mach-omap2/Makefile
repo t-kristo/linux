@@ -223,7 +223,7 @@ obj-$(CONFIG_ARCH_OMAP3)		+= omap_hwmod_3xxx_early_data.o
 obj-$(CONFIG_SOC_AM33XX)		+= omap_hwmod_33xx_early_data.o
 obj-$(CONFIG_SOC_AM33XX)		+= omap_hwmod_33xx_43xx_interconnect_data.o
 obj-$(CONFIG_SOC_AM33XX)		+= omap_hwmod_33xx_43xx_ipblock_data.o
-obj-$(CONFIG_SOC_AM43XX)		+= omap_hwmod_43xx_data.o
+obj-$(CONFIG_SOC_AM43XX)		+= omap_hwmod_43xx_early_data.o
 obj-$(CONFIG_SOC_AM43XX)		+= omap_hwmod_33xx_43xx_interconnect_data.o
 obj-$(CONFIG_SOC_AM43XX)		+= omap_hwmod_33xx_43xx_ipblock_data.o
 obj-$(CONFIG_SOC_TI81XX)		+= omap_hwmod_81xx_data.o
@@ -234,6 +234,7 @@ obj-$(CONFIG_SOC_DRA7XX)		+= omap_hwmod_7xx_data.o
 ifeq ($(CONFIG_OMAP_HWMOD_DATA_MODULES),)
 obj-$(CONFIG_ARCH_OMAP3)		+= omap_hwmod_3xxx_late_data.o
 obj-$(CONFIG_SOC_AM33XX)		+= omap_hwmod_33xx_late_data.o
+obj-$(CONFIG_SOC_AM43XX)		+= omap_hwmod_43xx_late_data.o
 else
 obj-m					+= omap_hwmod_3xxx_data.o
 omap_hwmod_3xxx_data-objs := \
@@ -246,6 +247,13 @@ obj-m					+= omap_hwmod_33xx_data.o
 omap_hwmod_33xx_data-objs := \
 	omap_hwmod_common_data.o \
 	omap_hwmod_33xx_late_data.o \
+	omap_hwmod_33xx_43xx_ipblock_data.o \
+	omap_hwmod_33xx_43xx_interconnect_data.o
+obj-m					+= omap_hwmod_43xx_data.o
+omap_hwmod_43xx_data-objs := \
+	omap_hwmod_common_data.o \
+	omap_hwmod_common_ipblock_data.o \
+	omap_hwmod_43xx_late_data.o \
 	omap_hwmod_33xx_43xx_ipblock_data.o \
 	omap_hwmod_33xx_43xx_interconnect_data.o
 endif

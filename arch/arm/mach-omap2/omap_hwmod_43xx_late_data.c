@@ -16,6 +16,7 @@
 
 #include <linux/platform_data/gpio-omap.h>
 #include <linux/platform_data/spi-omap2-mcspi.h>
+#include <linux/module.h>
 #include "omap_hwmod.h"
 #include "omap_hwmod_33xx_43xx_common_data.h"
 #include "prcm43xx.h"
@@ -594,20 +595,6 @@ static struct omap_hwmod_ocp_if am43xx_l4_hs__cpgmac0 = {
 	.user		= OCP_USER_MPU,
 };
 
-static struct omap_hwmod_ocp_if am43xx_l4_wkup__timer1 = {
-	.master		= &am33xx_l4_wkup_hwmod,
-	.slave		= &am33xx_timer1_hwmod,
-	.clk		= "sys_clkin_ck",
-	.user		= OCP_USER_MPU,
-};
-
-static struct omap_hwmod_ocp_if am43xx_l4_wkup__uart1 = {
-	.master		= &am33xx_l4_wkup_hwmod,
-	.slave		= &am33xx_uart1_hwmod,
-	.clk		= "sys_clkin_ck",
-	.user		= OCP_USER_MPU,
-};
-
 static struct omap_hwmod_ocp_if am43xx_l4_wkup__wd_timer1 = {
 	.master		= &am33xx_l4_wkup_hwmod,
 	.slave		= &am33xx_wd_timer1_hwmod,
@@ -808,7 +795,6 @@ static struct omap_hwmod_ocp_if *am43xx_hwmod_ocp_ifs[] __initdata = {
 	&am43xx_l4_ls__gpio4,
 	&am43xx_l4_ls__gpio5,
 	&am43xx_l3_main__pruss,
-	&am33xx_mpu__l3_main,
 	&am33xx_mpu__prcm,
 	&am33xx_l3_s__l4_ls,
 	&am33xx_l3_s__l4_wkup,
@@ -824,8 +810,6 @@ static struct omap_hwmod_ocp_if *am43xx_hwmod_ocp_ifs[] __initdata = {
 	&am43xx_l4_wkup__control,
 	&am43xx_l4_wkup__smartreflex0,
 	&am43xx_l4_wkup__smartreflex1,
-	&am43xx_l4_wkup__uart1,
-	&am43xx_l4_wkup__timer1,
 	&am43xx_l4_wkup__i2c1,
 	&am43xx_l4_wkup__gpio0,
 	&am43xx_l4_wkup__wd_timer1,
@@ -844,18 +828,12 @@ static struct omap_hwmod_ocp_if *am43xx_hwmod_ocp_ifs[] __initdata = {
 	&am33xx_l4_ls__mmc0,
 	&am33xx_l4_ls__mmc1,
 	&am33xx_l3_s__mmc2,
-	&am33xx_l4_ls__timer2,
 	&am33xx_l4_ls__timer3,
 	&am33xx_l4_ls__timer4,
 	&am33xx_l4_ls__timer5,
 	&am33xx_l4_ls__timer6,
 	&am33xx_l4_ls__timer7,
 	&am33xx_l3_main__tpcc,
-	&am33xx_l4_ls__uart2,
-	&am33xx_l4_ls__uart3,
-	&am33xx_l4_ls__uart4,
-	&am33xx_l4_ls__uart5,
-	&am33xx_l4_ls__uart6,
 	&am33xx_l4_ls__spinlock,
 	&am33xx_l4_ls__elm,
 	&am33xx_l4_ls__epwmss0,
@@ -895,6 +873,70 @@ static struct omap_hwmod_ocp_if *am43xx_hwmod_ocp_ifs[] __initdata = {
 int __init am43xx_hwmod_init(void)
 {
 	omap_hwmod_am43xx_reg();
-	omap_hwmod_init();
-	return omap_hwmod_register_links(am43xx_hwmod_ocp_ifs);
+	return omap_hwmod_register_links_late(am43xx_hwmod_ocp_ifs);
 }
+
+static const struct of_device_id am43xx_hwmod_data_match[] = {
+	{ .compatible = "ti,am4-l3" },
+	{ },
+};
+
+static int __init am43xx_hwmod_data_probe(struct platform_device *pdev)
+{
+	void **hwmod_ptrs;
+
+	hwmod_ptrs = dev_get_platdata(&pdev->dev);
+
+	am33xx_i2c_class.reset = hwmod_ptrs[OMAP_HWMOD_PTR_I2C_RESET];
+	am33xx_wd_timer_hwmod_class.pre_shutdown =
+		hwmod_ptrs[OMAP_HWMOD_PTR_WD_TIMER_DIS];
+
+	pr_info("am43xx_hwmod_init()\n");
+
+	am43xx_hwmod_init();
+
+	omap_hwmod_init_postsetup();
+
+	pr_info("omap_hwmod_setup_all()\n");
+
+	omap_hwmod_setup_all();
+
+	pr_info("pdata_quirks_init()\n");
+
+	omap_pdata_quirks_late_init(am43xx_hwmod_data_match);
+
+	return 0;
+}
+
+static int am43xx_hwmod_data_remove(struct platform_device *pdev)
+{
+	return -EBUSY;
+}
+
+MODULE_DEVICE_TABLE(of, am43xx_hwmod_data_match);
+
+static struct platform_driver am43xx_hwmod_data_driver = {
+	.remove = am43xx_hwmod_data_remove,
+	.driver = {
+		.name = "am43xx-hwmod-data",
+		.of_match_table = am43xx_hwmod_data_match,
+	},
+};
+
+static int __init am43xx_hwmod_data_driver_init(void)
+{
+	return platform_driver_probe(&am43xx_hwmod_data_driver,
+				     am43xx_hwmod_data_probe);
+}
+arch_initcall(am43xx_hwmod_data_driver_init);
+
+static void __exit am43xx_hwmod_data_driver_exit(void)
+{
+	platform_driver_unregister(&am43xx_hwmod_data_driver);
+}
+module_exit(am43xx_hwmod_data_driver_exit);
+
+MODULE_ALIAS("platform:am43xx-hwmod-data");
+MODULE_AUTHOR("Tero Kristo <t-kristo@ti.com");
+MODULE_DESCRIPTION("AM43xx hwmod data driver");
+MODULE_LICENSE("GPL v2");
