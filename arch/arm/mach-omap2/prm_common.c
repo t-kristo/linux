@@ -370,7 +370,7 @@ void __init omap2_set_globals_prm(void __iomem *prm)
 }
 
 /**
- * prm_read_reset_sources - return the sources of the SoC's last reset
+ * omap_prm_read_reset_sources - return the sources of the SoC's last reset
  *
  * Return a u32 bitmask representing the reset sources that caused the
  * SoC to reset.  The low-level per-SoC functions called by this
@@ -381,7 +381,7 @@ void __init omap2_set_globals_prm(void __iomem *prm)
  * OMAP_UNKNOWN_RST_SRC_ID_SHIFT) if no low-level read_reset_sources()
  * function was registered.
  */
-u32 prm_read_reset_sources(void)
+u32 omap_prm_read_reset_sources(void)
 {
 	u32 ret = 1 << OMAP_UNKNOWN_RST_SRC_ID_SHIFT;
 

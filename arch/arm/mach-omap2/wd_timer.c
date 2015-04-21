@@ -121,7 +121,7 @@ static int __init omap_init_wdt(void)
 		return -EINVAL;
 	}
 
-	pdata.read_reset_sources = prm_read_reset_sources;
+	pdata.read_reset_sources = omap_prm_read_reset_sources;
 
 	pdev = omap_device_build(dev_name, id, oh, &pdata,
 				 sizeof(struct omap_wd_timer_platform_data));
