@@ -2002,15 +2002,17 @@ static void _omap4_update_context_lost(struct omap_hwmod *oh)
 	if (oh->prcm.omap4.flags & HWMOD_OMAP4_NO_CONTEXT_LOSS_BIT)
 		return;
 
-	if (!prm_was_any_context_lost_old(oh->clkdm->pwrdm.ptr->prcm_partition,
-					  oh->clkdm->pwrdm.ptr->prcm_offs,
-					  oh->prcm.omap4.context_offs))
+	if (!omap_prm_was_any_context_lost_old(oh->clkdm->pwrdm.ptr->
+					       prcm_partition,
+					       oh->clkdm->pwrdm.ptr->prcm_offs,
+					       oh->prcm.omap4.context_offs))
 		return;
 
 	oh->prcm.omap4.context_lost_counter++;
-	prm_clear_context_loss_flags_old(oh->clkdm->pwrdm.ptr->prcm_partition,
-					 oh->clkdm->pwrdm.ptr->prcm_offs,
-					 oh->prcm.omap4.context_offs);
+	omap_prm_clear_context_loss_flags_old(oh->clkdm->pwrdm.ptr->
+					      prcm_partition,
+					      oh->clkdm->pwrdm.ptr->prcm_offs,
+					      oh->prcm.omap4.context_offs);
 }
 
 /**

@@ -162,8 +162,8 @@ int omap_prm_deassert_hardreset(u8 shift, u8 st_shift, u8 part, s16 prm_mod,
 				u16 offset, u16 st_offset);
 int omap_prm_is_hardreset_asserted(u8 shift, u8 part, s16 prm_mod, u16 offset);
 u32 omap_prm_read_reset_sources(void);
-extern bool prm_was_any_context_lost_old(u8 part, s16 inst, u16 idx);
-extern void prm_clear_context_loss_flags_old(u8 part, s16 inst, u16 idx);
+bool omap_prm_was_any_context_lost_old(u8 part, s16 inst, u16 idx);
+void omap_prm_clear_context_loss_flags_old(u8 part, s16 inst, u16 idx);
 void omap_prm_reset_system(void);
 
 void omap_prm_reconfigure_io_chain(void);

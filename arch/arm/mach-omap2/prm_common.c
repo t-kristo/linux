@@ -394,7 +394,7 @@ u32 omap_prm_read_reset_sources(void)
 }
 
 /**
- * prm_was_any_context_lost_old - was device context lost? (old API)
+ * omap_prm_was_any_context_lost_old - was device context lost? (old API)
  * @part: PRM partition ID (e.g., OMAP4430_PRM_PARTITION)
  * @inst: PRM instance offset (e.g., OMAP4430_PRM_MPU_INST)
  * @idx: CONTEXT register offset
@@ -405,7 +405,7 @@ u32 omap_prm_read_reset_sources(void)
  * callers need to use a less-SoC-dependent way to identify hardware
  * IP blocks.
  */
-bool prm_was_any_context_lost_old(u8 part, s16 inst, u16 idx)
+bool omap_prm_was_any_context_lost_old(u8 part, s16 inst, u16 idx)
 {
 	bool ret = true;
 
@@ -419,7 +419,7 @@ bool prm_was_any_context_lost_old(u8 part, s16 inst, u16 idx)
 }
 
 /**
- * prm_clear_context_lost_flags_old - clear context loss flags (old API)
+ * omap_prm_clear_context_lost_flags_old - clear context loss flags (old API)
  * @part: PRM partition ID (e.g., OMAP4430_PRM_PARTITION)
  * @inst: PRM instance offset (e.g., OMAP4430_PRM_MPU_INST)
  * @idx: CONTEXT register offset
@@ -429,7 +429,7 @@ bool prm_was_any_context_lost_old(u8 part, s16 inst, u16 idx)
  * need to use a less-SoC-dependent way to identify hardware IP
  * blocks.
  */
-void prm_clear_context_loss_flags_old(u8 part, s16 inst, u16 idx)
+void omap_prm_clear_context_loss_flags_old(u8 part, s16 inst, u16 idx)
 {
 	if (prm_ll_data->clear_context_loss_flags_old)
 		prm_ll_data->clear_context_loss_flags_old(part, inst, idx);
