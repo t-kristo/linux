@@ -154,8 +154,8 @@ struct prm_ll_data {
 	void (*vp_clear_txdone)(u8 vp_id);
 };
 
-extern int prm_register(struct prm_ll_data *pld);
-extern int prm_unregister(struct prm_ll_data *pld);
+int omap_prm_register(struct prm_ll_data *pld);
+int omap_prm_unregister(struct prm_ll_data *pld);
 
 int omap_prm_assert_hardreset(u8 shift, u8 part, s16 prm_mod, u16 offset);
 int omap_prm_deassert_hardreset(u8 shift, u8 st_shift, u8 part, s16 prm_mod,

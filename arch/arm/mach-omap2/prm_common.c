@@ -593,7 +593,7 @@ void omap_prm_vp_clear_txdone(u8 vp_id)
 }
 
 /**
- * prm_register - register per-SoC low-level data with the PRM
+ * omap_prm_register - register per-SoC low-level data with the PRM
  * @pld: low-level per-SoC OMAP PRM data & function pointers to register
  *
  * Register per-SoC low-level OMAP PRM data and function pointers with
@@ -603,7 +603,7 @@ void omap_prm_vp_clear_txdone(u8 vp_id)
  * is NULL, or -EEXIST if prm_register() has already been called
  * without an intervening prm_unregister().
  */
-int prm_register(struct prm_ll_data *pld)
+int omap_prm_register(struct prm_ll_data *pld)
 {
 	if (!pld)
 		return -EINVAL;
@@ -617,7 +617,7 @@ int prm_register(struct prm_ll_data *pld)
 }
 
 /**
- * prm_unregister - unregister per-SoC low-level data & function pointers
+ * omap_prm_unregister - unregister per-SoC low-level data & function pointers
  * @pld: low-level per-SoC OMAP PRM data & function pointers to unregister
  *
  * Unregister per-SoC low-level OMAP PRM data and function pointers
@@ -627,7 +627,7 @@ int prm_register(struct prm_ll_data *pld)
  * -EINVAL if @pld is NULL or if @pld does not match the struct
  * prm_ll_data * previously registered by prm_register().
  */
-int prm_unregister(struct prm_ll_data *pld)
+int omap_prm_unregister(struct prm_ll_data *pld)
 {
 	if (!pld || prm_ll_data != pld)
 		return -EINVAL;

@@ -222,11 +222,11 @@ static struct prm_ll_data omap2xxx_prm_ll_data = {
 
 int __init omap2xxx_prm_init(const struct omap_prcm_init_data *data)
 {
-	return prm_register(&omap2xxx_prm_ll_data);
+	return omap_prm_register(&omap2xxx_prm_ll_data);
 }
 
 static void __exit omap2xxx_prm_exit(void)
 {
-	prm_unregister(&omap2xxx_prm_ll_data);
+	omap_prm_unregister(&omap2xxx_prm_ll_data);
 }
 __exitcall(omap2xxx_prm_exit);

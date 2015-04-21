@@ -719,7 +719,7 @@ int __init omap44xx_prm_init(const struct omap_prcm_init_data *data)
 
 	omap4_prminst_set_prm_dev_inst(data->device_inst_offset);
 
-	return prm_register(&omap44xx_prm_ll_data);
+	return omap_prm_register(&omap44xx_prm_ll_data);
 }
 
 static int omap44xx_prm_late_init(void)
@@ -759,6 +759,6 @@ static int omap44xx_prm_late_init(void)
 
 static void __exit omap44xx_prm_exit(void)
 {
-	prm_unregister(&omap44xx_prm_ll_data);
+	omap_prm_unregister(&omap44xx_prm_ll_data);
 }
 __exitcall(omap44xx_prm_exit);

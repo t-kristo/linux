@@ -380,11 +380,11 @@ static struct prm_ll_data am33xx_prm_ll_data = {
 
 int __init am33xx_prm_init(const struct omap_prcm_init_data *data)
 {
-	return prm_register(&am33xx_prm_ll_data);
+	return omap_prm_register(&am33xx_prm_ll_data);
 }
 
 static void __exit am33xx_prm_exit(void)
 {
-	prm_unregister(&am33xx_prm_ll_data);
+	omap_prm_unregister(&am33xx_prm_ll_data);
 }
 __exitcall(am33xx_prm_exit);

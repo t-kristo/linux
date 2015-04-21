@@ -677,7 +677,7 @@ int __init omap3xxx_prm_init(const struct omap_prcm_init_data *data)
 	if (omap3_has_io_wakeup())
 		prm_features |= PRM_HAS_IO_WAKEUP;
 
-	return prm_register(&omap3xxx_prm_ll_data);
+	return omap_prm_register(&omap3xxx_prm_ll_data);
 }
 
 static const struct of_device_id omap3_prm_dt_match_table[] = {
@@ -722,6 +722,6 @@ static int omap3xxx_prm_late_init(void)
 
 static void __exit omap3xxx_prm_exit(void)
 {
-	prm_unregister(&omap3xxx_prm_ll_data);
+	omap_prm_unregister(&omap3xxx_prm_ll_data);
 }
 __exitcall(omap3xxx_prm_exit);
