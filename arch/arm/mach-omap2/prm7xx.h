@@ -24,8 +24,7 @@
 
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/prm.h>
-
-#include "prm44xx_54xx.h"
+#include <linux/power/omap/prm44xx_54xx.h>
 
 /* PRM instances */
 #define DRA7XX_PRM_OCP_SOCKET_INST	0x0000
