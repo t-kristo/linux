@@ -88,6 +88,7 @@
 extern int omap2xxx_clkdm_sleep(struct clockdomain *clkdm);
 extern int omap2xxx_clkdm_wakeup(struct clockdomain *clkdm);
 
+void __init omap2_prm_init_pm(void);
 int __init omap2xxx_prm_init(const struct omap_prcm_init_data *data);
 
 #endif

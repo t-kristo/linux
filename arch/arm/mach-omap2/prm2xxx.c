@@ -207,9 +207,43 @@ struct pwrdm_ops omap2_pwrdm_operations = {
 	.pwrdm_wait_transition	= omap2_pwrdm_wait_transition,
 };
 
-/*
+/**
+ * omap2_prm_init_pm - power management init for OMAP2 PRM module
  *
+ * Initializes power management for OMAP2 PRM module. This includes all
+ * the necessary PRM setups to reach idle. No return value.
  */
+void __init omap2_prm_init_pm(void)
+{
+	/* Enable autoidle */
+	omap2_prm_write_mod_reg(OMAP24XX_AUTOIDLE_MASK, OCP_MOD,
+				OMAP2_PRCM_SYSCONFIG_OFFSET);
+
+	/*
+	 * REVISIT: Configure number of 32 kHz clock cycles for sys_clk
+	 * stabilisation
+	 */
+	omap2_prm_write_mod_reg(15 << OMAP_SETUP_TIME_SHIFT, OMAP24XX_GR_MOD,
+				OMAP2_PRCM_CLKSSETUP_OFFSET);
+
+	/* Configure automatic voltage transition */
+	omap2_prm_write_mod_reg(2 << OMAP_SETUP_TIME_SHIFT, OMAP24XX_GR_MOD,
+				OMAP2_PRCM_VOLTSETUP_OFFSET);
+	omap2_prm_write_mod_reg(OMAP24XX_AUTO_EXTVOLT_MASK |
+				(0x1 << OMAP24XX_SETOFF_LEVEL_SHIFT) |
+				OMAP24XX_MEMRETCTRL_MASK |
+				(0x1 << OMAP24XX_SETRET_LEVEL_SHIFT) |
+				(0x0 << OMAP24XX_VOLT_LEVEL_SHIFT),
+				OMAP24XX_GR_MOD, OMAP2_PRCM_VOLTCTRL_OFFSET);
+
+	/* Enable wake-up events */
+	omap2_prm_write_mod_reg(OMAP24XX_EN_GPIOS_MASK | OMAP24XX_EN_GPT1_MASK,
+				WKUP_MOD, PM_WKEN);
+
+	/* Enable SYS_CLKEN control when all domains idle */
+	omap2_prm_set_mod_reg_bits(OMAP_AUTOEXTCLKMODE_MASK, OMAP24XX_GR_MOD,
+				   OMAP2_PRCM_CLKSRC_CTRL_OFFSET);
+}
 
 static struct prm_ll_data omap2xxx_prm_ll_data = {
 	.read_reset_sources = &omap2xxx_prm_read_reset_sources,
