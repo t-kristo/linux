@@ -26,13 +26,13 @@
 #include <linux/init.h>
 #include <linux/err.h>
 #include <linux/platform_device.h>
+#include <linux/power/omap/prm.h>
 
 #include "soc.h"
 #include "omap_hwmod.h"
 #include "omap_device.h"
 #include "hdq1w.h"
 
-#include "prm.h"
 #include "common.h"
 
 /**

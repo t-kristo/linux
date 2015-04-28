@@ -7,9 +7,9 @@
  */
 #include <linux/kernel.h>
 #include <linux/reboot.h>
+#include <linux/power/omap/prm.h>
 
 #include "common.h"
-#include "prm.h"
 
 /**
  * am3xx_restart - trigger a software restart of the SoC

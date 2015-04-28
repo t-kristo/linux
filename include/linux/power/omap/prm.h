@@ -10,15 +10,15 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
-#ifndef __ARCH_ARM_MACH_OMAP2_PRM_H
-#define __ARCH_ARM_MACH_OMAP2_PRM_H
+#ifndef __LINUX_POWER_OMAP_PRM_H
+#define __LINUX_POWER_OMAP_PRM_H
 
 #include <linux/power/omap/prcm-common.h>
 
 # ifndef __ASSEMBLER__
 extern void __iomem *prm_base;
 extern u16 prm_features;
-extern void omap2_set_globals_prm(void __iomem *prm);
+void omap2_set_globals_prm(void __iomem *prm);
 int omap_prcm_init(void);
 int omap2_prm_base_init(void);
 int omap2_prcm_base_init(void);
@@ -60,8 +60,7 @@ int omap2_prcm_base_init(void);
  *	 PM_PWSTST_DSS, PM_PWSTST_CAM, PM_PWSTST_PER, PM_PWSTST_EMU,
  *	 PM_PWSTST_NEON
  */
-#define OMAP_INTRANSITION_MASK				(1 << 20)
-
+#define OMAP_INTRANSITION_MASK				BIT(20)
 
 /*
  * 24XX: PM_PWSTST_GFX, PM_PWSTST_DSP
@@ -188,6 +187,5 @@ u32 omap_prm_vp_check_txdone(u8 vp_id);
 void omap_prm_vp_clear_txdone(u8 vp_id);
 
 #endif
-
 
 #endif

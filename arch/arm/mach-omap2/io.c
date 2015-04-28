@@ -21,6 +21,7 @@
 #include <linux/init.h>
 #include <linux/io.h>
 #include <linux/clk.h>
+#include <linux/power/omap/prm.h>
 
 #include <asm/tlb.h>
 #include <asm/mach/map.h>
@@ -46,7 +47,6 @@
 #include "cm3xxx.h"
 #include "cm33xx.h"
 #include "cm44xx.h"
-#include "prm.h"
 #include "cm.h"
 #include "prcm_mpu44xx.h"
 #include "prminst44xx.h"

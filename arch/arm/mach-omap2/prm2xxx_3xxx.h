@@ -17,8 +17,7 @@
 #define __ARCH_ARM_MACH_OMAP2_PRM2XXX_3XXX_H
 
 #include <linux/power/omap/prcm-common.h>
-
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 
 /*
  * Module specific PRM register offsets from PRM_BASE + domain offset

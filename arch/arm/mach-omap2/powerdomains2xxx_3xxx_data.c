@@ -33,7 +33,7 @@
 
 #include "powerdomain.h"
 
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 
 /* OMAP2/3-common powerdomains */
 

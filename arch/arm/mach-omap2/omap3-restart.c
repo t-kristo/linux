@@ -13,9 +13,9 @@
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/reboot.h>
+#include <linux/power/omap/prm.h>
 
 #include "control.h"
-#include "prm.h"
 
 /* Global address base setup code */
 

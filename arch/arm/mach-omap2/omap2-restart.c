@@ -12,10 +12,10 @@
 #include <linux/init.h>
 #include <linux/clk.h>
 #include <linux/io.h>
+#include <linux/power/omap/prm.h>
 
 #include "soc.h"
 #include "common.h"
-#include "prm.h"
 
 /*
  * reset_virt_prcm_set_ck, reset_sys_ck: pointers to the virt_prcm_set

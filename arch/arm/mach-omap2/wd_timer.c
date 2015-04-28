@@ -12,14 +12,13 @@
 #include <linux/kernel.h>
 #include <linux/io.h>
 #include <linux/err.h>
-
+#include <linux/power/omap/prm.h>
 #include <linux/platform_data/omap-wd-timer.h>
 
 #include "omap_hwmod.h"
 #include "omap_device.h"
 #include "wd_timer.h"
 #include "common.h"
-#include "prm.h"
 #include "soc.h"
 
 /*

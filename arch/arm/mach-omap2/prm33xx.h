@@ -17,8 +17,7 @@
 #define __ARCH_ARM_MACH_OMAP2_PRM33XX_H
 
 #include <linux/power/omap/prcm-common.h>
-
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 
 /* PRM instances */
 #define AM33XX_PRM_OCP_SOCKET_MOD	0x0B00

@@ -16,7 +16,7 @@
 #ifndef __ARCH_ARM_MACH_OMAP2_PRM_REGBITS_33XX_H
 #define __ARCH_ARM_MACH_OMAP2_PRM_REGBITS_33XX_H
 
-#include "prm.h"
+#include <linux/power/omap/prm.h>
 
 #define AM33XX_GFX_MEM_ONSTATE_MASK			(0x3 << 17)
 #define AM33XX_GFX_MEM_RETSTATE_MASK			(1 << 6)
