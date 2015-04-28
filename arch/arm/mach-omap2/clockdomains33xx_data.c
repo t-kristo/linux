@@ -18,7 +18,6 @@
 #include <linux/io.h>
 
 #include "clockdomain.h"
-#include "cm.h"
 #include "cm33xx.h"
 #include "cm-regbits-33xx.h"
 

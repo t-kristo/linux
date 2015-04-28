@@ -20,9 +20,9 @@
 #include <linux/errno.h>
 #include <linux/err.h>
 #include <linux/io.h>
+#include <linux/power/omap/cm.h>
 
 #include "clockdomain.h"
-#include "cm.h"
 #include "cm1_44xx.h"
 #include "cm2_44xx.h"
 #include "cm44xx.h"

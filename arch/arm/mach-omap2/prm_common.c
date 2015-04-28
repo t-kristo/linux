@@ -27,6 +27,7 @@
 #include <linux/of_address.h>
 #include <linux/clk-provider.h>
 #include <linux/clk/ti.h>
+#include <linux/power/omap/cm.h>
 
 #include "soc.h"
 #include "prm2xxx_3xxx.h"
@@ -39,7 +40,6 @@
 #include "prcm43xx.h"
 #include "common.h"
 #include "clock.h"
-#include "cm.h"
 #include "control.h"
 
 /*

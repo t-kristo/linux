@@ -17,9 +17,9 @@
 #include <linux/errno.h>
 #include <linux/err.h>
 #include <linux/io.h>
+#include <linux/power/omap/cm.h>
 
 #include "prm2xxx.h"
-#include "cm.h"
 #include "cm2xxx.h"
 #include "cm-regbits-24xx.h"
 #include "clockdomain.h"

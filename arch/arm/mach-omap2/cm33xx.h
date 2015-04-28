@@ -18,8 +18,8 @@
 #define __ARCH_ARM_MACH_OMAP2_CM_33XX_H
 
 #include <linux/power/omap/prcm-common.h>
+#include <linux/power/omap/cm.h>
 
-#include "cm.h"
 #include "cm-regbits-33xx.h"
 
 /* CM base address */

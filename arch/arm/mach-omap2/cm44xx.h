@@ -18,8 +18,7 @@
 
 
 #include <linux/power/omap/prcm-common.h>
-
-#include "cm.h"
+#include <linux/power/omap/cm.h>
 
 #define OMAP4_CM_CLKSTCTRL				0x0000
 #define OMAP4_CM_STATICDEP				0x0004
