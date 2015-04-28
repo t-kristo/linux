@@ -152,6 +152,7 @@ struct prm_ll_data {
 	int (*clear_mod_irqs)(s16 module, u8 regs, u32 wkst_mask);
 	u32 (*vp_check_txdone)(u8 vp_id);
 	void (*vp_clear_txdone)(u8 vp_id);
+	void (*init_pm)(u8 flags);
 };
 
 int omap_prm_register(struct prm_ll_data *pld);
@@ -168,6 +169,11 @@ void omap_prm_reset_system(void);
 
 void omap_prm_reconfigure_io_chain(void);
 int omap_prm_clear_mod_irqs(s16 module, u8 regs, u32 wkst_mask);
+
+#define OMAP_PRM_HAS_IVA		0x1
+#define OMAP_PRM_HAS_UART4		0x2
+
+void omap_prm_init_pm(u8 flags);
 
 /*
  * Voltage Processor (VP) identifiers

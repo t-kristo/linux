@@ -353,9 +353,17 @@ restore:
 
 static void __init prcm_setup_regs(void)
 {
+	u8 flags = 0;
+
 	omap3_ctrl_init();
 
-	omap3_prm_init_pm(cpu_is_omap3630(), omap3_has_iva());
+	if (cpu_is_omap3630())
+		flags |= OMAP_PRM_HAS_UART4;
+
+	if (omap3_has_iva())
+		flags |= OMAP_PRM_HAS_IVA;
+
+	omap_prm_init_pm(flags);
 }
 
 void omap3_pm_off_mode_enable(int enable)

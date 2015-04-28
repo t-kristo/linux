@@ -637,6 +637,23 @@ int omap_prm_unregister(struct prm_ll_data *pld)
 	return 0;
 }
 
+/**
+ * omap_prm_init_pm - initialize power management features for PRM module
+ * @flags: PRM features supported
+ *
+ * Initializes PRM module so that idle can be reached.
+ */
+void omap_prm_init_pm(u8 flags)
+{
+	if (!prm_ll_data->init_pm) {
+		WARN_ONCE(1, "prm: %s: no mapping function defined\n",
+			  __func__);
+		return;
+	}
+
+	prm_ll_data->init_pm(flags);
+}
+
 #ifdef CONFIG_ARCH_OMAP2
 static struct omap_prcm_init_data omap2_prm_data __initdata = {
 	.index = TI_CLKM_PRM,

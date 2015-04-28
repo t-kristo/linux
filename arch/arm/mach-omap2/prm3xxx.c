@@ -288,7 +288,7 @@ static void omap3_prm_reset_modem(void)
  *
  * Initializes PRM registers for PM use. Called from PM init.
  */
-void __init omap3_prm_init_pm(bool has_uart4, bool has_iva)
+static void omap3_prm_init_pm(u8 flags)
 {
 	u32 en_uart4_mask;
 	u32 grpsel_uart4_mask;
@@ -317,7 +317,7 @@ void __init omap3_prm_init_pm(bool has_uart4, bool has_iva)
 	omap2_prm_write_mod_reg(OMAP3430_PM_WKEN_DSS_EN_DSS_MASK,
 				OMAP3430_DSS_MOD, PM_WKEN);
 
-	if (has_uart4) {
+	if (flags & OMAP_PRM_HAS_UART4) {
 		en_uart4_mask = OMAP3630_EN_UART4_MASK;
 		grpsel_uart4_mask = OMAP3630_GRPSEL_UART4_MASK;
 	}
@@ -349,7 +349,7 @@ void __init omap3_prm_init_pm(bool has_uart4, bool has_iva)
 				OMAP3430_PER_MOD, OMAP3430_PM_MPUGRPSEL);
 
 	/* Don't attach IVA interrupts */
-	if (has_iva) {
+	if (flags & OMAP_PRM_HAS_IVA) {
 		omap2_prm_write_mod_reg(0, WKUP_MOD, OMAP3430_PM_IVAGRPSEL);
 		omap2_prm_write_mod_reg(0, CORE_MOD, OMAP3430_PM_IVAGRPSEL1);
 		omap2_prm_write_mod_reg(0, CORE_MOD, OMAP3430ES2_PM_IVAGRPSEL3);
@@ -669,6 +669,7 @@ static struct prm_ll_data omap3xxx_prm_ll_data = {
 	.clear_mod_irqs = &omap3xxx_prm_clear_mod_irqs,
 	.vp_check_txdone = &omap3_prm_vp_check_txdone,
 	.vp_clear_txdone = &omap3_prm_vp_clear_txdone,
+	.init_pm = &omap3_prm_init_pm,
 };
 
 int __init omap3xxx_prm_init(const struct omap_prcm_init_data *data)

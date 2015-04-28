@@ -209,11 +209,12 @@ struct pwrdm_ops omap2_pwrdm_operations = {
 
 /**
  * omap2_prm_init_pm - power management init for OMAP2 PRM module
+ * @flags: PRM feature flags
  *
  * Initializes power management for OMAP2 PRM module. This includes all
  * the necessary PRM setups to reach idle. No return value.
  */
-void __init omap2_prm_init_pm(void)
+static void omap2_prm_init_pm(u8 flags)
 {
 	/* Enable autoidle */
 	omap2_prm_write_mod_reg(OMAP24XX_AUTOIDLE_MASK, OCP_MOD,
@@ -252,6 +253,7 @@ static struct prm_ll_data omap2xxx_prm_ll_data = {
 	.is_hardreset_asserted = &omap2_prm_is_hardreset_asserted,
 	.reset_system = &omap2xxx_prm_dpll_reset,
 	.clear_mod_irqs = &omap2xxx_prm_clear_mod_irqs,
+	.init_pm = &omap2_prm_init_pm,
 };
 
 int __init omap2xxx_prm_init(const struct omap_prcm_init_data *data)

@@ -217,7 +217,7 @@ static void __init prcm_setup_regs(void)
 
 	omap_common_suspend_init(omap2_enter_full_retention);
 
-	omap2_prm_init_pm();
+	omap_prm_init_pm(0);
 }
 
 int __init omap2_pm_init(void)
