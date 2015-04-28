@@ -38,6 +38,13 @@
 #define M_UNLOCK	0
 #define M_LOCK		1
 
+#define OMAP2420_PRCM_VOLTSETUP \
+	OMAP2_L4_IO_ADDRESS(OMAP2420_PRM_BASE + OCP_MOD + \
+			    OMAP2_PRCM_VOLTSETUP_OFFSET)
+
+#define OMAP2430_PRCM_VOLTSETUP \
+	OMAP2_L4_IO_ADDRESS(OMAP2430_PRM_BASE + OCP_MOD + \
+			    OMAP2_PRCM_VOLTSETUP_OFFSET)
 
 static struct memory_timings mem_timings;
 static u32 curr_perf_level = CORE_CLK_SRC_DPLL_X2;
