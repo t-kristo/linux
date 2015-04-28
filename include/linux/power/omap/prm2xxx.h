@@ -13,8 +13,8 @@
  * other.  The PRM on OMAP4 has a new register layout, and is handled
  * in a separate file.
  */
-#ifndef __ARCH_ARM_MACH_OMAP2_PRM2XXX_H
-#define __ARCH_ARM_MACH_OMAP2_PRM2XXX_H
+#ifndef __LINUX_POWER_OMAP_PRM2XXX_H
+#define __LINUX_POWER_OMAP_PRM2XXX_H
 
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/prm.h>
@@ -85,8 +85,8 @@
 
 #ifndef __ASSEMBLER__
 /* Function prototypes */
-extern int omap2xxx_clkdm_sleep(struct clockdomain *clkdm);
-extern int omap2xxx_clkdm_wakeup(struct clockdomain *clkdm);
+int omap2xxx_clkdm_sleep(struct clockdomain *clkdm);
+int omap2xxx_clkdm_wakeup(struct clockdomain *clkdm);
 
 int __init omap2xxx_prm_init(const struct omap_prcm_init_data *data);
 

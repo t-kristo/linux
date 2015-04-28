@@ -29,12 +29,12 @@
  * These crashes may be intermittent.
  */
 #include <linux/linkage.h>
+#include <linux/power/omap/prm2xxx.h>
 
 #include <asm/assembler.h>
 
 #include "soc.h"
 #include "iomap.h"
-#include "prm2xxx.h"
 #include "cm2xxx.h"
 #include "sdrc.h"
 

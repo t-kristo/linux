@@ -14,7 +14,7 @@
  * published by the Free Software Foundation.
  */
 
-#include "prm2xxx.h"
+#include <linux/power/omap/prm2xxx.h>
 
 #define OMAP24XX_EN_CORE_SHIFT 				0
 #define OMAP24XX_FORCESTATE_MASK			(1 << 18)

@@ -23,11 +23,11 @@
 #include <linux/delay.h>
 #include <linux/clk.h>
 #include <linux/io.h>
+#include <linux/power/omap/prm2xxx.h>
 
 #include "soc.h"
 #include "iomap.h"
 #include "common.h"
-#include "prm2xxx.h"
 #include "clock.h"
 #include "sdrc.h"
 #include "sram.h"

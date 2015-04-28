@@ -30,6 +30,7 @@
 #include <linux/time.h>
 #include <linux/gpio.h>
 #include <linux/platform_data/gpio-omap.h>
+#include <linux/power/omap/prm2xxx.h>
 
 #include <asm/fncpy.h>
 
@@ -43,7 +44,6 @@
 #include "soc.h"
 #include "common.h"
 #include "clock.h"
-#include "prm2xxx.h"
 #include "prm-regbits-24xx.h"
 #include "cm2xxx.h"
 #include "cm-regbits-24xx.h"
