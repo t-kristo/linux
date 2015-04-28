@@ -17,6 +17,7 @@
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/io.h>
+#include <linux/power/omap/prm2xxx_3xxx.h>
 
 #include <asm/fncpy.h>
 #include <asm/tlb.h>
@@ -26,7 +27,6 @@
 
 #include "soc.h"
 #include "iomap.h"
-#include "prm2xxx_3xxx.h"
 #include "sdrc.h"
 #include "sram.h"
 

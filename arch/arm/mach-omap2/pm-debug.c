@@ -26,6 +26,7 @@
 #include <linux/io.h>
 #include <linux/module.h>
 #include <linux/slab.h>
+#include <linux/power/omap/prm2xxx_3xxx.h>
 
 #include "clock.h"
 #include "powerdomain.h"
@@ -34,7 +35,6 @@
 
 #include "soc.h"
 #include "cm2xxx_3xxx.h"
-#include "prm2xxx_3xxx.h"
 #include "pm.h"
 
 u32 enable_off_mode;

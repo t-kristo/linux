@@ -15,9 +15,9 @@
 #include <linux/errno.h>
 #include <linux/err.h>
 #include <linux/io.h>
+#include <linux/power/omap/prm2xxx_3xxx.h>
 
 #include "powerdomain.h"
-#include "prm2xxx_3xxx.h"
 #include "prm-regbits-24xx.h"
 #include "clockdomain.h"
 

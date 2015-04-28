@@ -18,8 +18,8 @@
 #include <linux/err.h>
 #include <linux/io.h>
 #include <linux/power/omap/cm.h>
+#include <linux/power/omap/prm2xxx_3xxx.h>
 
-#include "prm2xxx_3xxx.h"
 #include "cm3xxx.h"
 #include "cm-regbits-34xx.h"
 #include "clockdomain.h"

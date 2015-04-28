@@ -13,8 +13,8 @@
  * other.  The PRM on OMAP4 has a new register layout, and is handled
  * in a separate file.
  */
-#ifndef __ARCH_ARM_MACH_OMAP2_PRM2XXX_3XXX_H
-#define __ARCH_ARM_MACH_OMAP2_PRM2XXX_3XXX_H
+#ifndef __LINUX_POWER_OMAP_PRM2XXX_3XXX_H
+#define __LINUX_POWER_OMAP_PRM2XXX_3XXX_H
 
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/prm.h>
@@ -46,11 +46,12 @@
 #define PM_EVGENONTIM					0x00d8
 #define PM_EVGENOFFTIM					0x00dc
 
-
 #ifndef __ASSEMBLER__
 
 #include <linux/io.h>
-#include "powerdomain.h"
+
+struct powerdomain;
+struct clockdomain;
 
 /* Power/reset management domain register get/set */
 static inline u32 omap2_prm_read_mod_reg(s16 module, u16 idx)
@@ -107,25 +108,25 @@ int omap2_prm_deassert_hardreset(u8 rst_shift, u8 st_shift, u8 part,
 				 s16 prm_mod, u16 reset_offset,
 				 u16 st_offset);
 
-extern int omap2_pwrdm_set_next_pwrst(struct powerdomain *pwrdm, u8 pwrst);
-extern int omap2_pwrdm_read_next_pwrst(struct powerdomain *pwrdm);
-extern int omap2_pwrdm_read_pwrst(struct powerdomain *pwrdm);
-extern int omap2_pwrdm_set_mem_onst(struct powerdomain *pwrdm, u8 bank,
-				    u8 pwrst);
-extern int omap2_pwrdm_set_mem_retst(struct powerdomain *pwrdm, u8 bank,
-				     u8 pwrst);
-extern int omap2_pwrdm_read_mem_pwrst(struct powerdomain *pwrdm, u8 bank);
-extern int omap2_pwrdm_read_mem_retst(struct powerdomain *pwrdm, u8 bank);
-extern int omap2_pwrdm_set_logic_retst(struct powerdomain *pwrdm, u8 pwrst);
-extern int omap2_pwrdm_wait_transition(struct powerdomain *pwrdm);
+int omap2_pwrdm_set_next_pwrst(struct powerdomain *pwrdm, u8 pwrst);
+int omap2_pwrdm_read_next_pwrst(struct powerdomain *pwrdm);
+int omap2_pwrdm_read_pwrst(struct powerdomain *pwrdm);
+int omap2_pwrdm_set_mem_onst(struct powerdomain *pwrdm, u8 bank,
+			     u8 pwrst);
+int omap2_pwrdm_set_mem_retst(struct powerdomain *pwrdm, u8 bank,
+			      u8 pwrst);
+int omap2_pwrdm_read_mem_pwrst(struct powerdomain *pwrdm, u8 bank);
+int omap2_pwrdm_read_mem_retst(struct powerdomain *pwrdm, u8 bank);
+int omap2_pwrdm_set_logic_retst(struct powerdomain *pwrdm, u8 pwrst);
+int omap2_pwrdm_wait_transition(struct powerdomain *pwrdm);
 
-extern int omap2_clkdm_add_wkdep(struct clockdomain *clkdm1,
-				 struct clockdomain *clkdm2);
-extern int omap2_clkdm_del_wkdep(struct clockdomain *clkdm1,
-				 struct clockdomain *clkdm2);
-extern int omap2_clkdm_read_wkdep(struct clockdomain *clkdm1,
-				  struct clockdomain *clkdm2);
-extern int omap2_clkdm_clear_all_wkdeps(struct clockdomain *clkdm);
+int omap2_clkdm_add_wkdep(struct clockdomain *clkdm1,
+			  struct clockdomain *clkdm2);
+int omap2_clkdm_del_wkdep(struct clockdomain *clkdm1,
+			  struct clockdomain *clkdm2);
+int omap2_clkdm_read_wkdep(struct clockdomain *clkdm1,
+			   struct clockdomain *clkdm2);
+int omap2_clkdm_clear_all_wkdeps(struct clockdomain *clkdm);
 
 #endif /* __ASSEMBLER */
 
@@ -166,7 +167,7 @@ extern int omap2_clkdm_clear_all_wkdeps(struct clockdomain *clkdm);
 #define OMAP_OFFLOADMODE_MASK				(0x3 << 3)
 #define OMAP_ONLOADMODE_SHIFT				1
 #define OMAP_ONLOADMODE_MASK				(0x3 << 1)
-#define OMAP_ENABLE_MASK				(1 << 0)
+#define OMAP_ENABLE_MASK				BIT(0)
 
 /* PRM_RSTTIME */
 /* Named RM_RSTTIME_WKUP on the 24xx */
@@ -178,9 +179,8 @@ extern int omap2_clkdm_clear_all_wkdeps(struct clockdomain *clkdm);
 /* PRM_RSTCTRL */
 /* Named RM_RSTCTRL_WKUP on the 24xx */
 /* 2420 calls RST_DPLL3 'RST_DPLL' */
-#define OMAP_RST_DPLL3_MASK				(1 << 2)
-#define OMAP_RST_GS_MASK				(1 << 1)
-
+#define OMAP_RST_DPLL3_MASK				BIT(2)
+#define OMAP_RST_GS_MASK				BIT(1)
 
 /*
  * Bits common to module-shared registers
@@ -196,7 +196,7 @@ extern int omap2_clkdm_clear_all_wkdeps(struct clockdomain *clkdm);
  * 3430: RM_RSTST_IVA2, RM_RSTST_MPU, RM_RSTST_GFX, RM_RSTST_DSS,
  *	 RM_RSTST_CAM, RM_RSTST_PER, RM_RSTST_NEON
  */
-#define OMAP_COREDOMAINWKUP_RST_MASK			(1 << 3)
+#define OMAP_COREDOMAINWKUP_RST_MASK			BIT(3)
 
 /*
  * 24XX: RM_RSTST_MPU, RM_RSTST_GFX, RM_RSTST_DSP
@@ -205,7 +205,7 @@ extern int omap2_clkdm_clear_all_wkdeps(struct clockdomain *clkdm);
  *
  * 3430: RM_RSTST_CORE, RM_RSTST_EMU
  */
-#define OMAP_DOMAINWKUP_RST_MASK			(1 << 2)
+#define OMAP_DOMAINWKUP_RST_MASK			BIT(2)
 
 /*
  * 24XX: RM_RSTST_MPU, RM_RSTST_WKUP, RM_RSTST_DSP
@@ -216,9 +216,9 @@ extern int omap2_clkdm_clear_all_wkdeps(struct clockdomain *clkdm);
  * 3430: RM_RSTST_CORE, RM_RSTST_EMU
  */
 #define OMAP_GLOBALWARM_RST_SHIFT			1
-#define OMAP_GLOBALWARM_RST_MASK			(1 << 1)
+#define OMAP_GLOBALWARM_RST_MASK			BIT(1)
 #define OMAP_GLOBALCOLD_RST_SHIFT			0
-#define OMAP_GLOBALCOLD_RST_MASK			(1 << 0)
+#define OMAP_GLOBALCOLD_RST_MASK			BIT(0)
 
 /*
  * 24XX: PM_WKDEP_GFX, PM_WKDEP_MPU, PM_WKDEP_CORE, PM_WKDEP_DSP
@@ -230,7 +230,7 @@ extern int omap2_clkdm_clear_all_wkdeps(struct clockdomain *clkdm);
  *	 PM_WKDEP_PER
  */
 #define OMAP_EN_WKUP_SHIFT				4
-#define OMAP_EN_WKUP_MASK				(1 << 4)
+#define OMAP_EN_WKUP_MASK				BIT(4)
 
 /*
  * 24XX: PM_PWSTCTRL_MPU, PM_PWSTCTRL_CORE, PM_PWSTCTRL_GFX,
@@ -242,7 +242,6 @@ extern int omap2_clkdm_clear_all_wkdeps(struct clockdomain *clkdm);
  *	 PM_PWSTCTRL_DSS, PM_PWSTCTRL_CAM, PM_PWSTCTRL_PER,
  *	 PM_PWSTCTRL_NEON
  */
-#define OMAP_LOGICRETSTATE_MASK				(1 << 2)
-
+#define OMAP_LOGICRETSTATE_MASK				BIT(2)
 
 #endif

@@ -28,13 +28,13 @@
 #include <linux/console.h>
 #include <linux/omap-dma.h>
 #include <linux/platform_data/serial-omap.h>
+#include <linux/power/omap/prm2xxx_3xxx.h>
 
 #include "common.h"
 #include "omap_hwmod.h"
 #include "omap_device.h"
 #include "omap-pm.h"
 #include "soc.h"
-#include "prm2xxx_3xxx.h"
 #include "pm.h"
 #include "cm2xxx_3xxx.h"
 #include "prm-regbits-34xx.h"

@@ -18,7 +18,6 @@
 #include "powerdomain.h"
 #include "powerdomains2xxx_3xxx_data.h"
 
-#include "prm2xxx_3xxx.h"
 #include "prm-regbits-24xx.h"
 
 /* 24XX powerdomains and dependencies */

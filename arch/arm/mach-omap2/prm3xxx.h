@@ -18,8 +18,7 @@
 
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/prm.h>
-
-#include "prm2xxx_3xxx.h"
+#include <linux/power/omap/prm2xxx_3xxx.h>
 
 /*
  * OMAP3-specific global PRM registers

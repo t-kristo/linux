@@ -25,7 +25,6 @@
 #include "cm2xxx_3xxx.h"
 #include "prcm44xx.h"
 #include "cm44xx.h"
-#include "prm2xxx_3xxx.h"
 #include "prm44xx.h"
 
 #include <asm/cpu.h>
