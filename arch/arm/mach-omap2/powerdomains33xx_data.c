@@ -15,10 +15,10 @@
 
 #include <linux/kernel.h>
 #include <linux/init.h>
+#include <linux/power/omap/prm33xx.h>
 
 #include "powerdomain.h"
 #include "prm-regbits-33xx.h"
-#include "prm33xx.h"
 
 static struct powerdomain gfx_33xx_pwrdm = {
 	.name			= "gfx_pwrdm",

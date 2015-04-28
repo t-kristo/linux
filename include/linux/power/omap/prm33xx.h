@@ -13,8 +13,8 @@
  * GNU General Public License for more details.
  */
 
-#ifndef __ARCH_ARM_MACH_OMAP2_PRM33XX_H
-#define __ARCH_ARM_MACH_OMAP2_PRM33XX_H
+#ifndef __LINUX_POWER_OMAP_PRM33XX_H
+#define __LINUX_POWER_OMAP_PRM33XX_H
 
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/prm.h>
