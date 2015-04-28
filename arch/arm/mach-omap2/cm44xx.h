@@ -17,7 +17,8 @@
 #define __ARCH_ASM_MACH_OMAP2_CM44XX_H
 
 
-#include "prcm-common.h"
+#include <linux/power/omap/prcm-common.h>
+
 #include "cm.h"
 
 #define OMAP4_CM_CLKSTCTRL				0x0000

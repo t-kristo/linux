@@ -13,7 +13,7 @@
 #ifndef __ARCH_ARM_MACH_OMAP2_PRM_H
 #define __ARCH_ARM_MACH_OMAP2_PRM_H
 
-#include "prcm-common.h"
+#include <linux/power/omap/prcm-common.h>
 
 # ifndef __ASSEMBLER__
 extern void __iomem *prm_base;

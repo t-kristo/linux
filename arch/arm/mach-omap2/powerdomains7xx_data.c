@@ -25,7 +25,6 @@
 
 #include "powerdomain.h"
 
-#include "prcm-common.h"
 #include "prcm44xx.h"
 #include "prm7xx.h"
 #include "prcm_mpu7xx.h"

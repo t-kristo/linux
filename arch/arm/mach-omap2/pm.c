@@ -17,6 +17,7 @@
 #include <linux/export.h>
 #include <linux/suspend.h>
 #include <linux/cpu.h>
+#include <linux/power/omap/prcm-common.h>
 
 #include <asm/system_misc.h>
 
@@ -25,7 +26,6 @@
 #include "common.h"
 
 #include "soc.h"
-#include "prcm-common.h"
 #include "voltage.h"
 #include "powerdomain.h"
 #include "clockdomain.h"

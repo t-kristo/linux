@@ -18,7 +18,6 @@
 
 #include "iomap.h"
 #include "common.h"
-#include "prcm-common.h"
 #include "prm44xx.h"
 #include "prm54xx.h"
 #include "prm7xx.h"

@@ -13,7 +13,6 @@
 
 #include "powerdomain.h"
 
-#include "prcm-common.h"
 #include "prcm44xx.h"
 #include "prcm43xx.h"
 

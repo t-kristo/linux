@@ -30,7 +30,6 @@
 #include "prcm44xx.h"
 #include "prm44xx.h"
 #include "prcm_mpu44xx.h"
-#include "prcm-common.h"
 
 #define OMAP4430_IDLEST_SHIFT		16
 #define OMAP4430_IDLEST_MASK		(0x3 << 16)

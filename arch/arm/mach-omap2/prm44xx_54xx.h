@@ -23,7 +23,7 @@
 #ifndef __ARCH_ARM_MACH_OMAP2_PRM44XX_54XX_H
 #define __ARCH_ARM_MACH_OMAP2_PRM44XX_54XX_H
 
-#include "prcm-common.h"
+#include <linux/power/omap/prcm-common.h>
 
 /* Function prototypes */
 #ifndef __ASSEMBLER__
