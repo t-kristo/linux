@@ -654,6 +654,22 @@ void omap_prm_init_pm(u8 flags)
 	prm_ll_data->init_pm(flags);
 }
 
+/**
+ * omap_prm_get_revision - gets PRCM version info from hardware
+ *
+ * Get PRCM hardware revision. Returns the bitcoded revision information.
+ */
+u32 omap_prm_get_revision(void)
+{
+	if (!prm_ll_data->get_revision) {
+		WARN_ONCE(1, "prm: %s: no mapping function defined\n",
+			  __func__);
+		return 0;
+	}
+
+	return prm_ll_data->get_revision();
+}
+
 #ifdef CONFIG_ARCH_OMAP2
 static struct omap_prcm_init_data omap2_prm_data __initdata = {
 	.index = TI_CLKM_PRM,

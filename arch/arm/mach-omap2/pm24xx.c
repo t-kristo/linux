@@ -225,7 +225,7 @@ int __init omap2_pm_init(void)
 	u32 l;
 
 	printk(KERN_INFO "Power Management for OMAP2 initializing\n");
-	l = omap2_prm_read_mod_reg(OCP_MOD, OMAP2_PRCM_REVISION_OFFSET);
+	l = omap_prm_get_revision();
 	printk(KERN_INFO "PRCM revision %d.%d\n", (l >> 4) & 0x0f, l & 0x0f);
 
 	/* Look up important powerdomains */

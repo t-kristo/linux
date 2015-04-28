@@ -208,6 +208,17 @@ struct pwrdm_ops omap2_pwrdm_operations = {
 };
 
 /**
+ * omap2_prm_get_revision - reads the PRCM revision info from hardware
+ *
+ * Reads the PRCM revision from hardware register. Returns the revision
+ * register value.
+ */
+static u32 omap2_prm_get_revision(void)
+{
+	return omap2_prm_read_mod_reg(OCP_MOD, OMAP2_PRCM_REVISION_OFFSET);
+}
+
+/**
  * omap2_prm_init_pm - power management init for OMAP2 PRM module
  * @flags: PRM feature flags
  *
@@ -254,6 +265,7 @@ static struct prm_ll_data omap2xxx_prm_ll_data = {
 	.reset_system = &omap2xxx_prm_dpll_reset,
 	.clear_mod_irqs = &omap2xxx_prm_clear_mod_irqs,
 	.init_pm = &omap2_prm_init_pm,
+	.get_revision = &omap2_prm_get_revision,
 };
 
 int __init omap2xxx_prm_init(const struct omap_prcm_init_data *data)

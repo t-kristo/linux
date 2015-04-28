@@ -152,6 +152,7 @@ struct prm_ll_data {
 	u32 (*vp_check_txdone)(u8 vp_id);
 	void (*vp_clear_txdone)(u8 vp_id);
 	void (*init_pm)(u8 flags);
+	u32 (*get_revision)(void);
 };
 
 int omap_prm_register(struct prm_ll_data *pld);
@@ -165,6 +166,7 @@ u32 omap_prm_read_reset_sources(void);
 bool omap_prm_was_any_context_lost_old(u8 part, s16 inst, u16 idx);
 void omap_prm_clear_context_loss_flags_old(u8 part, s16 inst, u16 idx);
 void omap_prm_reset_system(void);
+u32 omap_prm_get_revision(void);
 
 void omap_prm_reconfigure_io_chain(void);
 int omap_prm_clear_mod_irqs(s16 module, u8 regs, u32 wkst_mask);
