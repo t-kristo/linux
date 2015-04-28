@@ -22,8 +22,8 @@
  *     or "OMAP4430".
  */
 
-#ifndef __ARCH_ARM_MACH_OMAP2_PRM44XX_H
-#define __ARCH_ARM_MACH_OMAP2_PRM44XX_H
+#ifndef __LINUX_POWER_OMAP_PRM44XX_H
+#define __LINUX_POWER_OMAP_PRM44XX_H
 
 #include <linux/power/omap/prm.h>
 #include <linux/power/omap/prm44xx_54xx.h>
@@ -60,7 +60,6 @@
 #define OMAP4_RM_RSTTIME				0x0008
 #define OMAP4_PM_PWSTCTRL				0x0000
 #define OMAP4_PM_PWSTST					0x0004
-
 
 /* PRM */
 

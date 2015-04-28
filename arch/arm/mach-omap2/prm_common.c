@@ -31,9 +31,9 @@
 #include <linux/power/omap/prm2xxx.h>
 #include <linux/power/omap/prm3xxx.h>
 #include <linux/power/omap/prm33xx.h>
+#include <linux/power/omap/prm44xx.h>
 
 #include "soc.h"
-#include "prm44xx.h"
 #include "prm54xx.h"
 #include "prm7xx.h"
 #include "prcm43xx.h"

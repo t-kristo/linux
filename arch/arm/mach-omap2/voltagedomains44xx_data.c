@@ -20,11 +20,11 @@
 #include <linux/kernel.h>
 #include <linux/err.h>
 #include <linux/init.h>
+#include <linux/power/omap/prm44xx.h>
 
 #include "common.h"
 #include "soc.h"
 #include "prm-regbits-44xx.h"
-#include "prm44xx.h"
 #include "prcm44xx.h"
 #include "prminst44xx.h"
 #include "voltage.h"

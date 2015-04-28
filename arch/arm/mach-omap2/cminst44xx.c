@@ -21,6 +21,7 @@
 #include <linux/err.h>
 #include <linux/io.h>
 #include <linux/power/omap/cm.h>
+#include <linux/power/omap/prm44xx.h>
 
 #include "clockdomain.h"
 #include "cm1_44xx.h"
@@ -28,7 +29,6 @@
 #include "cm44xx.h"
 #include "cm-regbits-34xx.h"
 #include "prcm44xx.h"
-#include "prm44xx.h"
 #include "prcm_mpu44xx.h"
 
 #define OMAP4430_IDLEST_SHIFT		16

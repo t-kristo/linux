@@ -12,6 +12,7 @@
 #include <linux/init.h>
 #include <linux/bug.h>
 #include <linux/io.h>
+#include <linux/power/omap/prm44xx.h>
 
 #include <asm/div64.h>
 
@@ -21,7 +22,6 @@
 #include "vc.h"
 #include "prm-regbits-34xx.h"
 #include "prm-regbits-44xx.h"
-#include "prm44xx.h"
 #include "pm.h"
 #include "scrm44xx.h"
 #include "control.h"

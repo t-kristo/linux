@@ -1,5 +1,6 @@
 #include <linux/kernel.h>
 #include <linux/init.h>
+#include <linux/power/omap/prm44xx.h>
 
 #include "common.h"
 
@@ -7,7 +8,6 @@
 #include "vp.h"
 #include "prm-regbits-34xx.h"
 #include "prm-regbits-44xx.h"
-#include "prm44xx.h"
 
 static u32 _vp_set_init_voltage(struct voltagedomain *voltdm, u32 volt)
 {

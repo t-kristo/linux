@@ -42,6 +42,7 @@
 #include <linux/errno.h>
 #include <linux/linkage.h>
 #include <linux/smp.h>
+#include <linux/power/omap/prm44xx.h>
 
 #include <asm/cacheflush.h>
 #include <asm/tlbflush.h>
@@ -59,7 +60,6 @@
 #include "prcm_mpu54xx.h"
 #include "prminst44xx.h"
 #include "prcm44xx.h"
-#include "prm44xx.h"
 #include "prm-regbits-44xx.h"
 
 #ifdef CONFIG_SMP
