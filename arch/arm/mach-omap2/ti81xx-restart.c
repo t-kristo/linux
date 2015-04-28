@@ -6,11 +6,11 @@
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/reboot.h>
+#include <linux/power/omap/prm3xxx.h>
 
 #include "iomap.h"
 #include "common.h"
 #include "control.h"
-#include "prm3xxx.h"
 
 #define TI81XX_PRM_DEVICE_RSTCTRL	0x00a0
 #define TI81XX_GLOBAL_RST_COLD		BIT(1)

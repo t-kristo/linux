@@ -23,13 +23,13 @@
  * MA 02111-1307 USA
  */
 #include <linux/linkage.h>
+#include <linux/power/omap/prm3xxx.h>
 
 #include <asm/assembler.h>
 
 #include "omap34xx.h"
 #include "iomap.h"
 #include "cm3xxx.h"
-#include "prm3xxx.h"
 #include "sdrc.h"
 #include "sram.h"
 #include "control.h"

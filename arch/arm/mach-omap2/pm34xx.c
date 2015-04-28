@@ -31,6 +31,7 @@
 #include <linux/omap-dma.h>
 #include <linux/omap-gpmc.h>
 #include <linux/platform_data/gpio-omap.h>
+#include <linux/power/omap/prm3xxx.h>
 
 #include <trace/events/power.h>
 
@@ -45,7 +46,6 @@
 #include "cm3xxx.h"
 #include "cm-regbits-34xx.h"
 #include "prm-regbits-34xx.h"
-#include "prm3xxx.h"
 #include "pm.h"
 #include "sdrc.h"
 #include "sram.h"

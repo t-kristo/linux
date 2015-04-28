@@ -155,7 +155,6 @@
 #include "cm2xxx.h"
 #include "cm3xxx.h"
 #include "cm33xx.h"
-#include "prm3xxx.h"
 #include "prm44xx.h"
 #include "prm33xx.h"
 #include "prminst44xx.h"

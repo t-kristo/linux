@@ -29,9 +29,9 @@
 #include <linux/clk/ti.h>
 #include <linux/power/omap/cm.h>
 #include <linux/power/omap/prm2xxx.h>
+#include <linux/power/omap/prm3xxx.h>
 
 #include "soc.h"
-#include "prm3xxx.h"
 #include "prm33xx.h"
 #include "prm44xx.h"
 #include "prm54xx.h"

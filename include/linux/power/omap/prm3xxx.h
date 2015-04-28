@@ -13,8 +13,8 @@
  * other.  The PRM on OMAP4 has a new register layout, and is handled
  * in a separate file.
  */
-#ifndef __ARCH_ARM_MACH_OMAP2_PRM3XXX_H
-#define __ARCH_ARM_MACH_OMAP2_PRM3XXX_H
+#ifndef __LINUX_POWER_OMAP_PRM3XXX_H
+#define __LINUX_POWER_OMAP_PRM3XXX_H
 
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/prm.h>
@@ -34,7 +34,6 @@
 
 #define OMAP3_PRM_IRQSTATUS_MPU_OFFSET	0x0018
 #define OMAP3_PRM_IRQENABLE_MPU_OFFSET	0x001c
-
 
 #define OMAP3_PRM_VC_SMPS_SA_OFFSET	0x0020
 #define OMAP3_PRM_VC_SMPS_VOL_RA_OFFSET	0x0024
@@ -88,22 +87,20 @@
 #define OMAP3430_PRM_IRQSTATUS_IVA2			0x00f8
 #define OMAP3430_PRM_IRQENABLE_IVA2			0x00fc
 
-
 #ifndef __ASSEMBLER__
 
 /*
  * OMAP3 access functions for voltage controller (VC) and
  * voltage proccessor (VP) in the PRM.
  */
-extern u32 omap3_prm_vcvp_read(u8 offset);
-extern void omap3_prm_vcvp_write(u32 val, u8 offset);
-extern u32 omap3_prm_vcvp_rmw(u32 mask, u32 bits, u8 offset);
+u32 omap3_prm_vcvp_read(u8 offset);
+void omap3_prm_vcvp_write(u32 val, u8 offset);
+u32 omap3_prm_vcvp_rmw(u32 mask, u32 bits, u8 offset);
 
 int __init omap3xxx_prm_init(const struct omap_prcm_init_data *data);
 int omap3xxx_prm_clear_global_cold_reset(void);
 void omap3_prm_save_scratchpad_contents(u32 *ptr);
 
 #endif /* __ASSEMBLER */
-
 
 #endif
