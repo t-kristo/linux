@@ -34,9 +34,9 @@
 #include <linux/power/omap/prm44xx.h>
 #include <linux/power/omap/prm54xx.h>
 #include <linux/power/omap/prm7xx.h>
+#include <linux/power/omap/prcm43xx.h>
 
 #include "soc.h"
-#include "prcm43xx.h"
 #include "common.h"
 #include "clock.h"
 #include "control.h"

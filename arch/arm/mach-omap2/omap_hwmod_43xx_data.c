@@ -16,9 +16,9 @@
 
 #include <linux/platform_data/gpio-omap.h>
 #include <linux/platform_data/spi-omap2-mcspi.h>
+#include <linux/power/omap/prcm43xx.h>
 #include "omap_hwmod.h"
 #include "omap_hwmod_33xx_43xx_common_data.h"
-#include "prcm43xx.h"
 #include "omap_hwmod_common_data.h"
 #include "hdq1w.h"
 

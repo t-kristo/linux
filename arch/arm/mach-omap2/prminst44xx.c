@@ -24,7 +24,6 @@
 #include "common.h"
 #include "prm-regbits-44xx.h"
 #include "prcm44xx.h"
-#include "prcm43xx.h"
 #include "prcm_mpu44xx.h"
 #include "soc.h"
 

@@ -10,11 +10,11 @@
 
 #include <linux/kernel.h>
 #include <linux/init.h>
+#include <linux/power/omap/prcm43xx.h>
 
 #include "powerdomain.h"
 
 #include "prcm44xx.h"
-#include "prcm43xx.h"
 
 static struct powerdomain gfx_43xx_pwrdm = {
 	.name		  = "gfx_pwrdm",

@@ -10,10 +10,10 @@
 
 #include <linux/kernel.h>
 #include <linux/io.h>
+#include <linux/power/omap/prcm43xx.h>
 
 #include "clockdomain.h"
 #include "prcm44xx.h"
-#include "prcm43xx.h"
 
 static struct clockdomain l4_cefuse_43xx_clkdm = {
 	.name		  = "l4_cefuse_clkdm",

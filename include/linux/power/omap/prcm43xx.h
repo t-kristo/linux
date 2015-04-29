@@ -8,8 +8,8 @@
  * kind, whether express or implied.
  */
 
-#ifndef __ARCH_ARM_MACH_OMAP2_PRCM_43XX_H
-#define __ARCH_ARM_MACH_OMAP2_PRCM_43XX_H
+#ifndef __LINUX_POWER_OMAP_PRCM_43XX_H
+#define __LINUX_POWER_OMAP_PRCM_43XX_H
 
 #define AM43XX_PRM_PARTITION				1
 #define AM43XX_CM_PARTITION				1
