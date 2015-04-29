@@ -109,7 +109,7 @@ obj-$(CONFIG_SOC_DRA7XX)		+= $(omap-4-5-idle-common)
 endif
 
 # PRCM
-obj-y					+= prm_common.o cm_common.o
+obj-y					+= cm_common.o
 obj-$(CONFIG_ARCH_OMAP2)		+= prm2xxx_3xxx.o prm2xxx.o cm2xxx.o
 obj-$(CONFIG_ARCH_OMAP3)		+= prm2xxx_3xxx.o prm3xxx.o cm3xxx.o
 obj-$(CONFIG_ARCH_OMAP3)		+= vc3xxx_data.o vp3xxx_data.o

@@ -12,8 +12,6 @@
  * For historical purposes, the API used to configure the PRM
  * interrupt handler refers to it as the "PRCM interrupt."  The
  * underlying registers are located in the PRM on OMAP3/4.
- *
- * XXX This code should eventually be moved to a PRM driver.
  */
 
 #include <linux/kernel.h>
@@ -72,10 +70,10 @@ static struct prm_ll_data null_prm_ll_data;
 static struct prm_ll_data *prm_ll_data = &null_prm_ll_data;
 
 /*
- * prcm_pdata: function pointers to platform specific implementations
+ * omap_prcm_pdata: function pointers to platform specific implementations
  * for some support features required by PRCM drivers.
  */
-static struct omap_prcm_plat_data *prcm_pdata;
+struct omap_prcm_plat_data *omap_prcm_pdata;
 
 /* Private functions */
 
@@ -83,7 +81,7 @@ static struct omap_prcm_plat_data *prcm_pdata;
  * Move priority events from events to priority_events array
  */
 static void omap_prcm_events_filter_priority(unsigned long *events,
-	unsigned long *priority_events)
+					     unsigned long *priority_events)
 {
 	int i;
 
@@ -121,7 +119,8 @@ static void omap_prcm_irq_handler(unsigned int irq, struct irq_desc *desc)
 	 * suspend.
 	 */
 	if (prcm_irq_setup->suspended) {
-		prcm_irq_setup->save_and_clear_irqen(prcm_irq_setup->saved_mask);
+		prcm_irq_setup->
+			save_and_clear_irqen(prcm_irq_setup->saved_mask);
 		prcm_irq_setup->suspend_save_flag = true;
 	}
 
@@ -205,7 +204,7 @@ void omap_prcm_irq_cleanup(void)
 		for (i = 0; i < prcm_irq_setup->nr_regs; i++) {
 			if (prcm_irq_chips[i])
 				irq_remove_generic_chip(prcm_irq_chips[i],
-					0xffffffff, 0, 0);
+							0xffffffff, 0, 0);
 			prcm_irq_chips[i] = NULL;
 		}
 		kfree(prcm_irq_chips);
@@ -226,7 +225,7 @@ void omap_prcm_irq_cleanup(void)
 
 	if (prcm_irq_setup->base_irq > 0)
 		irq_free_descs(prcm_irq_setup->base_irq,
-			prcm_irq_setup->nr_regs * 32);
+			       prcm_irq_setup->nr_regs * 32);
 	prcm_irq_setup->base_irq = 0;
 }
 
@@ -289,10 +288,10 @@ int omap_prcm_register_chain_handler(struct omap_prcm_irq_setup *irq_setup)
 
 	prcm_irq_setup = irq_setup;
 
-	prcm_irq_chips = kzalloc(sizeof(void *) * nr_regs, GFP_KERNEL);
-	prcm_irq_setup->saved_mask = kzalloc(sizeof(u32) * nr_regs, GFP_KERNEL);
-	prcm_irq_setup->priority_mask = kzalloc(sizeof(u32) * nr_regs,
-		GFP_KERNEL);
+	prcm_irq_chips = kcalloc(nr_regs, sizeof(void *), GFP_KERNEL);
+	prcm_irq_setup->saved_mask = kcalloc(nr_regs, sizeof(u32), GFP_KERNEL);
+	prcm_irq_setup->priority_mask = kcalloc(nr_regs, sizeof(u32),
+						GFP_KERNEL);
 
 	if (!prcm_irq_chips || !prcm_irq_setup->saved_mask ||
 	    !prcm_irq_setup->priority_mask) {
@@ -321,14 +320,14 @@ int omap_prcm_register_chain_handler(struct omap_prcm_irq_setup *irq_setup)
 
 	if (irq_setup->base_irq < 0) {
 		pr_err("PRCM: failed to allocate irq descs: %d\n",
-			irq_setup->base_irq);
+		       irq_setup->base_irq);
 		goto err;
 	}
 
 	for (i = 0; i < irq_setup->nr_regs; i++) {
 		gc = irq_alloc_generic_chip("PRCM", 1,
-			irq_setup->base_irq + i * 32, prm_base,
-			handle_level_irq);
+					    irq_setup->base_irq + i * 32,
+					    prm_base, handle_level_irq);
 
 		if (!gc) {
 			pr_err("PRCM: failed to allocate generic chip\n");
@@ -348,9 +347,10 @@ int omap_prcm_register_chain_handler(struct omap_prcm_irq_setup *irq_setup)
 
 	if (of_have_populated_dt()) {
 		int irq = omap_prcm_event_to_irq("io");
-		if (prcm_pdata)
-			prcm_pdata->pcs_legacy_init(irq, irq_setup->
-						    reconfigure_io_chain);
+
+		if (omap_prcm_pdata)
+			omap_prcm_pdata->pcs_legacy_init(irq, irq_setup->
+							 reconfigure_io_chain);
 		else
 			pr_warn("PRCM: no pdata, unable to setup pcs irq.\n");
 	}
@@ -392,7 +392,8 @@ u32 omap_prm_read_reset_sources(void)
 	if (prm_ll_data->read_reset_sources)
 		ret = prm_ll_data->read_reset_sources();
 	else
-		WARN_ONCE(1, "prm: %s: no mapping function defined for reset sources\n", __func__);
+		WARN_ONCE(1, "prm: %s: no mapping function defined\n",
+			  __func__);
 
 	return ret;
 }
@@ -855,10 +856,10 @@ subsys_initcall(prm_late_init);
 
 int __init omap2_prcm_register_pdata(struct omap_prcm_plat_data *data)
 {
-	if (prcm_pdata || !data)
+	if (omap_prcm_pdata || !data)
 		return -EINVAL;
 
-	prcm_pdata = data;
+	omap_prcm_pdata = data;
 
 	return 0;
 }
