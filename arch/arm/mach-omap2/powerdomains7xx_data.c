@@ -22,11 +22,11 @@
 
 #include <linux/kernel.h>
 #include <linux/init.h>
+#include <linux/power/omap/prm7xx.h>
 
 #include "powerdomain.h"
 
 #include "prcm44xx.h"
-#include "prm7xx.h"
 #include "prcm_mpu7xx.h"
 
 /* iva_7xx_pwrdm: IVA-HD power domain */

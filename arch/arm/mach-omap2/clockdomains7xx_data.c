@@ -22,13 +22,13 @@
 
 #include <linux/kernel.h>
 #include <linux/io.h>
+#include <linux/power/omap/prm7xx.h>
 
 #include "clockdomain.h"
 #include "cm1_7xx.h"
 #include "cm2_7xx.h"
 
 #include "cm-regbits-7xx.h"
-#include "prm7xx.h"
 #include "prcm44xx.h"
 #include "prcm_mpu7xx.h"
 

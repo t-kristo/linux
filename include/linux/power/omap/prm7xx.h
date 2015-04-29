@@ -19,8 +19,8 @@
  * published by the Free Software Foundation.
  */
 
-#ifndef __ARCH_ARM_MACH_OMAP2_PRM7XX_H
-#define __ARCH_ARM_MACH_OMAP2_PRM7XX_H
+#ifndef __LINUX_POWER_OMAP_PRM7XX_H
+#define __LINUX_POWER_OMAP_PRM7XX_H
 
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/prm.h>
