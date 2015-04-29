@@ -199,3 +199,21 @@ void omap4_prminst_global_warm_sw_reset(void)
 	v = omap4_prminst_read_inst_reg(OMAP4430_PRM_PARTITION,
 				    inst, OMAP4_PRM_RSTCTRL_OFFSET);
 }
+
+/**
+ * omap4_prminst_clear_mpuss_prev_logic_pwrst - clear MPUSS previous logic state
+ *
+ * Clears MPUSS previous logic state entered. This is used to track the state
+ * MPUSS enters during idle. No return value.
+ */
+void omap4_prminst_clear_mpuss_prev_logic_pwrst(void)
+{
+	u32 reg;
+
+	reg = omap4_prminst_read_inst_reg(OMAP4430_PRM_PARTITION,
+					  OMAP4430_PRM_MPU_INST,
+					  OMAP4_RM_MPU_MPU_CONTEXT_OFFSET);
+	omap4_prminst_write_inst_reg(reg, OMAP4430_PRM_PARTITION,
+				     OMAP4430_PRM_MPU_INST,
+				     OMAP4_RM_MPU_MPU_CONTEXT_OFFSET);
+}

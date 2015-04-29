@@ -150,17 +150,6 @@ static void scu_pwrst_prepare(unsigned int cpu_id, unsigned int cpu_state)
 		writel_relaxed(scu_pwr_st, pm_info->scu_sar_addr);
 }
 
-/* Helper functions for MPUSS OSWR */
-static inline void mpuss_clear_prev_logic_pwrst(void)
-{
-	u32 reg;
-
-	reg = omap4_prminst_read_inst_reg(OMAP4430_PRM_PARTITION,
-		OMAP4430_PRM_MPU_INST, OMAP4_RM_MPU_MPU_CONTEXT_OFFSET);
-	omap4_prminst_write_inst_reg(reg, OMAP4430_PRM_PARTITION,
-		OMAP4430_PRM_MPU_INST, OMAP4_RM_MPU_MPU_CONTEXT_OFFSET);
-}
-
 static inline void cpu_clear_prev_logic_pwrst(unsigned int cpu_id)
 {
 	u32 reg;
@@ -264,7 +253,7 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 	 * Check MPUSS next state and save interrupt controller if needed.
 	 * In MPUSS OSWR or device OFF, interrupt controller  contest is lost.
 	 */
-	mpuss_clear_prev_logic_pwrst();
+	omap4_prminst_clear_mpuss_prev_logic_pwrst();
 	if ((pwrdm_read_next_pwrst(mpuss_pd) == PWRDM_POWER_RET) &&
 		(pwrdm_read_logic_retst(mpuss_pd) == PWRDM_POWER_OFF))
 		save_state = 2;
@@ -417,7 +406,7 @@ int __init omap4_mpuss_init(void)
 		return -ENODEV;
 	}
 	pwrdm_clear_all_prev_pwrst(mpuss_pd);
-	mpuss_clear_prev_logic_pwrst();
+	omap4_prminst_clear_mpuss_prev_logic_pwrst();
 
 	if (sar_base) {
 		/* Save device type on scratchpad for low level code to use */

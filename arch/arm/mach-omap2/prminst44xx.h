@@ -15,6 +15,7 @@
 #define PRM_INSTANCE_UNKNOWN	-1
 extern s32 omap4_prmst_get_prm_dev_inst(void);
 void omap4_prminst_set_prm_dev_inst(s32 dev_inst);
+void omap4_prminst_clear_mpuss_prev_logic_pwrst(void);
 
 /*
  * In an ideal world, we would not export these low-level functions,
