@@ -374,6 +374,25 @@ static void __init __maybe_unused omap_common_late_init(void)
 	omap_soc_device_init();
 }
 
+static struct omap_prcm_plat_data prcm_pdata = {
+	.pcs_legacy_init = omap_pcs_legacy_init,
+};
+
+static int __init omap2_prcm_init(void)
+{
+	int ret;
+
+	ret = omap2_prcm_register_pdata(&prcm_pdata);
+	if (ret) {
+		pr_err("%s: pdata register failed with %d\n", __func__, ret);
+		return ret;
+	}
+
+	omap2_prcm_base_init();
+
+	return 0;
+}
+
 #ifdef CONFIG_SOC_OMAP2420
 void __init omap2420_init_early(void)
 {
@@ -382,7 +401,7 @@ void __init omap2420_init_early(void)
 			       OMAP2_L3_IO_ADDRESS(OMAP2420_SMS_BASE));
 	omap2_control_base_init();
 	omap2xxx_check_revision();
-	omap2_prcm_base_init();
+	omap2_prcm_init();
 	omap2xxx_voltagedomains_init();
 	omap242x_powerdomains_init();
 	omap242x_clockdomains_init();
@@ -408,7 +427,7 @@ void __init omap2430_init_early(void)
 			       OMAP2_L3_IO_ADDRESS(OMAP243X_SMS_BASE));
 	omap2_control_base_init();
 	omap2xxx_check_revision();
-	omap2_prcm_base_init();
+	omap2_prcm_init();
 	omap2xxx_voltagedomains_init();
 	omap243x_powerdomains_init();
 	omap243x_clockdomains_init();
@@ -447,7 +466,7 @@ void __init omap3_init_early(void)
 	omap2_control_base_init();
 	omap3xxx_check_revision();
 	omap3xxx_check_features();
-	omap2_prcm_base_init();
+	omap2_prcm_init();
 	/* XXX: remove these once OMAP3 is DT only */
 	if (!of_have_populated_dt()) {
 		omap3xxx_prm_init(NULL);
@@ -549,7 +568,7 @@ void __init ti814x_init_early(void)
 	omap2_control_base_init();
 	omap3xxx_check_revision();
 	ti81xx_check_features();
-	omap2_prcm_base_init();
+	omap2_prcm_init();
 	omap3xxx_voltagedomains_init();
 	omap3xxx_powerdomains_init();
 	ti81xx_clockdomains_init();
@@ -566,7 +585,7 @@ void __init ti816x_init_early(void)
 	omap2_control_base_init();
 	omap3xxx_check_revision();
 	ti81xx_check_features();
-	omap2_prcm_base_init();
+	omap2_prcm_init();
 	omap3xxx_voltagedomains_init();
 	omap3xxx_powerdomains_init();
 	ti81xx_clockdomains_init();
@@ -585,7 +604,7 @@ void __init am33xx_init_early(void)
 	omap2_control_base_init();
 	omap3xxx_check_revision();
 	am33xx_check_features();
-	omap2_prcm_base_init();
+	omap2_prcm_init();
 	am33xx_powerdomains_init();
 	am33xx_clockdomains_init();
 	am33xx_hwmod_init();
@@ -607,7 +626,7 @@ void __init am43xx_init_early(void)
 	omap2_control_base_init();
 	omap3xxx_check_revision();
 	am33xx_check_features();
-	omap2_prcm_base_init();
+	omap2_prcm_init();
 	am43xx_powerdomains_init();
 	am43xx_clockdomains_init();
 	am43xx_hwmod_init();
@@ -631,7 +650,7 @@ void __init omap4430_init_early(void)
 	omap2_control_base_init();
 	omap4xxx_check_revision();
 	omap4xxx_check_features();
-	omap2_prcm_base_init();
+	omap2_prcm_init();
 	omap4_pm_init_early();
 	omap44xx_voltagedomains_init();
 	omap44xx_powerdomains_init();
@@ -658,7 +677,7 @@ void __init omap5_init_early(void)
 	omap2_set_globals_prcm_mpu(OMAP2_L4_IO_ADDRESS(OMAP54XX_PRCM_MPU_BASE));
 	omap2_control_base_init();
 	omap4_pm_init_early();
-	omap2_prcm_base_init();
+	omap2_prcm_init();
 	omap5xxx_check_revision();
 	omap54xx_voltagedomains_init();
 	omap54xx_powerdomains_init();
@@ -683,7 +702,7 @@ void __init dra7xx_init_early(void)
 	omap2_set_globals_prcm_mpu(OMAP2_L4_IO_ADDRESS(OMAP54XX_PRCM_MPU_BASE));
 	omap2_control_base_init();
 	omap4_pm_init_early();
-	omap2_prcm_base_init();
+	omap2_prcm_init();
 	dra7xxx_check_revision();
 	dra7xx_powerdomains_init();
 	dra7xx_clockdomains_init();

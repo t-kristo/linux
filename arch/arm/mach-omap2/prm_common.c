@@ -36,11 +36,6 @@
 #include <linux/power/omap/prm7xx.h>
 #include <linux/power/omap/prcm43xx.h>
 
-#include "soc.h"
-#include "common.h"
-#include "clock.h"
-#include "control.h"
-
 /*
  * OMAP_PRCM_MAX_NR_PENDING_REG: maximum number of PRM_IRQ*_MPU regs
  * XXX this is technically not needed, since
@@ -75,6 +70,12 @@ u16 prm_features;
  */
 static struct prm_ll_data null_prm_ll_data;
 static struct prm_ll_data *prm_ll_data = &null_prm_ll_data;
+
+/*
+ * prcm_pdata: function pointers to platform specific implementations
+ * for some support features required by PRCM drivers.
+ */
+static struct omap_prcm_plat_data *prcm_pdata;
 
 /* Private functions */
 
@@ -347,7 +348,11 @@ int omap_prcm_register_chain_handler(struct omap_prcm_irq_setup *irq_setup)
 
 	if (of_have_populated_dt()) {
 		int irq = omap_prcm_event_to_irq("io");
-		omap_pcs_legacy_init(irq, irq_setup->reconfigure_io_chain);
+		if (prcm_pdata)
+			prcm_pdata->pcs_legacy_init(irq, irq_setup->
+						    reconfigure_io_chain);
+		else
+			pr_warn("PRCM: no pdata, unable to setup pcs irq.\n");
 	}
 
 	return 0;
@@ -847,3 +852,13 @@ static int __init prm_late_init(void)
 	return 0;
 }
 subsys_initcall(prm_late_init);
+
+int __init omap2_prcm_register_pdata(struct omap_prcm_plat_data *data)
+{
+	if (prcm_pdata || !data)
+		return -EINVAL;
+
+	prcm_pdata = data;
+
+	return 0;
+}
