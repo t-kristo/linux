@@ -26,7 +26,6 @@
 #include "soc.h"
 #include "prm-regbits-44xx.h"
 #include "prcm44xx.h"
-#include "prminst44xx.h"
 #include "voltage.h"
 #include "omap_opp_data.h"
 #include "vc.h"

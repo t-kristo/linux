@@ -19,6 +19,7 @@
 #include <linux/io.h>
 #include <linux/of_irq.h>
 #include <linux/power/omap/prm44xx.h>
+#include <linux/power/omap/prminst44xx.h>
 
 #include "soc.h"
 #include "iomap.h"
@@ -26,7 +27,6 @@
 #include "vp.h"
 #include "prm-regbits-44xx.h"
 #include "prcm44xx.h"
-#include "prminst44xx.h"
 #include "powerdomain.h"
 
 /* Static data */
