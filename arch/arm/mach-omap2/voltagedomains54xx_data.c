@@ -12,10 +12,10 @@
 #include <linux/kernel.h>
 #include <linux/err.h>
 #include <linux/init.h>
+#include <linux/power/omap/prm54xx.h>
 
 #include "common.h"
 
-#include "prm54xx.h"
 #include "voltage.h"
 #include "omap_opp_data.h"
 #include "vc.h"

@@ -16,10 +16,10 @@
 #include <linux/err.h>
 #include <linux/io.h>
 #include <linux/power/omap/prm44xx.h>
+#include <linux/power/omap/prm54xx.h>
 
 #include "iomap.h"
 #include "common.h"
-#include "prm54xx.h"
 #include "prm7xx.h"
 #include "prminst44xx.h"
 #include "prm-regbits-44xx.h"

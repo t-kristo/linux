@@ -20,11 +20,11 @@
 
 #include <linux/kernel.h>
 #include <linux/init.h>
+#include <linux/power/omap/prm54xx.h>
 
 #include "powerdomain.h"
 
 #include "prcm44xx.h"
-#include "prm54xx.h"
 #include "prcm_mpu54xx.h"
 
 /* core_54xx_pwrdm: CORE power domain */

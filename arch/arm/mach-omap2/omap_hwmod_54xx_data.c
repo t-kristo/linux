@@ -26,13 +26,13 @@
 #include <linux/omap-dma.h>
 #include <linux/platform_data/spi-omap2-mcspi.h>
 #include <linux/platform_data/asoc-ti-mcbsp.h>
+#include <linux/power/omap/prm54xx.h>
 #include <plat/dmtimer.h>
 
 #include "omap_hwmod.h"
 #include "omap_hwmod_common_data.h"
 #include "cm1_54xx.h"
 #include "cm2_54xx.h"
-#include "prm54xx.h"
 #include "i2c.h"
 #include "wd_timer.h"
 
