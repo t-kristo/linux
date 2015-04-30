@@ -540,8 +540,12 @@ int omap_prcm_event_to_irq(const char *event);
 void omap_prcm_irq_prepare(void);
 void omap_prcm_irq_complete(void);
 
+struct powerdomain;
+
 struct omap_prcm_plat_data {
 	void (*pcs_legacy_init)(int irq, void (*rearm)(void));
+	struct voltagedomain * (*voltdm_lookup)(const char *name);
+	void (*pm_dbg_update_time)(struct powerdomain *pwrdm, int prev);
 };
 
 int __init omap2_prcm_register_pdata(struct omap_prcm_plat_data *data);

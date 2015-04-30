@@ -31,10 +31,6 @@
 
 #include "powerdomain.h"
 #include "clockdomain.h"
-#include "voltage.h"
-
-#include "soc.h"
-#include "pm.h"
 
 #define PWRDM_TRACE_STATES_FLAG	(1<<31)
 
@@ -99,7 +95,7 @@ static int _pwrdm_register(struct powerdomain *pwrdm)
 		if (!arch_pwrdm->pwrdm_has_voltdm())
 			goto skip_voltdm;
 
-	voltdm = voltdm_lookup(pwrdm->voltdm.name);
+	voltdm = omap_prcm_pdata->voltdm_lookup(pwrdm->voltdm.name);
 	if (!voltdm) {
 		pr_err("powerdomain: %s: voltagedomain %s does not exist\n",
 		       pwrdm->name, pwrdm->voltdm.name);
@@ -189,7 +185,7 @@ static int _pwrdm_state_switch(struct powerdomain *pwrdm, int flag)
 	if (state != prev)
 		pwrdm->state_counter[state]++;
 
-	pm_dbg_update_time(pwrdm, prev);
+	omap_prcm_pdata->pm_dbg_update_time(pwrdm, prev);
 
 	pwrdm->state = state;
 

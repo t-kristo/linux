@@ -54,6 +54,7 @@
 #include "cm44xx.h"
 #include "prcm_mpu44xx.h"
 #include "opp2xxx.h"
+#include "pm.h"
 
 /*
  * omap_clk_soc_init: points to a function that does the SoC-specific
@@ -374,8 +375,25 @@ static void __init __maybe_unused omap_common_late_init(void)
 	omap_soc_device_init();
 }
 
+/**
+ * _pm_dbg_update_wrapper - callback wrapper for PM debug functionality
+ * @pwrdm: powerdomain for update state for
+ * @prev: previous power state
+ *
+ * This wrapper just directly passes the update information to the PM
+ * debug functionality. Only needed because the actual function itself
+ * may be a NOP macro in case PM debug is not built-in, and the
+ * function pointer assignment below would fail in this case.
+ */
+static void _pm_dbg_update_wrapper(struct powerdomain *pwrdm, int prev)
+{
+	pm_dbg_update_time(pwrdm, prev);
+}
+
 static struct omap_prcm_plat_data prcm_pdata = {
 	.pcs_legacy_init = omap_pcs_legacy_init,
+	.voltdm_lookup = voltdm_lookup,
+	.pm_dbg_update_time = _pm_dbg_update_wrapper,
 };
 
 static int __init omap2_prcm_init(void)
