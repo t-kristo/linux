@@ -3871,7 +3871,7 @@ int omap_hwmod_get_context_loss_count(struct omap_hwmod *oh)
 
 	pwrdm = omap_hwmod_get_pwrdm(oh);
 	if (pwrdm)
-		ret = pwrdm_get_context_loss_count(pwrdm);
+		ret = omap_pwrdm_get_context_loss_count(pwrdm);
 
 	return ret;
 }

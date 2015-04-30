@@ -247,20 +247,20 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 		return -ENXIO;
 	}
 
-	pwrdm_pre_transition(NULL);
+	omap_pwrdm_pre_transition(NULL);
 
 	/*
 	 * Check MPUSS next state and save interrupt controller if needed.
 	 * In MPUSS OSWR or device OFF, interrupt controller  contest is lost.
 	 */
 	omap4_prminst_clear_mpuss_prev_logic_pwrst();
-	if ((pwrdm_read_next_pwrst(mpuss_pd) == PWRDM_POWER_RET) &&
-		(pwrdm_read_logic_retst(mpuss_pd) == PWRDM_POWER_OFF))
+	if ((omap_pwrdm_read_next_pwrst(mpuss_pd) == PWRDM_POWER_RET) &&
+	    (omap_pwrdm_read_logic_retst(mpuss_pd) == PWRDM_POWER_OFF))
 		save_state = 2;
 
 	cpu_clear_prev_logic_pwrst(cpu);
-	pwrdm_set_next_pwrst(pm_info->pwrdm, power_state);
-	pwrdm_set_logic_retst(pm_info->pwrdm, cpu_logic_state);
+	omap_pwrdm_set_next_pwrst(pm_info->pwrdm, power_state);
+	omap_pwrdm_set_logic_retst(pm_info->pwrdm, cpu_logic_state);
 	set_cpu_wakeup_addr(cpu, virt_to_phys(omap_pm_ops.resume));
 	omap_pm_ops.scu_prepare(cpu, power_state);
 	l2x0_pwrst_prepare(cpu, save_state);
@@ -284,9 +284,9 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 	 * domain transition
 	 */
 	wakeup_cpu = smp_processor_id();
-	pwrdm_set_next_pwrst(pm_info->pwrdm, PWRDM_POWER_ON);
+	omap_pwrdm_set_next_pwrst(pm_info->pwrdm, PWRDM_POWER_ON);
 
-	pwrdm_post_transition(NULL);
+	omap_pwrdm_post_transition(NULL);
 
 	return 0;
 }
@@ -305,14 +305,14 @@ int omap4_hotplug_cpu(unsigned int cpu, unsigned int power_state)
 		return -ENXIO;
 
 	/* Use the achievable power state for the domain */
-	power_state = pwrdm_get_valid_lp_state(pm_info->pwrdm,
-					       false, power_state);
+	power_state = omap_pwrdm_get_valid_lp_state(pm_info->pwrdm,
+						    false, power_state);
 
 	if (power_state == PWRDM_POWER_OFF)
 		cpu_state = 1;
 
-	pwrdm_clear_all_prev_pwrst(pm_info->pwrdm);
-	pwrdm_set_next_pwrst(pm_info->pwrdm, power_state);
+	omap_pwrdm_clear_all_prev_pwrst(pm_info->pwrdm);
+	omap_pwrdm_set_next_pwrst(pm_info->pwrdm, power_state);
 	set_cpu_wakeup_addr(cpu, virt_to_phys(omap_pm_ops.hotplug_restart));
 	omap_pm_ops.scu_prepare(cpu, power_state);
 
@@ -323,7 +323,7 @@ int omap4_hotplug_cpu(unsigned int cpu, unsigned int power_state)
 	 */
 	omap_pm_ops.finish_suspend(cpu_state);
 
-	pwrdm_set_next_pwrst(pm_info->pwrdm, PWRDM_POWER_ON);
+	omap_pwrdm_set_next_pwrst(pm_info->pwrdm, PWRDM_POWER_ON);
 	return 0;
 }
 
@@ -366,18 +366,18 @@ int __init omap4_mpuss_init(void)
 					CPU0_WAKEUP_NS_PA_ADDR_OFFSET;
 		pm_info->l2x0_sar_addr = sar_base + L2X0_SAVE_OFFSET0;
 	}
-	pm_info->pwrdm = pwrdm_lookup("cpu0_pwrdm");
+	pm_info->pwrdm = omap_pwrdm_lookup("cpu0_pwrdm");
 	if (!pm_info->pwrdm) {
 		pr_err("Lookup failed for CPU0 pwrdm\n");
 		return -ENODEV;
 	}
 
 	/* Clear CPU previous power domain state */
-	pwrdm_clear_all_prev_pwrst(pm_info->pwrdm);
+	omap_pwrdm_clear_all_prev_pwrst(pm_info->pwrdm);
 	cpu_clear_prev_logic_pwrst(0);
 
 	/* Initialise CPU0 power domain state to ON */
-	pwrdm_set_next_pwrst(pm_info->pwrdm, PWRDM_POWER_ON);
+	omap_pwrdm_set_next_pwrst(pm_info->pwrdm, PWRDM_POWER_ON);
 
 	pm_info = &per_cpu(omap4_pm_info, 0x1);
 	if (sar_base) {
@@ -387,25 +387,25 @@ int __init omap4_mpuss_init(void)
 		pm_info->l2x0_sar_addr = sar_base + L2X0_SAVE_OFFSET1;
 	}
 
-	pm_info->pwrdm = pwrdm_lookup("cpu1_pwrdm");
+	pm_info->pwrdm = omap_pwrdm_lookup("cpu1_pwrdm");
 	if (!pm_info->pwrdm) {
 		pr_err("Lookup failed for CPU1 pwrdm\n");
 		return -ENODEV;
 	}
 
 	/* Clear CPU previous power domain state */
-	pwrdm_clear_all_prev_pwrst(pm_info->pwrdm);
+	omap_pwrdm_clear_all_prev_pwrst(pm_info->pwrdm);
 	cpu_clear_prev_logic_pwrst(1);
 
 	/* Initialise CPU1 power domain state to ON */
-	pwrdm_set_next_pwrst(pm_info->pwrdm, PWRDM_POWER_ON);
+	omap_pwrdm_set_next_pwrst(pm_info->pwrdm, PWRDM_POWER_ON);
 
-	mpuss_pd = pwrdm_lookup("mpu_pwrdm");
+	mpuss_pd = omap_pwrdm_lookup("mpu_pwrdm");
 	if (!mpuss_pd) {
 		pr_err("Failed to lookup MPUSS power domain\n");
 		return -ENODEV;
 	}
-	pwrdm_clear_all_prev_pwrst(mpuss_pd);
+	omap_pwrdm_clear_all_prev_pwrst(mpuss_pd);
 	omap4_prminst_clear_mpuss_prev_logic_pwrst();
 
 	if (sar_base) {

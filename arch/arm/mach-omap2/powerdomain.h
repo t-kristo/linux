@@ -200,51 +200,51 @@ struct pwrdm_ops {
 	int	(*pwrdm_has_voltdm)(void);
 };
 
-int pwrdm_register_platform_funcs(struct pwrdm_ops *custom_funcs);
-int pwrdm_register_pwrdms(struct powerdomain **pwrdm_list);
-int pwrdm_complete_init(void);
+int omap_pwrdm_register_platform_funcs(struct pwrdm_ops *custom_funcs);
+int omap_pwrdm_register_pwrdms(struct powerdomain **pwrdm_list);
+int omap_pwrdm_complete_init(void);
 
-struct powerdomain *pwrdm_lookup(const char *name);
+struct powerdomain *omap_pwrdm_lookup(const char *name);
 
-int pwrdm_for_each(int (*fn)(struct powerdomain *pwrdm, void *user),
+int omap_pwrdm_for_each(int (*fn)(struct powerdomain *pwrdm, void *user),
 			void *user);
-int pwrdm_for_each_nolock(int (*fn)(struct powerdomain *pwrdm, void *user),
-			void *user);
+int omap_pwrdm_for_each_nolock(int (*fn)(struct powerdomain *pwrdm, void *user),
+			       void *user);
 
-int pwrdm_add_clkdm(struct powerdomain *pwrdm, struct clockdomain *clkdm);
+int omap_pwrdm_add_clkdm(struct powerdomain *pwrdm, struct clockdomain *clkdm);
 
-int pwrdm_get_mem_bank_count(struct powerdomain *pwrdm);
+int omap_pwrdm_get_mem_bank_count(struct powerdomain *pwrdm);
 
-u8 pwrdm_get_valid_lp_state(struct powerdomain *pwrdm,
-			    bool is_logic_state, u8 req_state);
+u8 omap_pwrdm_get_valid_lp_state(struct powerdomain *pwrdm,
+				 bool is_logic_state, u8 req_state);
 
-int pwrdm_set_next_pwrst(struct powerdomain *pwrdm, u8 pwrst);
-int pwrdm_read_next_pwrst(struct powerdomain *pwrdm);
-int pwrdm_read_pwrst(struct powerdomain *pwrdm);
-int pwrdm_read_prev_pwrst(struct powerdomain *pwrdm);
-int pwrdm_clear_all_prev_pwrst(struct powerdomain *pwrdm);
+int omap_pwrdm_set_next_pwrst(struct powerdomain *pwrdm, u8 pwrst);
+int omap_pwrdm_read_next_pwrst(struct powerdomain *pwrdm);
+int omap_pwrdm_read_pwrst(struct powerdomain *pwrdm);
+int omap_pwrdm_read_prev_pwrst(struct powerdomain *pwrdm);
+int omap_pwrdm_clear_all_prev_pwrst(struct powerdomain *pwrdm);
 
-int pwrdm_set_logic_retst(struct powerdomain *pwrdm, u8 pwrst);
-int pwrdm_set_mem_onst(struct powerdomain *pwrdm, u8 bank, u8 pwrst);
-int pwrdm_set_mem_retst(struct powerdomain *pwrdm, u8 bank, u8 pwrst);
+int omap_pwrdm_set_logic_retst(struct powerdomain *pwrdm, u8 pwrst);
+int omap_pwrdm_set_mem_onst(struct powerdomain *pwrdm, u8 bank, u8 pwrst);
+int omap_pwrdm_set_mem_retst(struct powerdomain *pwrdm, u8 bank, u8 pwrst);
 
-int pwrdm_read_logic_pwrst(struct powerdomain *pwrdm);
-int pwrdm_read_prev_logic_pwrst(struct powerdomain *pwrdm);
-int pwrdm_read_logic_retst(struct powerdomain *pwrdm);
-int pwrdm_read_mem_pwrst(struct powerdomain *pwrdm, u8 bank);
-int pwrdm_read_prev_mem_pwrst(struct powerdomain *pwrdm, u8 bank);
-int pwrdm_read_mem_retst(struct powerdomain *pwrdm, u8 bank);
+int omap_pwrdm_read_logic_pwrst(struct powerdomain *pwrdm);
+int omap_pwrdm_read_prev_logic_pwrst(struct powerdomain *pwrdm);
+int omap_pwrdm_read_logic_retst(struct powerdomain *pwrdm);
+int omap_pwrdm_read_mem_pwrst(struct powerdomain *pwrdm, u8 bank);
+int omap_pwrdm_read_prev_mem_pwrst(struct powerdomain *pwrdm, u8 bank);
+int omap_pwrdm_read_mem_retst(struct powerdomain *pwrdm, u8 bank);
 
-int pwrdm_enable_hdwr_sar(struct powerdomain *pwrdm);
-int pwrdm_disable_hdwr_sar(struct powerdomain *pwrdm);
-bool pwrdm_has_hdwr_sar(struct powerdomain *pwrdm);
+int omap_pwrdm_enable_hdwr_sar(struct powerdomain *pwrdm);
+int omap_pwrdm_disable_hdwr_sar(struct powerdomain *pwrdm);
+bool omap_pwrdm_has_hdwr_sar(struct powerdomain *pwrdm);
 
-int pwrdm_state_switch_nolock(struct powerdomain *pwrdm);
-int pwrdm_state_switch(struct powerdomain *pwrdm);
-int pwrdm_pre_transition(struct powerdomain *pwrdm);
-int pwrdm_post_transition(struct powerdomain *pwrdm);
-int pwrdm_get_context_loss_count(struct powerdomain *pwrdm);
-bool pwrdm_can_ever_lose_context(struct powerdomain *pwrdm);
+int omap_pwrdm_state_switch_nolock(struct powerdomain *pwrdm);
+int omap_pwrdm_state_switch(struct powerdomain *pwrdm);
+int omap_pwrdm_pre_transition(struct powerdomain *pwrdm);
+int omap_pwrdm_post_transition(struct powerdomain *pwrdm);
+int omap_pwrdm_get_context_loss_count(struct powerdomain *pwrdm);
+bool omap_pwrdm_can_ever_lose_context(struct powerdomain *pwrdm);
 
 extern int omap_set_pwrdm_state(struct powerdomain *pwrdm, u8 state);
 
@@ -270,7 +270,7 @@ extern u32 omap2_pwrdm_get_mem_bank_stst_mask(u8 bank);
 extern struct powerdomain wkup_omap2_pwrdm;
 extern struct powerdomain gfx_omap2_pwrdm;
 
-extern void pwrdm_lock(struct powerdomain *pwrdm);
-extern void pwrdm_unlock(struct powerdomain *pwrdm);
+void omap_pwrdm_lock(struct powerdomain *pwrdm);
+void omap_pwrdm_unlock(struct powerdomain *pwrdm);
 
 #endif

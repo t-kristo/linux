@@ -60,14 +60,16 @@ static int omap4_pm_suspend(void)
 
 	/* Save current powerdomain state */
 	list_for_each_entry(pwrst, &pwrst_list, node) {
-		pwrst->saved_state = pwrdm_read_next_pwrst(pwrst->pwrdm);
-		pwrst->saved_logic_state = pwrdm_read_logic_retst(pwrst->pwrdm);
+		pwrst->saved_state = omap_pwrdm_read_next_pwrst(pwrst->pwrdm);
+		pwrst->saved_logic_state =
+			omap_pwrdm_read_logic_retst(pwrst->pwrdm);
 	}
 
 	/* Set targeted power domain states by suspend */
 	list_for_each_entry(pwrst, &pwrst_list, node) {
 		omap_set_pwrdm_state(pwrst->pwrdm, pwrst->next_state);
-		pwrdm_set_logic_retst(pwrst->pwrdm, pwrst->next_logic_state);
+		omap_pwrdm_set_logic_retst(pwrst->pwrdm,
+					   pwrst->next_logic_state);
 	}
 
 	/*
@@ -83,14 +85,15 @@ static int omap4_pm_suspend(void)
 
 	/* Restore next powerdomain state */
 	list_for_each_entry(pwrst, &pwrst_list, node) {
-		state = pwrdm_read_prev_pwrst(pwrst->pwrdm);
+		state = omap_pwrdm_read_prev_pwrst(pwrst->pwrdm);
 		if (state > pwrst->next_state) {
 			pr_info("Powerdomain (%s) didn't enter target state %d\n",
 				pwrst->pwrdm->name, pwrst->next_state);
 			ret = -1;
 		}
 		omap_set_pwrdm_state(pwrst->pwrdm, pwrst->saved_state);
-		pwrdm_set_logic_retst(pwrst->pwrdm, pwrst->saved_logic_state);
+		omap_pwrdm_set_logic_retst(pwrst->pwrdm,
+					   pwrst->saved_logic_state);
 	}
 	if (ret) {
 		pr_crit("Could not enter target state in pm_suspend\n");
@@ -136,10 +139,10 @@ static int __init pwrdms_setup(struct powerdomain *pwrdm, void *unused)
 		return -ENOMEM;
 
 	pwrst->pwrdm = pwrdm;
-	pwrst->next_state = pwrdm_get_valid_lp_state(pwrdm, false,
-						     PWRDM_POWER_RET);
-	pwrst->next_logic_state = pwrdm_get_valid_lp_state(pwrdm, true,
-							   PWRDM_POWER_OFF);
+	pwrst->next_state = omap_pwrdm_get_valid_lp_state(pwrdm, false,
+							  PWRDM_POWER_RET);
+	pwrst->next_logic_state =
+		omap_pwrdm_get_valid_lp_state(pwrdm, true, PWRDM_POWER_OFF);
 
 	list_add(&pwrst->node, &pwrst_list);
 
@@ -258,7 +261,7 @@ int __init omap4_pm_init(void)
 	if (cpu_is_omap44xx())
 		pr_warn("OMAP4 PM: u-boot >= v2012.07 is required for full PM support\n");
 
-	ret = pwrdm_for_each(pwrdms_setup, NULL);
+	ret = omap_pwrdm_for_each(pwrdms_setup, NULL);
 	if (ret) {
 		pr_err("Failed to setup powerdomains.\n");
 		goto err2;

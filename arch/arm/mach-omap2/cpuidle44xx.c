@@ -91,7 +91,7 @@ static int omap_enter_idle_coupled(struct cpuidle_device *dev,
 	 * out of coherency and in OFF mode.
 	 */
 	if (dev->cpu == 0 && cpumask_test_cpu(1, cpu_online_mask)) {
-		while (pwrdm_read_pwrst(cpu_pd[1]) != PWRDM_POWER_OFF) {
+		while (omap_pwrdm_read_pwrst(cpu_pd[1]) != PWRDM_POWER_OFF) {
 			cpu_relax();
 
 			/*
@@ -119,7 +119,7 @@ static int omap_enter_idle_coupled(struct cpuidle_device *dev,
 	cpu_pm_enter();
 
 	if (dev->cpu == 0) {
-		pwrdm_set_logic_retst(mpu_pd, cx->mpu_logic_state);
+		omap_pwrdm_set_logic_retst(mpu_pd, cx->mpu_logic_state);
 		omap_set_pwrdm_state(mpu_pd, cx->mpu_state);
 
 		/*
@@ -230,9 +230,9 @@ static struct cpuidle_driver omap4_idle_driver = {
  */
 int __init omap4_idle_init(void)
 {
-	mpu_pd = pwrdm_lookup("mpu_pwrdm");
-	cpu_pd[0] = pwrdm_lookup("cpu0_pwrdm");
-	cpu_pd[1] = pwrdm_lookup("cpu1_pwrdm");
+	mpu_pd = omap_pwrdm_lookup("mpu_pwrdm");
+	cpu_pd[0] = omap_pwrdm_lookup("cpu0_pwrdm");
+	cpu_pd[1] = omap_pwrdm_lookup("cpu1_pwrdm");
 	if ((!mpu_pd) || (!cpu_pd[0]) || (!cpu_pd[1]))
 		return -ENODEV;
 

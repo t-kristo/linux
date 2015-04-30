@@ -112,7 +112,7 @@ static void omap3_core_restore_context(void)
 static void omap3_save_secure_ram_context(void)
 {
 	u32 ret;
-	int mpu_next_state = pwrdm_read_next_pwrst(mpu_pwrdm);
+	int mpu_next_state = omap_pwrdm_read_next_pwrst(mpu_pwrdm);
 
 	if (omap_type() != OMAP2_DEVICE_TYPE_GP) {
 		/*
@@ -120,10 +120,10 @@ static void omap3_save_secure_ram_context(void)
 		 * otherwise the WFI executed inside the ROM code
 		 * will hang the system.
 		 */
-		pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_ON);
+		omap_pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_ON);
 		ret = _omap_save_secure_sram((u32 *)(unsigned long)
 				__pa(omap3_secure_ram_storage));
-		pwrdm_set_next_pwrst(mpu_pwrdm, mpu_next_state);
+		omap_pwrdm_set_next_pwrst(mpu_pwrdm, mpu_next_state);
 		/* Following is for error tracking, it should not happen */
 		if (ret) {
 			pr_err("save_secure_sram() returns %08x\n", ret);
@@ -201,7 +201,7 @@ void omap_sram_idle(void)
 	int core_prev_state;
 	u32 sdrc_pwr = 0;
 
-	mpu_next_state = pwrdm_read_next_pwrst(mpu_pwrdm);
+	mpu_next_state = omap_pwrdm_read_next_pwrst(mpu_pwrdm);
 	switch (mpu_next_state) {
 	case PWRDM_POWER_ON:
 	case PWRDM_POWER_RET:
@@ -218,14 +218,14 @@ void omap_sram_idle(void)
 	}
 
 	/* NEON control */
-	if (pwrdm_read_pwrst(neon_pwrdm) == PWRDM_POWER_ON)
-		pwrdm_set_next_pwrst(neon_pwrdm, mpu_next_state);
+	if (omap_pwrdm_read_pwrst(neon_pwrdm) == PWRDM_POWER_ON)
+		omap_pwrdm_set_next_pwrst(neon_pwrdm, mpu_next_state);
 
 	/* Enable IO-PAD and IO-CHAIN wakeups */
-	per_next_state = pwrdm_read_next_pwrst(per_pwrdm);
-	core_next_state = pwrdm_read_next_pwrst(core_pwrdm);
+	per_next_state = omap_pwrdm_read_next_pwrst(per_pwrdm);
+	core_next_state = omap_pwrdm_read_next_pwrst(core_pwrdm);
 
-	pwrdm_pre_transition(NULL);
+	omap_pwrdm_pre_transition(NULL);
 
 	/* PER */
 	if (per_next_state < PWRDM_POWER_ON) {
@@ -279,7 +279,7 @@ void omap_sram_idle(void)
 
 	/* CORE */
 	if (core_next_state < PWRDM_POWER_ON) {
-		core_prev_state = pwrdm_read_prev_pwrst(core_pwrdm);
+		core_prev_state = omap_pwrdm_read_prev_pwrst(core_pwrdm);
 		if (core_prev_state == PWRDM_POWER_OFF) {
 			omap3_core_restore_context();
 			omap3_cm_restore_context();
@@ -289,7 +289,7 @@ void omap_sram_idle(void)
 	}
 	omap3_intc_resume_idle();
 
-	pwrdm_post_transition(NULL);
+	omap_pwrdm_post_transition(NULL);
 
 	/* PER */
 	if (per_next_state < PWRDM_POWER_ON)
@@ -316,12 +316,12 @@ static int omap3_pm_suspend(void)
 
 	/* Read current next_pwrsts */
 	list_for_each_entry(pwrst, &pwrst_list, node)
-		pwrst->saved_state = pwrdm_read_next_pwrst(pwrst->pwrdm);
+		pwrst->saved_state = omap_pwrdm_read_next_pwrst(pwrst->pwrdm);
 	/* Set ones wanted by suspend */
 	list_for_each_entry(pwrst, &pwrst_list, node) {
 		if (omap_set_pwrdm_state(pwrst->pwrdm, pwrst->next_state))
 			goto restore;
-		if (pwrdm_clear_all_prev_pwrst(pwrst->pwrdm))
+		if (omap_pwrdm_clear_all_prev_pwrst(pwrst->pwrdm))
 			goto restore;
 	}
 
@@ -332,7 +332,7 @@ static int omap3_pm_suspend(void)
 restore:
 	/* Restore next_pwrsts */
 	list_for_each_entry(pwrst, &pwrst_list, node) {
-		state = pwrdm_read_prev_pwrst(pwrst->pwrdm);
+		state = omap_pwrdm_read_prev_pwrst(pwrst->pwrdm);
 		if (state > pwrst->next_state) {
 			pr_info("Powerdomain (%s) didn't enter target state %d\n",
 				pwrst->pwrdm->name, pwrst->next_state);
@@ -428,8 +428,8 @@ static int __init pwrdms_setup(struct powerdomain *pwrdm, void *unused)
 	pwrst->next_state = PWRDM_POWER_RET;
 	list_add(&pwrst->node, &pwrst_list);
 
-	if (pwrdm_has_hdwr_sar(pwrdm))
-		pwrdm_enable_hdwr_sar(pwrdm);
+	if (omap_pwrdm_has_hdwr_sar(pwrdm))
+		omap_pwrdm_enable_hdwr_sar(pwrdm);
 
 	return omap_set_pwrdm_state(pwrst->pwrdm, pwrst->next_state);
 }
@@ -498,7 +498,7 @@ int __init omap3_pm_init(void)
 		goto err2;
 	}
 
-	ret = pwrdm_for_each(pwrdms_setup, NULL);
+	ret = omap_pwrdm_for_each(pwrdms_setup, NULL);
 	if (ret) {
 		pr_err("Failed to setup powerdomains\n");
 		goto err3;
@@ -506,16 +506,16 @@ int __init omap3_pm_init(void)
 
 	(void) clkdm_for_each(omap_pm_clkdms_setup, NULL);
 
-	mpu_pwrdm = pwrdm_lookup("mpu_pwrdm");
+	mpu_pwrdm = omap_pwrdm_lookup("mpu_pwrdm");
 	if (mpu_pwrdm == NULL) {
 		pr_err("Failed to get mpu_pwrdm\n");
 		ret = -EINVAL;
 		goto err3;
 	}
 
-	neon_pwrdm = pwrdm_lookup("neon_pwrdm");
-	per_pwrdm = pwrdm_lookup("per_pwrdm");
-	core_pwrdm = pwrdm_lookup("core_pwrdm");
+	neon_pwrdm = omap_pwrdm_lookup("neon_pwrdm");
+	per_pwrdm = omap_pwrdm_lookup("per_pwrdm");
+	core_pwrdm = omap_pwrdm_lookup("core_pwrdm");
 
 	neon_clkdm = clkdm_lookup("neon_clkdm");
 	mpu_clkdm = clkdm_lookup("mpu_clkdm");

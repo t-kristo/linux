@@ -119,8 +119,8 @@ static int omap3_enter_idle(struct cpuidle_device *dev,
 	if (cx->flags & OMAP_CPUIDLE_CX_NO_CLKDM_IDLE) {
 		clkdm_deny_idle(mpu_pd->pwrdm_clkdms[0]);
 	} else {
-		pwrdm_set_next_pwrst(mpu_pd, cx->mpu_state);
-		pwrdm_set_next_pwrst(core_pd, cx->core_state);
+		omap_pwrdm_set_next_pwrst(mpu_pd, cx->mpu_state);
+		omap_pwrdm_set_next_pwrst(core_pd, cx->core_state);
 	}
 
 	/*
@@ -138,7 +138,7 @@ static int omap3_enter_idle(struct cpuidle_device *dev,
 	 * VFP context.
 	 */
 	if (cx->mpu_state == PWRDM_POWER_OFF &&
-	    pwrdm_read_prev_pwrst(mpu_pd) == PWRDM_POWER_OFF)
+	    omap_pwrdm_read_prev_pwrst(mpu_pd) == PWRDM_POWER_OFF)
 		cpu_pm_exit();
 
 	/* Re-allow idle for C1 */
@@ -225,7 +225,7 @@ static int omap3_enter_idle_bm(struct cpuidle_device *dev,
 	 * Use only C1 if CAM is active.
 	 * CAM does not have wakeup capability in OMAP3.
 	 */
-	if (pwrdm_read_pwrst(cam_pd) == PWRDM_POWER_ON)
+	if (omap_pwrdm_read_pwrst(cam_pd) == PWRDM_POWER_ON)
 		new_state_idx = drv->safe_state_index;
 	else
 		new_state_idx = next_valid_state(dev, drv, index);
@@ -241,18 +241,18 @@ static int omap3_enter_idle_bm(struct cpuidle_device *dev,
 	/* Program PER state */
 	cx = &omap3_idle_data[new_state_idx];
 
-	per_next_state = pwrdm_read_next_pwrst(per_pd);
+	per_next_state = omap_pwrdm_read_next_pwrst(per_pd);
 	per_saved_state = per_next_state;
 	if (per_next_state < cx->per_min_state) {
 		per_next_state = cx->per_min_state;
-		pwrdm_set_next_pwrst(per_pd, per_next_state);
+		omap_pwrdm_set_next_pwrst(per_pd, per_next_state);
 	}
 
 	ret = omap3_enter_idle(dev, drv, new_state_idx);
 
 	/* Restore original PER state if it was modified */
 	if (per_next_state != per_saved_state)
-		pwrdm_set_next_pwrst(per_pd, per_saved_state);
+		omap_pwrdm_set_next_pwrst(per_pd, per_saved_state);
 
 	return ret;
 }
@@ -325,10 +325,10 @@ static struct cpuidle_driver omap3_idle_driver = {
  */
 int __init omap3_idle_init(void)
 {
-	mpu_pd = pwrdm_lookup("mpu_pwrdm");
-	core_pd = pwrdm_lookup("core_pwrdm");
-	per_pd = pwrdm_lookup("per_pwrdm");
-	cam_pd = pwrdm_lookup("cam_pwrdm");
+	mpu_pd = omap_pwrdm_lookup("mpu_pwrdm");
+	core_pd = omap_pwrdm_lookup("core_pwrdm");
+	per_pd = omap_pwrdm_lookup("per_pwrdm");
+	cam_pd = omap_pwrdm_lookup("cam_pwrdm");
 
 	if (!mpu_pd || !core_pd || !per_pd || !cam_pd)
 		return -ENODEV;

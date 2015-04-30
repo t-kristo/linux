@@ -104,7 +104,7 @@ static int omap4_boot_secondary(unsigned int cpu, struct task_struct *idle)
 
 	if (!cpu1_clkdm && !cpu1_pwrdm) {
 		cpu1_clkdm = clkdm_lookup("mpu1_clkdm");
-		cpu1_pwrdm = pwrdm_lookup("cpu1_pwrdm");
+		cpu1_pwrdm = omap_pwrdm_lookup("cpu1_pwrdm");
 	}
 
 	/*

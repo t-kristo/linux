@@ -79,8 +79,8 @@ static int omap2_enter_full_retention(void)
 	omap_prm_clear_mod_irqs(CORE_MOD, OMAP24XX_PM_WKST2, ~0);
 	omap_prm_clear_mod_irqs(WKUP_MOD, PM_WKST, ~0);
 
-	pwrdm_set_next_pwrst(core_pwrdm, PWRDM_POWER_RET);
-	pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_RET);
+	omap_pwrdm_set_next_pwrst(core_pwrdm, PWRDM_POWER_RET);
+	omap_pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_RET);
 
 	/* Workaround to kill USB */
 	l = omap_ctrl_readl(OMAP2_CONTROL_DEVCONF0) | OMAP24XX_USBSTANDBYCTRL;
@@ -115,8 +115,8 @@ no_sleep:
 
 	omap_prm_clear_mod_irqs(OCP_MOD, OMAP2_PRCM_IRQSTATUS_MPU_OFFSET, 0x20);
 
-	pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_ON);
-	pwrdm_set_next_pwrst(core_pwrdm, PWRDM_POWER_ON);
+	omap_pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_ON);
+	omap_pwrdm_set_next_pwrst(core_pwrdm, PWRDM_POWER_ON);
 
 	return 0;
 }
@@ -146,17 +146,17 @@ static void omap2_enter_mpu_retention(void)
 		omap_prm_clear_mod_irqs(WKUP_MOD, PM_WKST, ~0);
 
 		/* Try to enter MPU retention */
-		pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_RET);
+		omap_pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_RET);
 
 	} else {
 		/* Block MPU retention */
-		pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_ON);
+		omap_pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_ON);
 	}
 
 	/* WFI */
 	asm("mcr p15, 0, %0, c7, c0, 4" : : "r" (zero) : "memory", "cc");
 
-	pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_ON);
+	omap_pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_ON);
 }
 
 static int omap2_can_sleep(void)
@@ -195,21 +195,21 @@ static void __init prcm_setup_regs(void)
 	 * Set CORE powerdomain memory banks to retain their contents
 	 * during RETENTION
 	 */
-	num_mem_banks = pwrdm_get_mem_bank_count(core_pwrdm);
+	num_mem_banks = omap_pwrdm_get_mem_bank_count(core_pwrdm);
 	for (i = 0; i < num_mem_banks; i++)
-		pwrdm_set_mem_retst(core_pwrdm, i, PWRDM_POWER_RET);
+		omap_pwrdm_set_mem_retst(core_pwrdm, i, PWRDM_POWER_RET);
 
-	pwrdm_set_logic_retst(core_pwrdm, PWRDM_POWER_RET);
+	omap_pwrdm_set_logic_retst(core_pwrdm, PWRDM_POWER_RET);
 
-	pwrdm_set_logic_retst(mpu_pwrdm, PWRDM_POWER_RET);
+	omap_pwrdm_set_logic_retst(mpu_pwrdm, PWRDM_POWER_RET);
 
 	/* Force-power down DSP, GFX powerdomains */
 
 	pwrdm = clkdm_get_pwrdm(dsp_clkdm);
-	pwrdm_set_next_pwrst(pwrdm, PWRDM_POWER_OFF);
+	omap_pwrdm_set_next_pwrst(pwrdm, PWRDM_POWER_OFF);
 
 	pwrdm = clkdm_get_pwrdm(gfx_clkdm);
-	pwrdm_set_next_pwrst(pwrdm, PWRDM_POWER_OFF);
+	omap_pwrdm_set_next_pwrst(pwrdm, PWRDM_POWER_OFF);
 
 	/* Enable hardware-supervised idle for all clkdms */
 	clkdm_for_each(omap_pm_clkdms_setup, NULL);
@@ -230,11 +230,11 @@ int __init omap2_pm_init(void)
 
 	/* Look up important powerdomains */
 
-	mpu_pwrdm = pwrdm_lookup("mpu_pwrdm");
+	mpu_pwrdm = omap_pwrdm_lookup("mpu_pwrdm");
 	if (!mpu_pwrdm)
 		pr_err("PM: mpu_pwrdm not found\n");
 
-	core_pwrdm = pwrdm_lookup("core_pwrdm");
+	core_pwrdm = omap_pwrdm_lookup("core_pwrdm");
 	if (!core_pwrdm)
 		pr_err("PM: core_pwrdm not found\n");
 

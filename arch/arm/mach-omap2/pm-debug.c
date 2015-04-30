@@ -99,9 +99,10 @@ static int pwrdm_dbg_show_counter(struct powerdomain *pwrdm, void *user)
 		strncmp(pwrdm->name, "dpll", 4) == 0)
 		return 0;
 
-	if (pwrdm->state != pwrdm_read_pwrst(pwrdm))
+	if (pwrdm->state != omap_pwrdm_read_pwrst(pwrdm))
 		printk(KERN_ERR "pwrdm state mismatch(%s) %d != %d\n",
-			pwrdm->name, pwrdm->state, pwrdm_read_pwrst(pwrdm));
+		       pwrdm->name, pwrdm->state,
+		       omap_pwrdm_read_pwrst(pwrdm));
 
 	seq_printf(s, "%s (%s)", pwrdm->name,
 			pwrdm_state_names[pwrdm->state]);
@@ -129,7 +130,7 @@ static int pwrdm_dbg_show_timer(struct powerdomain *pwrdm, void *user)
 		strncmp(pwrdm->name, "dpll", 4) == 0)
 		return 0;
 
-	pwrdm_state_switch(pwrdm);
+	omap_pwrdm_state_switch(pwrdm);
 
 	seq_printf(s, "%s (%s)", pwrdm->name,
 		pwrdm_state_names[pwrdm->state]);
@@ -144,7 +145,7 @@ static int pwrdm_dbg_show_timer(struct powerdomain *pwrdm, void *user)
 
 static int pm_dbg_show_counters(struct seq_file *s, void *unused)
 {
-	pwrdm_for_each(pwrdm_dbg_show_counter, s);
+	omap_pwrdm_for_each(pwrdm_dbg_show_counter, s);
 	clkdm_for_each(clkdm_dbg_show_counter, s);
 
 	return 0;
@@ -152,7 +153,7 @@ static int pm_dbg_show_counters(struct seq_file *s, void *unused)
 
 static int pm_dbg_show_timers(struct seq_file *s, void *unused)
 {
-	pwrdm_for_each(pwrdm_dbg_show_timer, s);
+	omap_pwrdm_for_each(pwrdm_dbg_show_timer, s);
 	return 0;
 }
 
@@ -269,7 +270,7 @@ static int __init pm_dbg_init(void)
 	(void) debugfs_create_file("time", S_IRUGO,
 		d, (void *)DEBUG_FILE_TIMERS, &debug_fops);
 
-	pwrdm_for_each(pwrdms_setup, (void *)d);
+	omap_pwrdm_for_each(pwrdms_setup, (void *)d);
 
 	(void) debugfs_create_file("enable_off_mode", S_IRUGO | S_IWUSR, d,
 				   &enable_off_mode, &pm_dbg_option_fops);
