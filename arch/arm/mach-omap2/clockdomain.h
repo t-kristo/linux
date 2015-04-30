@@ -15,9 +15,9 @@
 #define __ARCH_ARM_MACH_OMAP2_CLOCKDOMAIN_H
 
 #include <linux/init.h>
+#include <linux/clk.h>
 
 #include "powerdomain.h"
-#include "clock.h"
 
 /*
  * Clockdomain flags

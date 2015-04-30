@@ -19,6 +19,7 @@
 #include <linux/io.h>
 #include <linux/power/omap/cm.h>
 #include <linux/power/omap/prm2xxx_3xxx.h>
+#include <linux/clk/ti.h>
 
 #include "cm3xxx.h"
 #include "cm-regbits-34xx.h"
