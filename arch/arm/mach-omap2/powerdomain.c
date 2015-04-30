@@ -92,13 +92,6 @@ static int _pwrdm_register(struct powerdomain *pwrdm)
 	if (!pwrdm || !pwrdm->name)
 		return -EINVAL;
 
-	if (cpu_is_omap44xx() &&
-	    pwrdm->prcm_partition == OMAP4430_INVALID_PRCM_PARTITION) {
-		pr_err("powerdomain: %s: missing OMAP4 PRCM partition ID\n",
-		       pwrdm->name);
-		return -EINVAL;
-	}
-
 	if (_pwrdm_lookup(pwrdm->name))
 		return -EEXIST;
 
