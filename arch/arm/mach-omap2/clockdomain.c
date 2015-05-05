@@ -28,8 +28,6 @@
 
 #include <linux/bitops.h>
 
-#include "soc.h"
-#include "clock.h"
 #include "clockdomain.h"
 
 /* clkdm_list contains all registered struct clockdomains */
@@ -1237,10 +1235,6 @@ ccd_exit:
  */
 int omap_clkdm_hwmod_enable(struct clockdomain *clkdm, struct omap_hwmod *oh)
 {
-	/* The clkdm attribute does not exist yet prior OMAP4 */
-	if (cpu_is_omap24xx() || cpu_is_omap34xx())
-		return 0;
-
 	/*
 	 * XXX Rewrite this code to maintain a list of enabled
 	 * downstream hwmods for debugging purposes?
@@ -1268,10 +1262,6 @@ int omap_clkdm_hwmod_enable(struct clockdomain *clkdm, struct omap_hwmod *oh)
  */
 int omap_clkdm_hwmod_disable(struct clockdomain *clkdm, struct omap_hwmod *oh)
 {
-	/* The clkdm attribute does not exist yet prior OMAP4 */
-	if (cpu_is_omap24xx() || cpu_is_omap34xx())
-		return 0;
-
 	/*
 	 * XXX Rewrite this code to maintain a list of enabled
 	 * downstream hwmods for debugging purposes?
