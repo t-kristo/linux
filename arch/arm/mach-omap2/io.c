@@ -50,7 +50,6 @@
 #include "cm2xxx.h"
 #include "cm3xxx.h"
 #include "cm33xx.h"
-#include "cm44xx.h"
 #include "prcm_mpu44xx.h"
 #include "opp2xxx.h"
 #include "pm.h"

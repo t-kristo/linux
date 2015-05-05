@@ -13,9 +13,8 @@
  * OMAP4 has two separate CM blocks, CM1 and CM2.  This file contains
  * macros and function prototypes that are applicable to both.
  */
-#ifndef __ARCH_ASM_MACH_OMAP2_CM44XX_H
-#define __ARCH_ASM_MACH_OMAP2_CM44XX_H
-
+#ifndef __LINUX_POWER_OMAP_CM44XX_H
+#define __LINUX_POWER_OMAP_CM44XX_H
 
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/cm.h>

@@ -17,11 +17,11 @@
 #include <linux/bug.h>
 #include <linux/of.h>
 #include <linux/of_address.h>
+#include <linux/power/omap/cm44xx.h>
 
 #include "cm2xxx.h"
 #include "cm3xxx.h"
 #include "cm33xx.h"
-#include "cm44xx.h"
 #include "clock.h"
 
 /*
