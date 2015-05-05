@@ -23,12 +23,9 @@
 #include <linux/limits.h>
 #include <linux/err.h>
 #include <linux/clk-provider.h>
-
 #include <linux/io.h>
-
 #include <linux/bitops.h>
-
-#include "clockdomain.h"
+#include <linux/power/omap/clockdomain.h>
 
 /* clkdm_list contains all registered struct clockdomains */
 static LIST_HEAD(clkdm_list);

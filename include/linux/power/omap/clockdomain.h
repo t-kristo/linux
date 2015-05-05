@@ -11,8 +11,8 @@
  * published by the Free Software Foundation.
  */
 
-#ifndef __ARCH_ARM_MACH_OMAP2_CLOCKDOMAIN_H
-#define __ARCH_ARM_MACH_OMAP2_CLOCKDOMAIN_H
+#ifndef __LINUX_POWER_OMAP_CLOCKDOMAIN_H
+#define __LINUX_POWER_OMAP_CLOCKDOMAIN_H
 
 #include <linux/init.h>
 #include <linux/clk.h>
@@ -43,13 +43,13 @@
  *     IP block inside the clockdomain is active, rather than the
  *     HW_AUTO mode.
  */
-#define CLKDM_CAN_FORCE_SLEEP			(1 << 0)
-#define CLKDM_CAN_FORCE_WAKEUP			(1 << 1)
-#define CLKDM_CAN_ENABLE_AUTO			(1 << 2)
-#define CLKDM_CAN_DISABLE_AUTO			(1 << 3)
-#define CLKDM_NO_AUTODEPS			(1 << 4)
-#define CLKDM_ACTIVE_WITH_MPU			(1 << 5)
-#define CLKDM_MISSING_IDLE_REPORTING		(1 << 6)
+#define CLKDM_CAN_FORCE_SLEEP			BIT(0)
+#define CLKDM_CAN_FORCE_WAKEUP			BIT(1)
+#define CLKDM_CAN_ENABLE_AUTO			BIT(2)
+#define CLKDM_CAN_DISABLE_AUTO			BIT(3)
+#define CLKDM_NO_AUTODEPS			BIT(4)
+#define CLKDM_ACTIVE_WITH_MPU			BIT(5)
+#define CLKDM_MISSING_IDLE_REPORTING		BIT(6)
 
 #define CLKDM_CAN_HWSUP		(CLKDM_CAN_ENABLE_AUTO | CLKDM_CAN_DISABLE_AUTO)
 #define CLKDM_CAN_SWSUP		(CLKDM_CAN_FORCE_SLEEP | CLKDM_CAN_FORCE_WAKEUP)
@@ -158,13 +158,19 @@ struct clockdomain {
  * @clkdm_clk_disable: Put the clkdm in right state for a clock disable
  */
 struct clkdm_ops {
-	int	(*clkdm_add_wkdep)(struct clockdomain *clkdm1, struct clockdomain *clkdm2);
-	int	(*clkdm_del_wkdep)(struct clockdomain *clkdm1, struct clockdomain *clkdm2);
-	int	(*clkdm_read_wkdep)(struct clockdomain *clkdm1, struct clockdomain *clkdm2);
+	int	(*clkdm_add_wkdep)(struct clockdomain *clkdm1,
+				   struct clockdomain *clkdm2);
+	int	(*clkdm_del_wkdep)(struct clockdomain *clkdm1,
+				   struct clockdomain *clkdm2);
+	int	(*clkdm_read_wkdep)(struct clockdomain *clkdm1,
+				    struct clockdomain *clkdm2);
 	int	(*clkdm_clear_all_wkdeps)(struct clockdomain *clkdm);
-	int	(*clkdm_add_sleepdep)(struct clockdomain *clkdm1, struct clockdomain *clkdm2);
-	int	(*clkdm_del_sleepdep)(struct clockdomain *clkdm1, struct clockdomain *clkdm2);
-	int	(*clkdm_read_sleepdep)(struct clockdomain *clkdm1, struct clockdomain *clkdm2);
+	int	(*clkdm_add_sleepdep)(struct clockdomain *clkdm1,
+				      struct clockdomain *clkdm2);
+	int	(*clkdm_del_sleepdep)(struct clockdomain *clkdm1,
+				      struct clockdomain *clkdm2);
+	int	(*clkdm_read_sleepdep)(struct clockdomain *clkdm1,
+				       struct clockdomain *clkdm2);
 	int	(*clkdm_clear_all_sleepdeps)(struct clockdomain *clkdm);
 	int	(*clkdm_sleep)(struct clockdomain *clkdm);
 	int	(*clkdm_wakeup)(struct clockdomain *clkdm);
@@ -217,14 +223,14 @@ int omap_clkdm_clk_disable(struct clockdomain *clkdm, struct clk *clk);
 int omap_clkdm_hwmod_enable(struct clockdomain *clkdm, struct omap_hwmod *oh);
 int omap_clkdm_hwmod_disable(struct clockdomain *clkdm, struct omap_hwmod *oh);
 
-extern void __init omap242x_clockdomains_init(void);
-extern void __init omap243x_clockdomains_init(void);
-extern void __init omap3xxx_clockdomains_init(void);
-extern void __init am33xx_clockdomains_init(void);
-extern void __init ti81xx_clockdomains_init(void);
-extern void __init omap44xx_clockdomains_init(void);
-extern void __init omap54xx_clockdomains_init(void);
-extern void __init dra7xx_clockdomains_init(void);
+void __init omap242x_clockdomains_init(void);
+void __init omap243x_clockdomains_init(void);
+void __init omap3xxx_clockdomains_init(void);
+void __init am33xx_clockdomains_init(void);
+void __init ti81xx_clockdomains_init(void);
+void __init omap44xx_clockdomains_init(void);
+void __init omap54xx_clockdomains_init(void);
+void __init dra7xx_clockdomains_init(void);
 void am43xx_clockdomains_init(void);
 
 void omap_clkdm_add_autodeps(struct clockdomain *clkdm);

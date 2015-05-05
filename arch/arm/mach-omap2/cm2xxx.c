@@ -19,10 +19,10 @@
 #include <linux/io.h>
 #include <linux/power/omap/cm.h>
 #include <linux/power/omap/prm2xxx.h>
+#include <linux/power/omap/clockdomain.h>
 
 #include "cm2xxx.h"
 #include "cm-regbits-24xx.h"
-#include "clockdomain.h"
 
 /* CM_AUTOIDLE_PLL.AUTO_* bit values for DPLLs */
 #define DPLL_AUTOIDLE_DISABLE				0x0

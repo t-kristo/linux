@@ -19,6 +19,7 @@
 #include <linux/cpu.h>
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/powerdomain.h>
+#include <linux/power/omap/clockdomain.h>
 
 #include <asm/system_misc.h>
 
@@ -28,7 +29,6 @@
 
 #include "soc.h"
 #include "voltage.h"
-#include "clockdomain.h"
 #include "pm.h"
 #include "twl-common.h"
 

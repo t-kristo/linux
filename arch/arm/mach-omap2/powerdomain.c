@@ -22,6 +22,7 @@
 #include <linux/spinlock.h>
 #include <linux/power/omap/prm44xx.h>
 #include <linux/power/omap/powerdomain.h>
+#include <linux/power/omap/clockdomain.h>
 #include <trace/events/power.h>
 
 #include "cm2xxx_3xxx.h"
@@ -29,8 +30,6 @@
 #include "cm44xx.h"
 
 #include <asm/cpu.h>
-
-#include "clockdomain.h"
 
 #define PWRDM_TRACE_STATES_FLAG	(1<<31)
 

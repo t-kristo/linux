@@ -16,12 +16,12 @@
 #include <linux/export.h>
 #include <linux/tick.h>
 #include <linux/power/omap/prm.h>
+#include <linux/power/omap/clockdomain.h>
 
 #include <asm/cpuidle.h>
 
 #include "common.h"
 #include "pm.h"
-#include "clockdomain.h"
 
 #define MAX_CPUS	2
 

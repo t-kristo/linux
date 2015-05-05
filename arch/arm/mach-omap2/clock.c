@@ -25,12 +25,12 @@
 #include <linux/bitops.h>
 #include <linux/of_address.h>
 #include <linux/power/omap/cm.h>
+#include <linux/power/omap/clockdomain.h>
 #include <asm/cpu.h>
 
 #include <trace/events/power.h>
 
 #include "soc.h"
-#include "clockdomain.h"
 #include "clock.h"
 #include "cm2xxx.h"
 #include "cm3xxx.h"

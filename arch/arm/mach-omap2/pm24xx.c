@@ -32,6 +32,7 @@
 #include <linux/platform_data/gpio-omap.h>
 #include <linux/power/omap/prm2xxx.h>
 #include <linux/power/omap/powerdomain.h>
+#include <linux/power/omap/clockdomain.h>
 
 #include <asm/fncpy.h>
 
@@ -52,7 +53,6 @@
 #include "sram.h"
 #include "pm.h"
 #include "control.h"
-#include "clockdomain.h"
 
 static void (*omap2_sram_suspend)(u32 dllctrl, void __iomem *sdrc_dlla_ctrl,
 				  void __iomem *sdrc_power);

@@ -19,8 +19,8 @@
 
 #include <linux/kernel.h>
 #include <linux/io.h>
+#include <linux/power/omap/clockdomain.h>
 
-#include "clockdomain.h"
 #include "cm81xx.h"
 
 /*

@@ -18,10 +18,10 @@
 #include <linux/slab.h>
 #include <asm/system_misc.h>
 #include <linux/power/omap/powerdomain.h>
+#include <linux/power/omap/clockdomain.h>
 
 #include "soc.h"
 #include "common.h"
-#include "clockdomain.h"
 #include "pm.h"
 
 u16 pm44xx_errata;

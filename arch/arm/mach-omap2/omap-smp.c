@@ -20,6 +20,7 @@
 #include <linux/smp.h>
 #include <linux/io.h>
 #include <linux/irqchip/arm-gic.h>
+#include <linux/power/omap/clockdomain.h>
 
 #include <asm/smp_scu.h>
 #include <asm/virt.h>
@@ -31,7 +32,6 @@
 #include "soc.h"
 #include "iomap.h"
 #include "common.h"
-#include "clockdomain.h"
 #include "pm.h"
 
 #define CPU_MASK		0xff0ffff0

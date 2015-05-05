@@ -16,9 +16,9 @@
 #include <linux/err.h>
 #include <linux/io.h>
 #include <linux/power/omap/prm2xxx_3xxx.h>
+#include <linux/power/omap/clockdomain.h>
 
 #include "prm-regbits-24xx.h"
-#include "clockdomain.h"
 
 /**
  * omap2_prm_is_hardreset_asserted - read the HW reset line state of

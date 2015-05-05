@@ -32,9 +32,9 @@
 
 #include <linux/kernel.h>
 #include <linux/io.h>
+#include <linux/power/omap/clockdomain.h>
 
 #include "soc.h"
-#include "clockdomain.h"
 #include "cm2xxx_3xxx.h"
 #include "cm-regbits-34xx.h"
 #include "prm-regbits-34xx.h"

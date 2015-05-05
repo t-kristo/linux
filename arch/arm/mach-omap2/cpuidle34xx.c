@@ -27,9 +27,8 @@
 #include <linux/export.h>
 #include <linux/cpu_pm.h>
 #include <linux/power/omap/powerdomain.h>
+#include <linux/power/omap/clockdomain.h>
 #include <asm/cpuidle.h>
-
-#include "clockdomain.h"
 
 #include "pm.h"
 #include "control.h"

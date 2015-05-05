@@ -23,8 +23,8 @@
 #include <linux/kernel.h>
 #include <linux/io.h>
 #include <linux/power/omap/prm7xx.h>
+#include <linux/power/omap/clockdomain.h>
 
-#include "clockdomain.h"
 #include "cm1_7xx.h"
 #include "cm2_7xx.h"
 

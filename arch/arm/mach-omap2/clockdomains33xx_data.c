@@ -16,8 +16,8 @@
 
 #include <linux/kernel.h>
 #include <linux/io.h>
+#include <linux/power/omap/clockdomain.h>
 
-#include "clockdomain.h"
 #include "cm33xx.h"
 #include "cm-regbits-33xx.h"
 

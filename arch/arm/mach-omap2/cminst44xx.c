@@ -22,8 +22,8 @@
 #include <linux/io.h>
 #include <linux/power/omap/cm.h>
 #include <linux/power/omap/prm44xx.h>
+#include <linux/power/omap/clockdomain.h>
 
-#include "clockdomain.h"
 #include "cm1_44xx.h"
 #include "cm2_44xx.h"
 #include "cm44xx.h"

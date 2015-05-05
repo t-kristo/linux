@@ -27,6 +27,7 @@
 #include <linux/power/omap/prm3xxx.h>
 #include <linux/power/omap/prm33xx.h>
 #include <linux/power/omap/prm44xx.h>
+#include <linux/power/omap/clockdomain.h>
 
 #include <asm/tlb.h>
 #include <asm/mach/map.h>
@@ -37,7 +38,6 @@
 #include "soc.h"
 #include "iomap.h"
 #include "voltage.h"
-#include "clockdomain.h"
 #include "common.h"
 #include "clock.h"
 #include "clock2xxx.h"
