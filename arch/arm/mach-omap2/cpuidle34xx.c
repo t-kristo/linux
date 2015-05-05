@@ -117,7 +117,7 @@ static int omap3_enter_idle(struct cpuidle_device *dev,
 
 	/* Deny idle for C1 */
 	if (cx->flags & OMAP_CPUIDLE_CX_NO_CLKDM_IDLE) {
-		clkdm_deny_idle(mpu_pd->pwrdm_clkdms[0]);
+		omap_clkdm_deny_idle(mpu_pd->pwrdm_clkdms[0]);
 	} else {
 		omap_pwrdm_set_next_pwrst(mpu_pd, cx->mpu_state);
 		omap_pwrdm_set_next_pwrst(core_pd, cx->core_state);
@@ -143,7 +143,7 @@ static int omap3_enter_idle(struct cpuidle_device *dev,
 
 	/* Re-allow idle for C1 */
 	if (cx->flags & OMAP_CPUIDLE_CX_NO_CLKDM_IDLE)
-		clkdm_allow_idle(mpu_pd->pwrdm_clkdms[0]);
+		omap_clkdm_allow_idle(mpu_pd->pwrdm_clkdms[0]);
 
 return_sleep_time:
 

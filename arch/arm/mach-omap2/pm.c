@@ -113,10 +113,10 @@ int __init omap_pm_clkdms_setup(struct clockdomain *clkdm, void *unused)
 	/* XXX The usecount test is racy */
 	if ((clkdm->flags & CLKDM_CAN_ENABLE_AUTO) &&
 	    !(clkdm->flags & CLKDM_MISSING_IDLE_REPORTING))
-		clkdm_allow_idle(clkdm);
+		omap_clkdm_allow_idle(clkdm);
 	else if (clkdm->flags & CLKDM_CAN_FORCE_SLEEP &&
 		 clkdm->usecount == 0)
-		clkdm_sleep(clkdm);
+		omap_clkdm_sleep(clkdm);
 	return 0;
 }
 

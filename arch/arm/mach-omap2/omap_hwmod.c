@@ -715,7 +715,7 @@ static int _add_initiator_dep(struct omap_hwmod *oh, struct omap_hwmod *init_oh)
 	if (clkdm && clkdm->flags & CLKDM_NO_AUTODEPS)
 		return 0;
 
-	return clkdm_add_sleepdep(clkdm, init_clkdm);
+	return omap_clkdm_add_sleepdep(clkdm, init_clkdm);
 }
 
 /**
@@ -744,7 +744,7 @@ static int _del_initiator_dep(struct omap_hwmod *oh, struct omap_hwmod *init_oh)
 	if (clkdm && clkdm->flags & CLKDM_NO_AUTODEPS)
 		return 0;
 
-	return clkdm_del_sleepdep(clkdm, init_clkdm);
+	return omap_clkdm_del_sleepdep(clkdm, init_clkdm);
 }
 
 /**
@@ -1521,7 +1521,7 @@ static int _init_clkdm(struct omap_hwmod *oh)
 		return 0;
 	}
 
-	oh->clkdm = clkdm_lookup(oh->clkdm_name);
+	oh->clkdm = omap_clkdm_lookup(oh->clkdm_name);
 	if (!oh->clkdm) {
 		pr_warn("omap_hwmod: %s: could not associate to clkdm %s\n",
 			oh->name, oh->clkdm_name);
@@ -1666,8 +1666,8 @@ static int _deassert_hardreset(struct omap_hwmod *oh, const char *name)
 		 * might not be completed. The clockdomain can be set
 		 * in HW_AUTO only when the module become ready.
 		 */
-		hwsup = clkdm_in_hwsup(oh->clkdm);
-		ret = clkdm_hwmod_enable(oh->clkdm, oh);
+		hwsup = omap_clkdm_in_hwsup(oh->clkdm);
+		ret = omap_clkdm_hwmod_enable(oh->clkdm, oh);
 		if (ret) {
 			WARN(1, "omap_hwmod: %s: could not enable clockdomain %s: %d\n",
 			     oh->name, oh->clkdm->name, ret);
@@ -1694,9 +1694,9 @@ static int _deassert_hardreset(struct omap_hwmod *oh, const char *name)
 		 * previous state was HW_AUTO.
 		 */
 		if (hwsup)
-			clkdm_allow_idle(oh->clkdm);
+			omap_clkdm_allow_idle(oh->clkdm);
 
-		clkdm_hwmod_disable(oh->clkdm, oh);
+		omap_clkdm_hwmod_disable(oh->clkdm, oh);
 	}
 
 	return ret;
@@ -2110,9 +2110,9 @@ static int _enable(struct omap_hwmod *oh)
 		 * completely the module. The clockdomain can be set
 		 * in HW_AUTO only when the module become ready.
 		 */
-		hwsup = clkdm_in_hwsup(oh->clkdm) &&
-			!clkdm_missing_idle_reporting(oh->clkdm);
-		r = clkdm_hwmod_enable(oh->clkdm, oh);
+		hwsup = omap_clkdm_in_hwsup(oh->clkdm) &&
+			!omap_clkdm_missing_idle_reporting(oh->clkdm);
+		r = omap_clkdm_hwmod_enable(oh->clkdm, oh);
 		if (r) {
 			WARN(1, "omap_hwmod: %s: could not enable clockdomain %s: %d\n",
 			     oh->name, oh->clkdm->name, r);
@@ -2137,7 +2137,7 @@ static int _enable(struct omap_hwmod *oh)
 		 * assuming that the previous state was HW_AUTO
 		 */
 		if (oh->clkdm && hwsup)
-			clkdm_allow_idle(oh->clkdm);
+			omap_clkdm_allow_idle(oh->clkdm);
 
 		oh->_state = _HWMOD_STATE_ENABLED;
 
@@ -2156,7 +2156,7 @@ static int _enable(struct omap_hwmod *oh)
 		       oh->name, r);
 
 		if (oh->clkdm)
-			clkdm_hwmod_disable(oh->clkdm, oh);
+			omap_clkdm_hwmod_disable(oh->clkdm, oh);
 	}
 
 	return r;
@@ -2200,7 +2200,7 @@ static int _idle(struct omap_hwmod *oh)
 	 */
 	_disable_clocks(oh);
 	if (oh->clkdm)
-		clkdm_hwmod_disable(oh->clkdm, oh);
+		omap_clkdm_hwmod_disable(oh->clkdm, oh);
 
 	/* Mux pins for device idle if populated */
 	if (oh->mux && oh->mux->pads_dynamic) {
@@ -2269,7 +2269,7 @@ static int _shutdown(struct omap_hwmod *oh)
 			soc_ops.disable_module(oh);
 		_disable_clocks(oh);
 		if (oh->clkdm)
-			clkdm_hwmod_disable(oh->clkdm, oh);
+			omap_clkdm_hwmod_disable(oh->clkdm, oh);
 	}
 	/* XXX Should this code also force-disable the optional clocks? */
 

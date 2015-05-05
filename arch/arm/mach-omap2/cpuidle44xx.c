@@ -140,9 +140,9 @@ static int omap_enter_idle_coupled(struct cpuidle_device *dev,
 		    mpuss_can_lose_context)
 			gic_dist_disable();
 
-		clkdm_wakeup(cpu_clkdm[1]);
+		omap_clkdm_wakeup(cpu_clkdm[1]);
 		omap_set_pwrdm_state(cpu_pd[1], PWRDM_POWER_ON);
-		clkdm_allow_idle(cpu_clkdm[1]);
+		omap_clkdm_allow_idle(cpu_clkdm[1]);
 
 		if (IS_PM44XX_ERRATUM(PM_OMAP4_ROM_SMP_BOOT_ERRATUM_GICD) &&
 		    mpuss_can_lose_context) {
@@ -236,8 +236,8 @@ int __init omap4_idle_init(void)
 	if ((!mpu_pd) || (!cpu_pd[0]) || (!cpu_pd[1]))
 		return -ENODEV;
 
-	cpu_clkdm[0] = clkdm_lookup("mpu0_clkdm");
-	cpu_clkdm[1] = clkdm_lookup("mpu1_clkdm");
+	cpu_clkdm[0] = omap_clkdm_lookup("mpu0_clkdm");
+	cpu_clkdm[1] = omap_clkdm_lookup("mpu1_clkdm");
 	if (!cpu_clkdm[0] || !cpu_clkdm[1])
 		return -ENODEV;
 

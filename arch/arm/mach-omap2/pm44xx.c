@@ -198,14 +198,14 @@ static inline int omap4plus_init_static_deps(const struct static_dep_map *map)
 		return 0;
 
 	while (map->from) {
-		from = clkdm_lookup(map->from);
-		to = clkdm_lookup(map->to);
+		from = omap_clkdm_lookup(map->from);
+		to = omap_clkdm_lookup(map->to);
 		if (!from || !to) {
 			pr_err("Failed lookup %s or %s for wakeup dependency\n",
 			       map->from, map->to);
 			return -EINVAL;
 		}
-		ret = clkdm_add_wkdep(from, to);
+		ret = omap_clkdm_add_wkdep(from, to);
 		if (ret) {
 			pr_err("Failed to add %s -> %s wakeup dependency(%d)\n",
 			       map->from, map->to, ret);
@@ -283,7 +283,7 @@ int __init omap4_pm_init(void)
 		goto err2;
 	}
 
-	(void) clkdm_for_each(omap_pm_clkdms_setup, NULL);
+	(void)omap_clkdm_for_each(omap_pm_clkdms_setup, NULL);
 
 	omap_common_suspend_init(omap4_pm_suspend);
 

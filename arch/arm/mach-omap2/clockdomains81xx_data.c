@@ -187,8 +187,8 @@ static struct clockdomain *clockdomains_ti81xx[] __initdata = {
 
 void __init ti81xx_clockdomains_init(void)
 {
-	clkdm_register_platform_funcs(&am33xx_clkdm_operations);
-	clkdm_register_clkdms(clockdomains_ti81xx);
-	clkdm_complete_init();
+	omap_clkdm_register_platform_funcs(&am33xx_clkdm_operations);
+	omap_clkdm_register_clkdms(clockdomains_ti81xx);
+	omap_clkdm_complete_init();
 }
 #endif

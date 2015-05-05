@@ -205,15 +205,15 @@ static void __init prcm_setup_regs(void)
 
 	/* Force-power down DSP, GFX powerdomains */
 
-	pwrdm = clkdm_get_pwrdm(dsp_clkdm);
+	pwrdm = omap_clkdm_get_pwrdm(dsp_clkdm);
 	omap_pwrdm_set_next_pwrst(pwrdm, PWRDM_POWER_OFF);
 
-	pwrdm = clkdm_get_pwrdm(gfx_clkdm);
+	pwrdm = omap_clkdm_get_pwrdm(gfx_clkdm);
 	omap_pwrdm_set_next_pwrst(pwrdm, PWRDM_POWER_OFF);
 
 	/* Enable hardware-supervised idle for all clkdms */
-	clkdm_for_each(omap_pm_clkdms_setup, NULL);
-	clkdm_add_wkdep(mpu_clkdm, wkup_clkdm);
+	omap_clkdm_for_each(omap_pm_clkdms_setup, NULL);
+	omap_clkdm_add_wkdep(mpu_clkdm, wkup_clkdm);
 
 	omap_common_suspend_init(omap2_enter_full_retention);
 
@@ -240,19 +240,19 @@ int __init omap2_pm_init(void)
 
 	/* Look up important clockdomains */
 
-	mpu_clkdm = clkdm_lookup("mpu_clkdm");
+	mpu_clkdm = omap_clkdm_lookup("mpu_clkdm");
 	if (!mpu_clkdm)
 		pr_err("PM: mpu_clkdm not found\n");
 
-	wkup_clkdm = clkdm_lookup("wkup_clkdm");
+	wkup_clkdm = omap_clkdm_lookup("wkup_clkdm");
 	if (!wkup_clkdm)
 		pr_err("PM: wkup_clkdm not found\n");
 
-	dsp_clkdm = clkdm_lookup("dsp_clkdm");
+	dsp_clkdm = omap_clkdm_lookup("dsp_clkdm");
 	if (!dsp_clkdm)
 		pr_err("PM: dsp_clkdm not found\n");
 
-	gfx_clkdm = clkdm_lookup("gfx_clkdm");
+	gfx_clkdm = omap_clkdm_lookup("gfx_clkdm");
 	if (!gfx_clkdm)
 		pr_err("PM: gfx_clkdm not found\n");
 

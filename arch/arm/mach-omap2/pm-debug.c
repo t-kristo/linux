@@ -146,7 +146,7 @@ static int pwrdm_dbg_show_timer(struct powerdomain *pwrdm, void *user)
 static int pm_dbg_show_counters(struct seq_file *s, void *unused)
 {
 	omap_pwrdm_for_each(pwrdm_dbg_show_counter, s);
-	clkdm_for_each(clkdm_dbg_show_counter, s);
+	omap_clkdm_for_each(clkdm_dbg_show_counter, s);
 
 	return 0;
 }

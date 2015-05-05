@@ -504,7 +504,7 @@ int __init omap3_pm_init(void)
 		goto err3;
 	}
 
-	(void) clkdm_for_each(omap_pm_clkdms_setup, NULL);
+	(void)omap_clkdm_for_each(omap_pm_clkdms_setup, NULL);
 
 	mpu_pwrdm = omap_pwrdm_lookup("mpu_pwrdm");
 	if (mpu_pwrdm == NULL) {
@@ -517,10 +517,10 @@ int __init omap3_pm_init(void)
 	per_pwrdm = omap_pwrdm_lookup("per_pwrdm");
 	core_pwrdm = omap_pwrdm_lookup("core_pwrdm");
 
-	neon_clkdm = clkdm_lookup("neon_clkdm");
-	mpu_clkdm = clkdm_lookup("mpu_clkdm");
-	per_clkdm = clkdm_lookup("per_clkdm");
-	wkup_clkdm = clkdm_lookup("wkup_clkdm");
+	neon_clkdm = omap_clkdm_lookup("neon_clkdm");
+	mpu_clkdm = omap_clkdm_lookup("mpu_clkdm");
+	per_clkdm = omap_clkdm_lookup("per_clkdm");
+	wkup_clkdm = omap_clkdm_lookup("wkup_clkdm");
 
 	omap_common_suspend_init(omap3_pm_suspend);
 
@@ -554,9 +554,9 @@ int __init omap3_pm_init(void)
 	 * or OSWR is enabled.
 	 */
 	if (IS_PM34XX_ERRATUM(PM_PER_MEMORIES_ERRATUM_i582))
-		clkdm_add_wkdep(per_clkdm, wkup_clkdm);
+		omap_clkdm_add_wkdep(per_clkdm, wkup_clkdm);
 
-	clkdm_add_wkdep(neon_clkdm, mpu_clkdm);
+	omap_clkdm_add_wkdep(neon_clkdm, mpu_clkdm);
 	if (omap_type() != OMAP2_DEVICE_TYPE_GP) {
 		omap3_secure_ram_storage =
 			kmalloc(0x803F, GFP_KERNEL);

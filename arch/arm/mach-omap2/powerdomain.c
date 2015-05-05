@@ -232,8 +232,8 @@ static u8 _pwrdm_save_clkdm_state_and_activate(struct powerdomain *pwrdm,
 		    arch_pwrdm->pwrdm_set_lowpwrstchange) {
 			sleep_switch = LOWPOWERSTATE_SWITCH;
 		} else {
-			*hwsup = clkdm_in_hwsup(pwrdm->pwrdm_clkdms[0]);
-			clkdm_wakeup_nolock(pwrdm->pwrdm_clkdms[0]);
+			*hwsup = omap_clkdm_in_hwsup(pwrdm->pwrdm_clkdms[0]);
+			omap_clkdm_wakeup_nolock(pwrdm->pwrdm_clkdms[0]);
 			sleep_switch = FORCEWAKEUP_SWITCH;
 		}
 	} else {
@@ -263,9 +263,9 @@ static void _pwrdm_restore_clkdm_state(struct powerdomain *pwrdm,
 	switch (sleep_switch) {
 	case FORCEWAKEUP_SWITCH:
 		if (hwsup)
-			clkdm_allow_idle_nolock(pwrdm->pwrdm_clkdms[0]);
+			omap_clkdm_allow_idle_nolock(pwrdm->pwrdm_clkdms[0]);
 		else
-			clkdm_sleep_nolock(pwrdm->pwrdm_clkdms[0]);
+			omap_clkdm_sleep_nolock(pwrdm->pwrdm_clkdms[0]);
 		break;
 	case LOWPOWERSTATE_SWITCH:
 		if (pwrdm->flags & PWRDM_HAS_LOWPOWERSTATECHANGE &&

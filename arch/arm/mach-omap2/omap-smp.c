@@ -103,7 +103,7 @@ static int omap4_boot_secondary(unsigned int cpu, struct task_struct *idle)
 		writel_relaxed(0x20, base + OMAP_AUX_CORE_BOOT_0);
 
 	if (!cpu1_clkdm && !cpu1_pwrdm) {
-		cpu1_clkdm = clkdm_lookup("mpu1_clkdm");
+		cpu1_clkdm = omap_clkdm_lookup("mpu1_clkdm");
 		cpu1_pwrdm = omap_pwrdm_lookup("cpu1_pwrdm");
 	}
 
@@ -143,9 +143,9 @@ static int omap4_boot_secondary(unsigned int cpu, struct task_struct *idle)
 		 * Ensure that CPU power state is set to ON to avoid CPU
 		 * powerdomain transition on wfi
 		 */
-		clkdm_wakeup(cpu1_clkdm);
+		omap_clkdm_wakeup(cpu1_clkdm);
 		omap_set_pwrdm_state(cpu1_pwrdm, PWRDM_POWER_ON);
-		clkdm_allow_idle(cpu1_clkdm);
+		omap_clkdm_allow_idle(cpu1_clkdm);
 
 		if (IS_PM44XX_ERRATUM(PM_OMAP4_ROM_SMP_BOOT_ERRATUM_GICD)) {
 			while (gic_dist_disabled()) {
