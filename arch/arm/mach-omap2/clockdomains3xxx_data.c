@@ -35,7 +35,6 @@
 #include <linux/power/omap/clockdomain.h>
 
 #include "soc.h"
-#include "cm2xxx_3xxx.h"
 #include "cm-regbits-34xx.h"
 #include "prm-regbits-34xx.h"
 

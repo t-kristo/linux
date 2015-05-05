@@ -24,7 +24,6 @@
 #include "soc.h"
 #include "common.h"
 #include "vp.h"
-#include "cm2xxx_3xxx.h"
 #include "prm-regbits-34xx.h"
 #include "cm3xxx.h"
 #include "cm-regbits-34xx.h"

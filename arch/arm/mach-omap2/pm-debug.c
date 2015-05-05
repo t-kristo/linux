@@ -34,7 +34,6 @@
 #include "omap-pm.h"
 
 #include "soc.h"
-#include "cm2xxx_3xxx.h"
 #include "pm.h"
 
 u32 enable_off_mode;

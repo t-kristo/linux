@@ -17,8 +17,7 @@
 #define __ARCH_ASM_MACH_OMAP2_CM2XXX_H
 
 #include <linux/power/omap/prcm-common.h>
-
-#include "cm2xxx_3xxx.h"
+#include <linux/power/omap/cm2xxx_3xxx.h>
 
 #define OMAP2420_CM_REGADDR(module, reg)				\
 			OMAP2_L4_IO_ADDRESS(OMAP2420_CM_BASE + (module) + (reg))

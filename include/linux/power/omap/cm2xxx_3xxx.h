@@ -13,8 +13,8 @@
  * other.  The CM modules/instances on OMAP4 are quite different, so
  * they are handled in a separate file.
  */
-#ifndef __ARCH_ASM_MACH_OMAP2_CM2XXX_3XXX_H
-#define __ARCH_ASM_MACH_OMAP2_CM2XXX_3XXX_H
+#ifndef __LINUX_POWER_OMAP_CM2XXX_3XXX_H
+#define __LINUX_POWER_OMAP_CM2XXX_3XXX_H
 
 #include <linux/power/omap/cm.h>
 
@@ -96,10 +96,10 @@ static inline u32 omap2_cm_clear_mod_reg_bits(u32 bits, s16 module, s16 idx)
 	return omap2_cm_rmw_mod_reg_bits(bits, 0x0, module, idx);
 }
 
-extern int omap2xxx_cm_apll54_enable(void);
-extern void omap2xxx_cm_apll54_disable(void);
-extern int omap2xxx_cm_apll96_enable(void);
-extern void omap2xxx_cm_apll96_disable(void);
+int omap2xxx_cm_apll54_enable(void);
+void omap2xxx_cm_apll54_disable(void);
+int omap2xxx_cm_apll96_enable(void);
+void omap2xxx_cm_apll96_disable(void);
 
 #endif
 
@@ -112,9 +112,9 @@ extern void omap2xxx_cm_apll96_disable(void);
 
 /* CM_ICLKEN_GFX */
 #define OMAP_EN_GFX_SHIFT				0
-#define OMAP_EN_GFX_MASK				(1 << 0)
+#define OMAP_EN_GFX_MASK				BIT(0)
 
 /* CM_IDLEST_GFX */
-#define OMAP_ST_GFX_MASK				(1 << 0)
+#define OMAP_ST_GFX_MASK				BIT(0)
 
 #endif

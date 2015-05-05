@@ -25,7 +25,6 @@
 #include <linux/power/omap/clockdomain.h>
 #include <trace/events/power.h>
 
-#include "cm2xxx_3xxx.h"
 #include "prcm44xx.h"
 
 #include <asm/cpu.h>

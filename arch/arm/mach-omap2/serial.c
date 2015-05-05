@@ -36,7 +36,6 @@
 #include "omap-pm.h"
 #include "soc.h"
 #include "pm.h"
-#include "cm2xxx_3xxx.h"
 #include "prm-regbits-34xx.h"
 #include "control.h"
 #include "mux.h"
