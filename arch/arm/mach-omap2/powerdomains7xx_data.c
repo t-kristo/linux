@@ -23,8 +23,7 @@
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/power/omap/prm7xx.h>
-
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 
 #include "prcm44xx.h"
 #include "prcm_mpu7xx.h"

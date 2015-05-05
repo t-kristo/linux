@@ -22,13 +22,12 @@
 #include <linux/interrupt.h>
 #include <linux/of.h>
 #include <linux/platform_data/gpio-omap.h>
+#include <linux/power/omap/powerdomain.h>
 
 #include "soc.h"
 #include "omap_hwmod.h"
 #include "omap_device.h"
 #include "omap-pm.h"
-
-#include "powerdomain.h"
 
 static int __init omap2_gpio_dev_init(struct omap_hwmod *oh, void *unused)
 {

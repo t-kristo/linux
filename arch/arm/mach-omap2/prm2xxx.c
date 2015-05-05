@@ -18,8 +18,8 @@
 #include <linux/io.h>
 #include <linux/irq.h>
 #include <linux/power/omap/prm2xxx.h>
+#include <linux/power/omap/powerdomain.h>
 
-#include "powerdomain.h"
 #include "clockdomain.h"
 #include "cm2xxx_3xxx.h"
 #include "prm-regbits-24xx.h"

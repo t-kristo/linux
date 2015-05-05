@@ -18,10 +18,10 @@
 #include <linux/errno.h>
 #include <linux/smp.h>
 #include <linux/io.h>
+#include <linux/power/omap/powerdomain.h>
 
 #include "omap-wakeupgen.h"
 #include "common.h"
-#include "powerdomain.h"
 
 /*
  * platform-specific code to shutdown a CPU

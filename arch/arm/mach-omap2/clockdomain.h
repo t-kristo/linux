@@ -16,8 +16,7 @@
 
 #include <linux/init.h>
 #include <linux/clk.h>
-
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 
 /*
  * Clockdomain flags

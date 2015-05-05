@@ -11,8 +11,7 @@
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/power/omap/prcm43xx.h>
-
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 
 #include "prcm44xx.h"
 

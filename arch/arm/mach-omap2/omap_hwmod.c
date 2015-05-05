@@ -142,6 +142,7 @@
 #include <linux/of.h>
 #include <linux/of_address.h>
 #include <linux/power/omap/prm.h>
+#include <linux/power/omap/powerdomain.h>
 
 #include <asm/system_misc.h>
 
@@ -151,7 +152,6 @@
 #include "soc.h"
 #include "common.h"
 #include "clockdomain.h"
-#include "powerdomain.h"
 #include "cm2xxx.h"
 #include "cm3xxx.h"
 #include "cm33xx.h"

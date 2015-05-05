@@ -35,7 +35,6 @@
 #include "control.h"
 
 #include "voltage.h"
-#include "powerdomain.h"
 
 #include "vc.h"
 #include "vp.h"

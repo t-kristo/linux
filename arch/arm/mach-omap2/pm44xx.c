@@ -17,11 +17,11 @@
 #include <linux/err.h>
 #include <linux/slab.h>
 #include <asm/system_misc.h>
+#include <linux/power/omap/powerdomain.h>
 
 #include "soc.h"
 #include "common.h"
 #include "clockdomain.h"
-#include "powerdomain.h"
 #include "pm.h"
 
 u16 pm44xx_errata;

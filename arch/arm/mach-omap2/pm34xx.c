@@ -32,6 +32,7 @@
 #include <linux/omap-gpmc.h>
 #include <linux/platform_data/gpio-omap.h>
 #include <linux/power/omap/prm3xxx.h>
+#include <linux/power/omap/powerdomain.h>
 
 #include <trace/events/power.h>
 
@@ -40,7 +41,6 @@
 #include <asm/system_misc.h>
 
 #include "clockdomain.h"
-#include "powerdomain.h"
 #include "soc.h"
 #include "common.h"
 #include "cm3xxx.h"

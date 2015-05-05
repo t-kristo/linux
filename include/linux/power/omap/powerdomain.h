@@ -14,8 +14,8 @@
  * opportunity.
  */
 
-#ifndef __ARCH_ARM_MACH_OMAP2_POWERDOMAIN_H
-#define __ARCH_ARM_MACH_OMAP2_POWERDOMAIN_H
+#ifndef __LINUX_POWER_OMAP_POWERDOMAIN_H
+#define __LINUX_POWER_OMAP_POWERDOMAIN_H
 
 #include <linux/types.h>
 #include <linux/list.h>
@@ -30,17 +30,16 @@
 #define PWRDM_MAX_PWRSTS	4
 
 /* Powerdomain allowable state bitfields */
-#define PWRSTS_ON		(1 << PWRDM_POWER_ON)
-#define PWRSTS_INACTIVE		(1 << PWRDM_POWER_INACTIVE)
-#define PWRSTS_RET		(1 << PWRDM_POWER_RET)
-#define PWRSTS_OFF		(1 << PWRDM_POWER_OFF)
+#define PWRSTS_ON		BIT(PWRDM_POWER_ON)
+#define PWRSTS_INACTIVE		BIT(PWRDM_POWER_INACTIVE)
+#define PWRSTS_RET		BIT(PWRDM_POWER_RET)
+#define PWRSTS_OFF		BIT(PWRDM_POWER_OFF)
 
 #define PWRSTS_OFF_ON		(PWRSTS_OFF | PWRSTS_ON)
 #define PWRSTS_OFF_RET		(PWRSTS_OFF | PWRSTS_RET)
 #define PWRSTS_RET_ON		(PWRSTS_RET | PWRSTS_ON)
 #define PWRSTS_OFF_RET_ON	(PWRSTS_OFF_RET | PWRSTS_ON)
 #define PWRSTS_INA_ON		(PWRSTS_INACTIVE | PWRSTS_ON)
-
 
 /*
  * Powerdomain flags (struct powerdomain.flags)
@@ -91,6 +90,8 @@ struct voltagedomain;
  * @pwrdm_clkdms: Clockdomains in this powerdomain
  * @node: list_head linking all powerdomains
  * @voltdm_node: list_head linking all powerdomains in a voltagedomain
+ * @state:
+ * @state_counter:
  * @pwrstctrl_offs: (AM33XX only) XXX_PWRSTCTRL reg offset from prcm_offs
  * @pwrstst_offs: (AM33XX only) XXX_PWRSTST reg offset from prcm_offs
  * @logicretstate_mask: (AM33XX only) mask for logic retention bitfield
@@ -100,8 +101,6 @@ struct voltagedomain;
  * @mem_pwrst_mask: (AM33XX only) mask for mem state bitfield in @pwrstst_offs
  * @mem_retst_mask: (AM33XX only) mask for mem retention state bitfield
  *	in @pwrstctrl_offs
- * @state:
- * @state_counter:
  * @timer:
  * @state_timer:
  * @_lock: spinlock used to serialize powerdomain and some clockdomain ops
@@ -184,13 +183,16 @@ struct pwrdm_ops {
 	int	(*pwrdm_read_pwrst)(struct powerdomain *pwrdm);
 	int	(*pwrdm_read_prev_pwrst)(struct powerdomain *pwrdm);
 	int	(*pwrdm_set_logic_retst)(struct powerdomain *pwrdm, u8 pwrst);
-	int	(*pwrdm_set_mem_onst)(struct powerdomain *pwrdm, u8 bank, u8 pwrst);
-	int	(*pwrdm_set_mem_retst)(struct powerdomain *pwrdm, u8 bank, u8 pwrst);
+	int	(*pwrdm_set_mem_onst)(struct powerdomain *pwrdm, u8 bank,
+				      u8 pwrst);
+	int	(*pwrdm_set_mem_retst)(struct powerdomain *pwrdm, u8 bank,
+				       u8 pwrst);
 	int	(*pwrdm_read_logic_pwrst)(struct powerdomain *pwrdm);
 	int	(*pwrdm_read_prev_logic_pwrst)(struct powerdomain *pwrdm);
 	int	(*pwrdm_read_logic_retst)(struct powerdomain *pwrdm);
 	int	(*pwrdm_read_mem_pwrst)(struct powerdomain *pwrdm, u8 bank);
-	int	(*pwrdm_read_prev_mem_pwrst)(struct powerdomain *pwrdm, u8 bank);
+	int	(*pwrdm_read_prev_mem_pwrst)(struct powerdomain *pwrdm,
+					     u8 bank);
 	int	(*pwrdm_read_mem_retst)(struct powerdomain *pwrdm, u8 bank);
 	int	(*pwrdm_clear_all_prev_pwrst)(struct powerdomain *pwrdm);
 	int	(*pwrdm_enable_hdwr_sar)(struct powerdomain *pwrdm);
@@ -246,15 +248,15 @@ int omap_pwrdm_post_transition(struct powerdomain *pwrdm);
 int omap_pwrdm_get_context_loss_count(struct powerdomain *pwrdm);
 bool omap_pwrdm_can_ever_lose_context(struct powerdomain *pwrdm);
 
-extern int omap_set_pwrdm_state(struct powerdomain *pwrdm, u8 state);
+int omap_set_pwrdm_state(struct powerdomain *pwrdm, u8 state);
 
-extern void omap242x_powerdomains_init(void);
-extern void omap243x_powerdomains_init(void);
-extern void omap3xxx_powerdomains_init(void);
-extern void am33xx_powerdomains_init(void);
-extern void omap44xx_powerdomains_init(void);
-extern void omap54xx_powerdomains_init(void);
-extern void dra7xx_powerdomains_init(void);
+void omap242x_powerdomains_init(void);
+void omap243x_powerdomains_init(void);
+void omap3xxx_powerdomains_init(void);
+void am33xx_powerdomains_init(void);
+void omap44xx_powerdomains_init(void);
+void omap54xx_powerdomains_init(void);
+void dra7xx_powerdomains_init(void);
 void am43xx_powerdomains_init(void);
 
 extern struct pwrdm_ops omap2_pwrdm_operations;
@@ -263,9 +265,9 @@ extern struct pwrdm_ops am33xx_pwrdm_operations;
 extern struct pwrdm_ops omap4_pwrdm_operations;
 
 /* Common Internal functions used across OMAP rev's */
-extern u32 omap2_pwrdm_get_mem_bank_onstate_mask(u8 bank);
-extern u32 omap2_pwrdm_get_mem_bank_retst_mask(u8 bank);
-extern u32 omap2_pwrdm_get_mem_bank_stst_mask(u8 bank);
+u32 omap2_pwrdm_get_mem_bank_onstate_mask(u8 bank);
+u32 omap2_pwrdm_get_mem_bank_retst_mask(u8 bank);
+u32 omap2_pwrdm_get_mem_bank_stst_mask(u8 bank);
 
 extern struct powerdomain wkup_omap2_pwrdm;
 extern struct powerdomain gfx_omap2_pwrdm;

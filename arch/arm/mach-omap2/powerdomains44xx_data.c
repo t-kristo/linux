@@ -22,8 +22,7 @@
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/power/omap/prm44xx.h>
-
-#include "powerdomain.h"
+#include <linux/power/omap/powerdomain.h>
 
 #include "prcm44xx.h"
 #include "prm-regbits-44xx.h"

@@ -13,9 +13,9 @@
 
 #include <linux/kernel.h>
 #include <linux/init.h>
+#include <linux/power/omap/powerdomain.h>
 
 #include "soc.h"
-#include "powerdomain.h"
 #include "powerdomains2xxx_3xxx_data.h"
 
 #include "prm-regbits-24xx.h"

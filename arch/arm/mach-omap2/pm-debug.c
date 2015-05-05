@@ -27,9 +27,9 @@
 #include <linux/module.h>
 #include <linux/slab.h>
 #include <linux/power/omap/prm2xxx_3xxx.h>
+#include <linux/power/omap/powerdomain.h>
 
 #include "clock.h"
-#include "powerdomain.h"
 #include "clockdomain.h"
 #include "omap-pm.h"
 
