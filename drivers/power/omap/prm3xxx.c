@@ -92,7 +92,7 @@ static struct omap3_vp omap3_vp[] = {
 	},
 };
 
-#define MAX_VP_ID ARRAY_SIZE(omap3_vp);
+#define MAX_VP_ID ARRAY_SIZE(omap3_vp)
 
 static u32 omap3_prm_vp_check_txdone(u8 vp_id)
 {
