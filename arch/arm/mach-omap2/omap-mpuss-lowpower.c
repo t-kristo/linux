@@ -51,13 +51,13 @@
 #include <asm/pgalloc.h>
 #include <asm/suspend.h>
 #include <asm/hardware/cache-l2x0.h>
+#include <linux/power/omap/prcm_mpu44xx.h>
 
 #include "soc.h"
 #include "common.h"
 #include "omap44xx.h"
 #include "omap4-sar-layout.h"
 #include "pm.h"
-#include "prcm_mpu44xx.h"
 #include "prcm_mpu54xx.h"
 
 #ifdef CONFIG_SMP

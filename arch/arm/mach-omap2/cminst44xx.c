@@ -25,11 +25,11 @@
 #include <linux/power/omap/clockdomain.h>
 #include <linux/power/omap/cm44xx.h>
 #include <linux/power/omap/prcm44xx.h>
+#include <linux/power/omap/prcm_mpu44xx.h>
 
 #include "cm1_44xx.h"
 #include "cm2_44xx.h"
 #include "cm-regbits-34xx.h"
-#include "prcm_mpu44xx.h"
 
 #define OMAP4430_IDLEST_SHIFT		16
 #define OMAP4430_IDLEST_MASK		(0x3 << 16)

@@ -24,8 +24,7 @@
 #include <linux/power/omap/prm44xx.h>
 #include <linux/power/omap/powerdomain.h>
 #include <linux/power/omap/prcm44xx.h>
-
-#include "prcm_mpu44xx.h"
+#include <linux/power/omap/prcm_mpu44xx.h>
 
 /* core_44xx_pwrdm: CORE power domain */
 static struct powerdomain core_44xx_pwrdm = {

@@ -22,8 +22,8 @@
  *     or "OMAP4430".
  */
 
-#ifndef __ARCH_ARM_MACH_OMAP2_PRCM_MPU44XX_H
-#define __ARCH_ARM_MACH_OMAP2_PRCM_MPU44XX_H
+#ifndef __LINUX_POWER_OMAP_PRCM_MPU44XX_H
+#define __LINUX_POWER_OMAP_PRCM_MPU44XX_H
 
 #include <linux/power/omap/prcm_mpu_44xx_54xx.h>
 
@@ -36,7 +36,6 @@
 /* PRCM_MPU clockdomain register offsets (from instance start) */
 #define OMAP4430_PRCM_MPU_CPU0_CPU0_CDOFFS	0x0018
 #define OMAP4430_PRCM_MPU_CPU1_CPU1_CDOFFS	0x0018
-
 
 /*
  * PRCM_MPU

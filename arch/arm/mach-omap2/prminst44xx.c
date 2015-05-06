@@ -21,10 +21,10 @@
 #include <linux/power/omap/prminst44xx.h>
 #include <linux/power/omap/prm-regbits-44xx.h>
 #include <linux/power/omap/prcm44xx.h>
+#include <linux/power/omap/prcm_mpu44xx.h>
 
 #include "iomap.h"
 #include "common.h"
-#include "prcm_mpu44xx.h"
 #include "soc.h"
 
 static void __iomem *_prm_bases[OMAP4_MAX_PRCM_PARTITIONS];

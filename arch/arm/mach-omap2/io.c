@@ -28,6 +28,7 @@
 #include <linux/power/omap/prm33xx.h>
 #include <linux/power/omap/prm44xx.h>
 #include <linux/power/omap/clockdomain.h>
+#include <linux/power/omap/prcm_mpu_44xx_54xx.h>
 
 #include <asm/tlb.h>
 #include <asm/mach/map.h>
@@ -50,7 +51,6 @@
 #include "cm2xxx.h"
 #include "cm3xxx.h"
 #include "cm33xx.h"
-#include "prcm_mpu44xx.h"
 #include "opp2xxx.h"
 #include "pm.h"
 
