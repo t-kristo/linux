@@ -17,8 +17,7 @@
 #include <linux/init.h>
 #include <linux/power/omap/prm33xx.h>
 #include <linux/power/omap/powerdomain.h>
-
-#include "prm-regbits-33xx.h"
+#include <linux/power/omap/prm-regbits-33xx.h>
 
 static struct powerdomain gfx_33xx_pwrdm = {
 	.name			= "gfx_pwrdm",

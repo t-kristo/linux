@@ -25,7 +25,6 @@
 
 #include "control.h"
 #include "cm33xx.h"
-#include "prm-regbits-33xx.h"
 #include "i2c.h"
 #include "wd_timer.h"
 #include "omap_hwmod_33xx_43xx_common_data.h"
