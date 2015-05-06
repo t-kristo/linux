@@ -188,6 +188,8 @@ void omap_prm_init_pm(u8 flags);
 u32 omap_prm_vp_check_txdone(u8 vp_id);
 void omap_prm_vp_clear_txdone(u8 vp_id);
 
+void __init omap2_prm_setup_features(u16 features);
+
 #endif
 
 #endif

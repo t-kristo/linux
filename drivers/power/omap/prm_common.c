@@ -869,3 +869,8 @@ int __init omap2_prcm_register_pdata(struct omap_prcm_plat_data *data)
 
 	return 0;
 }
+
+void __init omap2_prm_setup_features(u16 features)
+{
+	prm_features |= features;
+}
