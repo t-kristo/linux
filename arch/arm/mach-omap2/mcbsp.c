@@ -32,7 +32,6 @@
  * Sidetone needs non-gated ICLK and sidetone autoidle is broken.
  */
 #include "cm3xxx.h"
-#include "cm-regbits-34xx.h"
 
 static struct clk *mcbsp_iclks[5];
 

@@ -22,7 +22,6 @@
 #include "soc.h"
 #include "iomap.h"
 #include "common.h"
-#include "cm-regbits-34xx.h"
 #include "cm3xxx.h"
 #include "sdrc.h"
 #include "pm.h"

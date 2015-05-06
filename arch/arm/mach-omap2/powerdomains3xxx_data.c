@@ -19,7 +19,6 @@
 
 #include "soc.h"
 #include "powerdomains2xxx_3xxx_data.h"
-#include "cm-regbits-34xx.h"
 
 /*
  * 34XX-specific powerdomains, dependencies

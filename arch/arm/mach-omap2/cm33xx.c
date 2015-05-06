@@ -24,9 +24,9 @@
 #include <linux/power/omap/cm.h>
 #include <linux/power/omap/prm33xx.h>
 #include <linux/power/omap/clockdomain.h>
+#include <linux/power/omap/cm-regbits-34xx.h>
 
 #include "cm33xx.h"
-#include "cm-regbits-34xx.h"
 #include "cm-regbits-33xx.h"
 
 /*

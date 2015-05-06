@@ -19,7 +19,6 @@
 #include <linux/power/omap/prm-regbits-44xx.h>
 
 #include "pm.h"
-#include "cm-regbits-34xx.h"
 
 /*
  * OMAP3 and OMAP4 specific register bit initialisations
