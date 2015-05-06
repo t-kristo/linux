@@ -98,18 +98,16 @@ int omap2_prm_deassert_hardreset(u8 rst_shift, u8 st_shift, u8 part,
 	omap2_prm_rmw_mod_reg_bits(rst, 0, prm_mod, OMAP2_RM_RSTCTRL);
 	/* wait the status to be set */
 	omap_test_timeout(omap2_prm_read_mod_bits_shift(prm_mod, OMAP2_RM_RSTST,
-						  st),
+							st),
 			  MAX_MODULE_HARDRESET_WAIT, c);
 
 	return (c == MAX_MODULE_HARDRESET_WAIT) ? -EBUSY : 0;
 }
 
-
 /* Powerdomain low-level functions */
 
 /* Common functions across OMAP2 and OMAP3 */
-int omap2_pwrdm_set_mem_onst(struct powerdomain *pwrdm, u8 bank,
-								u8 pwrst)
+int omap2_pwrdm_set_mem_onst(struct powerdomain *pwrdm, u8 bank, u8 pwrst)
 {
 	u32 m;
 
@@ -121,8 +119,7 @@ int omap2_pwrdm_set_mem_onst(struct powerdomain *pwrdm, u8 bank,
 	return 0;
 }
 
-int omap2_pwrdm_set_mem_retst(struct powerdomain *pwrdm, u8 bank,
-								u8 pwrst)
+int omap2_pwrdm_set_mem_retst(struct powerdomain *pwrdm, u8 bank, u8 pwrst)
 {
 	u32 m;
 
@@ -234,4 +231,3 @@ int omap2_clkdm_clear_all_wkdeps(struct clockdomain *clkdm)
 				     PM_WKDEP);
 	return 0;
 }
-
