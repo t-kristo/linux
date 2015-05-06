@@ -20,11 +20,11 @@
 #include <linux/of_irq.h>
 #include <linux/power/omap/prm3xxx.h>
 #include <linux/power/omap/powerdomain.h>
+#include <linux/power/omap/prm-regbits-34xx.h>
 
 #include "soc.h"
 #include "common.h"
 #include "vp.h"
-#include "prm-regbits-34xx.h"
 #include "cm3xxx.h"
 #include "cm-regbits-34xx.h"
 #include "clock.h"

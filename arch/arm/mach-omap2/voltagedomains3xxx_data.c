@@ -17,10 +17,10 @@
 #include <linux/kernel.h>
 #include <linux/err.h>
 #include <linux/init.h>
+#include <linux/power/omap/prm-regbits-34xx.h>
 
 #include "soc.h"
 #include "common.h"
-#include "prm-regbits-34xx.h"
 #include "omap_opp_data.h"
 #include "voltage.h"
 #include "vc.h"

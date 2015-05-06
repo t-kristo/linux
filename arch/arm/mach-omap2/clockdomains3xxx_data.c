@@ -33,10 +33,10 @@
 #include <linux/kernel.h>
 #include <linux/io.h>
 #include <linux/power/omap/clockdomain.h>
+#include <linux/power/omap/prm-regbits-34xx.h>
 
 #include "soc.h"
 #include "cm-regbits-34xx.h"
-#include "prm-regbits-34xx.h"
 
 /*
  * Clockdomain dependencies for wkdeps/sleepdeps

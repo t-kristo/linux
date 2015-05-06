@@ -15,10 +15,10 @@
 #include <linux/init.h>
 #include <linux/bug.h>
 #include <linux/power/omap/powerdomain.h>
+#include <linux/power/omap/prm-regbits-34xx.h>
 
 #include "soc.h"
 #include "powerdomains2xxx_3xxx_data.h"
-#include "prm-regbits-34xx.h"
 #include "cm-regbits-34xx.h"
 
 /*
