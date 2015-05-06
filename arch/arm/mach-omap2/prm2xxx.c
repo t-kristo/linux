@@ -20,8 +20,7 @@
 #include <linux/power/omap/prm2xxx.h>
 #include <linux/power/omap/powerdomain.h>
 #include <linux/power/omap/clockdomain.h>
-
-#include "prm-regbits-24xx.h"
+#include <linux/power/omap/prm-regbits-24xx.h>
 
 /*
  * OMAP24xx PM_PWSTCTRL_*.POWERSTATE and PM_PWSTST_*.LASTSTATEENTERED bits -

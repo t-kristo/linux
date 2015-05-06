@@ -18,6 +18,7 @@
 #include <linux/platform_data/hsmmc-omap.h>
 #include <linux/platform_data/spi-omap2-mcspi.h>
 #include <linux/omap-dma.h>
+#include <linux/power/omap/prm-regbits-24xx.h>
 #include <plat/dmtimer.h>
 
 #include "omap_hwmod.h"
@@ -25,7 +26,6 @@
 
 #include "soc.h"
 #include "omap_hwmod_common_data.h"
-#include "prm-regbits-24xx.h"
 #include "cm-regbits-24xx.h"
 #include "i2c.h"
 #include "wd_timer.h"

@@ -46,7 +46,6 @@
 #include "soc.h"
 #include "common.h"
 #include "clock.h"
-#include "prm-regbits-24xx.h"
 #include "cm2xxx.h"
 #include "cm-regbits-24xx.h"
 #include "sdrc.h"

@@ -1,6 +1,3 @@
-#ifndef __ARCH_ARM_MACH_OMAP2_PRM_REGBITS_24XX_H
-#define __ARCH_ARM_MACH_OMAP2_PRM_REGBITS_24XX_H
-
 /*
  * OMAP24XX Power/Reset Management register bits
  *
@@ -14,14 +11,17 @@
  * published by the Free Software Foundation.
  */
 
+#ifndef __LINUX_POWER_OMAP_PRM_REGBITS_24XX_H
+#define __LINUX_POWER_OMAP_PRM_REGBITS_24XX_H
+
 #include <linux/power/omap/prm2xxx.h>
 
-#define OMAP24XX_EN_CORE_SHIFT 				0
-#define OMAP24XX_FORCESTATE_MASK			(1 << 18)
-#define OMAP24XX_AUTOIDLE_MASK				(1 << 0)
-#define OMAP24XX_AUTO_EXTVOLT_MASK			(1 << 15)
+#define OMAP24XX_EN_CORE_SHIFT				0
+#define OMAP24XX_FORCESTATE_MASK			BIT(18)
+#define OMAP24XX_AUTOIDLE_MASK				BIT(0)
+#define OMAP24XX_AUTO_EXTVOLT_MASK			BIT(15)
 #define OMAP24XX_SETOFF_LEVEL_SHIFT			12
-#define OMAP24XX_MEMRETCTRL_MASK			(1 << 8)
+#define OMAP24XX_MEMRETCTRL_MASK			BIT(8)
 #define OMAP24XX_SETRET_LEVEL_SHIFT			6
 #define OMAP24XX_VOLT_LEVEL_SHIFT			0
 #define OMAP2420_CLKOUT2_EN_SHIFT			15

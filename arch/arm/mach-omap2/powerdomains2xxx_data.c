@@ -14,11 +14,10 @@
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/power/omap/powerdomain.h>
+#include <linux/power/omap/prm2xxx.h>
 
 #include "soc.h"
 #include "powerdomains2xxx_3xxx_data.h"
-
-#include "prm-regbits-24xx.h"
 
 /* 24XX powerdomains and dependencies */
 
