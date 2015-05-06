@@ -25,7 +25,7 @@
 #ifndef __ARCH_ARM_MACH_OMAP2_PRCM_MPU44XX_H
 #define __ARCH_ARM_MACH_OMAP2_PRCM_MPU44XX_H
 
-#include "prcm_mpu_44xx_54xx.h"
+#include <linux/power/omap/prcm_mpu_44xx_54xx.h>
 
 /* PRCM_MPU instances */
 #define OMAP4430_PRCM_MPU_OCP_SOCKET_PRCM_INST	0x0000

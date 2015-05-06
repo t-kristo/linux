@@ -22,7 +22,7 @@
 #ifndef __ARCH_ARM_MACH_OMAP2_PRCM_MPU7XX_H
 #define __ARCH_ARM_MACH_OMAP2_PRCM_MPU7XX_H
 
-#include "prcm_mpu_44xx_54xx.h"
+#include <linux/power/omap/prcm_mpu_44xx_54xx.h>
 
 /* MPU_PRCM instances */
 #define DRA7XX_MPU_PRCM_OCP_SOCKET_INST	0x0000
