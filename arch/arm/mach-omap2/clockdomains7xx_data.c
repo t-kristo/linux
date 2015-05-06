@@ -25,12 +25,12 @@
 #include <linux/power/omap/prm7xx.h>
 #include <linux/power/omap/clockdomain.h>
 #include <linux/power/omap/prcm44xx.h>
+#include <linux/power/omap/prcm_mpu7xx.h>
 
 #include "cm1_7xx.h"
 #include "cm2_7xx.h"
 
 #include "cm-regbits-7xx.h"
-#include "prcm_mpu7xx.h"
 
 /* Static Dependencies for DRA7xx Clock Domains */
 

@@ -19,8 +19,8 @@
  * published by the Free Software Foundation.
  */
 
-#ifndef __ARCH_ARM_MACH_OMAP2_PRCM_MPU7XX_H
-#define __ARCH_ARM_MACH_OMAP2_PRCM_MPU7XX_H
+#ifndef __LINUX_POWER_OMAP_PRCM_MPU7XX_H
+#define __LINUX_POWER_OMAP_PRCM_MPU7XX_H
 
 #include <linux/power/omap/prcm_mpu_44xx_54xx.h>
 
@@ -35,7 +35,6 @@
 /* PRCM_MPU clockdomain register offsets (from instance start) */
 #define DRA7XX_MPU_PRCM_CM_C0_CPU0_CDOFFS	0x0000
 #define DRA7XX_MPU_PRCM_CM_C1_CPU1_CDOFFS	0x0000
-
 
 /* MPU_PRCM */
 
