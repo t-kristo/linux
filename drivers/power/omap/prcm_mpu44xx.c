@@ -17,10 +17,6 @@
 #include <linux/power/omap/prcm_mpu44xx.h>
 #include <linux/power/omap/prcm_mpu54xx.h>
 
-#include "iomap.h"
-#include "common.h"
-#include "cm-regbits-44xx.h"
-
 /*
  * prcm_mpu_base: the virtual address of the start of the PRCM_MPU IP
  *   block registers
