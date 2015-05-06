@@ -37,6 +37,11 @@
 /*
  * Registers access definitions
  */
+
+/* XXX: PRCM register accesses should eventually go through PRCM driver */
+#define OMAP34XX_CM_REGADDR(module, reg) \
+	OMAP2_L4_IO_ADDRESS(OMAP3430_CM_BASE + (module) + (reg))
+
 #define SDRC_SCRATCHPAD_SEM_OFFS	0xc
 #define SDRC_SCRATCHPAD_SEM_V	OMAP343X_SCRATCHPAD_REGADDR\
 					(SDRC_SCRATCHPAD_SEM_OFFS)

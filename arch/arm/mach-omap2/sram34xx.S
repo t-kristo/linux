@@ -74,6 +74,10 @@
 /* CM_CLKSEL1_PLL bit settings */
 #define CORE_DPLL_CLKOUT_DIV_SHIFT	0x1b
 
+/* XXX: Register access macros should eventually go through PRCM driver */
+#define OMAP34XX_CM_REGADDR(module, reg) \
+	OMAP2_L4_IO_ADDRESS(OMAP3430_CM_BASE + (module) + (reg))
+
 /*
  * omap3_sram_configure_core_dpll - change DPLL3 M2 divider
  *
