@@ -23,11 +23,9 @@
 #include <linux/power/omap/prm-regbits-34xx.h>
 #include <linux/power/omap/cm-regbits-34xx.h>
 #include <linux/power/omap/cm3xxx.h>
+#include <linux/clk/ti.h>
 
-#include "soc.h"
-#include "common.h"
-#include "vp.h"
-#include "clock.h"
+#define OMAP_INTC_START		NR_IRQS
 
 static void omap3xxx_prm_read_pending_irqs(unsigned long *events);
 static void omap3xxx_prm_ocp_barrier(void);
@@ -674,8 +672,6 @@ int __init omap3xxx_prm_init(const struct omap_prcm_init_data *data)
 {
 	omap2_clk_legacy_provider_init(TI_CLKM_PRM,
 				       prm_base + OMAP3430_IVA2_MOD);
-	if (omap3_has_io_wakeup())
-		prm_features |= PRM_HAS_IO_WAKEUP;
 
 	return omap_prm_register(&omap3xxx_prm_ll_data);
 }
@@ -692,7 +688,7 @@ static int omap3xxx_prm_late_init(void)
 	if (!(prm_features & PRM_HAS_IO_WAKEUP))
 		return 0;
 
-	if (omap3_has_io_chain_ctrl())
+	if (prm_features & PRM_HAS_IO_CHAIN_CTRL)
 		omap3_prcm_irq_setup.reconfigure_io_chain =
 			omap3_prm_reconfigure_io_chain;
 	else

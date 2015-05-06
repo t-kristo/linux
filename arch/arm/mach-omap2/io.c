@@ -469,6 +469,8 @@ void __init omap2430_init_late(void)
 #ifdef CONFIG_ARCH_OMAP3
 void __init omap3_init_early(void)
 {
+	u16 prm_fea = 0;
+
 	omap2_set_globals_tap(OMAP343X_CLASS, OMAP2_L4_IO_ADDRESS(0x4830A000));
 	omap2_set_globals_sdrc(OMAP2_L3_IO_ADDRESS(OMAP343X_SDRC_BASE),
 			       OMAP2_L3_IO_ADDRESS(OMAP343X_SMS_BASE));
@@ -483,6 +485,16 @@ void __init omap3_init_early(void)
 	omap2_control_base_init();
 	omap3xxx_check_revision();
 	omap3xxx_check_features();
+
+	/* Misc PRM feature setup */
+	if (omap3_has_io_wakeup())
+		prm_fea |= PRM_HAS_IO_WAKEUP;
+
+	if (omap3_has_io_chain_ctrl())
+		prm_fea |= PRM_HAS_IO_CHAIN_CTRL;
+
+	omap2_prm_setup_features(prm_fea);
+
 	omap2_prcm_init();
 	/* XXX: remove these once OMAP3 is DT only */
 	if (!of_have_populated_dt()) {
