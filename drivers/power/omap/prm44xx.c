@@ -324,8 +324,6 @@ static void omap44xx_prm_reconfigure_io_chain(void)
 		MAX_IOPAD_LATCH_TIME, i);
 	if (i == MAX_IOPAD_LATCH_TIME)
 		pr_warn("PRM: I/O chain clock line deassertion timed out\n");
-
-	return;
 }
 
 /**
@@ -364,7 +362,6 @@ static u32 omap44xx_prm_read_reset_sources(void)
 
 	if (inst == PRM_INSTANCE_UNKNOWN)
 		return 0;
-
 
 	v = omap4_prm_read_inst_reg(inst,
 				    OMAP4_RM_RSTST);
@@ -689,7 +686,8 @@ static int omap44xx_prm_late_init(void);
 static struct prm_ll_data omap44xx_prm_ll_data = {
 	.read_reset_sources = &omap44xx_prm_read_reset_sources,
 	.was_any_context_lost_old = &omap44xx_prm_was_any_context_lost_old,
-	.clear_context_loss_flags_old = &omap44xx_prm_clear_context_loss_flags_old,
+	.clear_context_loss_flags_old =
+		&omap44xx_prm_clear_context_loss_flags_old,
 	.late_init = &omap44xx_prm_late_init,
 	.assert_hardreset	= omap4_prminst_assert_hardreset,
 	.deassert_hardreset	= omap4_prminst_deassert_hardreset,
