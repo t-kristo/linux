@@ -60,7 +60,6 @@
 #include "prcm_mpu44xx.h"
 #include "prcm_mpu54xx.h"
 #include "prcm44xx.h"
-#include "prm-regbits-44xx.h"
 
 #ifdef CONFIG_SMP
 

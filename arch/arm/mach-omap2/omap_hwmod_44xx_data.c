@@ -26,6 +26,7 @@
 #include <linux/power/smartreflex.h>
 #include <linux/i2c-omap.h>
 #include <linux/power/omap/prm44xx.h>
+#include <linux/power/omap/prm-regbits-44xx.h>
 #include <linux/omap-dma.h>
 
 #include <linux/platform_data/spi-omap2-mcspi.h>
@@ -37,7 +38,6 @@
 #include "omap_hwmod_common_data.h"
 #include "cm1_44xx.h"
 #include "cm2_44xx.h"
-#include "prm-regbits-44xx.h"
 #include "i2c.h"
 #include "wd_timer.h"
 

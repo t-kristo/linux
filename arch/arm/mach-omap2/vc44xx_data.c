@@ -18,10 +18,10 @@
 #include <linux/err.h>
 #include <linux/init.h>
 #include <linux/power/omap/prm44xx.h>
+#include <linux/power/omap/prm-regbits-44xx.h>
 
 #include "common.h"
 
-#include "prm-regbits-44xx.h"
 #include "voltage.h"
 
 #include "vc.h"
