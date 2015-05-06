@@ -13,8 +13,6 @@
 #include <linux/power/omap/prcm43xx.h>
 #include <linux/power/omap/clockdomain.h>
 
-#include "prcm44xx.h"
-
 static struct clockdomain l4_cefuse_43xx_clkdm = {
 	.name		  = "l4_cefuse_clkdm",
 	.pwrdm		  = { .name = "cefuse_pwrdm" },

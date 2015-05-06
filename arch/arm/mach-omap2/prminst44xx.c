@@ -20,10 +20,10 @@
 #include <linux/power/omap/prm7xx.h>
 #include <linux/power/omap/prminst44xx.h>
 #include <linux/power/omap/prm-regbits-44xx.h>
+#include <linux/power/omap/prcm44xx.h>
 
 #include "iomap.h"
 #include "common.h"
-#include "prcm44xx.h"
 #include "prcm_mpu44xx.h"
 #include "soc.h"
 

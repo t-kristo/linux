@@ -22,8 +22,8 @@
 #include <linux/init.h>
 #include <linux/power/omap/prm54xx.h>
 #include <linux/power/omap/powerdomain.h>
+#include <linux/power/omap/prcm44xx.h>
 
-#include "prcm44xx.h"
 #include "prcm_mpu54xx.h"
 
 /* core_54xx_pwrdm: CORE power domain */

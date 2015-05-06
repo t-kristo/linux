@@ -25,8 +25,6 @@
 #include <linux/power/omap/clockdomain.h>
 #include <trace/events/power.h>
 
-#include "prcm44xx.h"
-
 #include <asm/cpu.h>
 
 #define PWRDM_TRACE_STATES_FLAG	(1<<31)

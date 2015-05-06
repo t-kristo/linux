@@ -22,12 +22,12 @@
 #include <linux/power/omap/prminst44xx.h>
 #include <linux/power/omap/powerdomain.h>
 #include <linux/power/omap/prm-regbits-44xx.h>
+#include <linux/power/omap/prcm44xx.h>
 
 #include "soc.h"
 #include "iomap.h"
 #include "common.h"
 #include "vp.h"
-#include "prcm44xx.h"
 
 /* Static data */
 

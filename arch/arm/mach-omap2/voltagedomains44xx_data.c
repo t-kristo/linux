@@ -24,7 +24,6 @@
 
 #include "common.h"
 #include "soc.h"
-#include "prcm44xx.h"
 #include "voltage.h"
 #include "omap_opp_data.h"
 #include "vc.h"

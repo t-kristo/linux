@@ -30,7 +30,6 @@
 #include "common.h"
 
 #include "prm-regbits-34xx.h"
-#include "prcm44xx.h"
 #include "control.h"
 
 #include "voltage.h"

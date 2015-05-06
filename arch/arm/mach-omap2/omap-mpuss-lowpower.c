@@ -59,7 +59,6 @@
 #include "pm.h"
 #include "prcm_mpu44xx.h"
 #include "prcm_mpu54xx.h"
-#include "prcm44xx.h"
 
 #ifdef CONFIG_SMP
 

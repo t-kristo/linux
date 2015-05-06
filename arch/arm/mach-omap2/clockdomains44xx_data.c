@@ -23,12 +23,12 @@
 #include <linux/io.h>
 #include <linux/power/omap/prm44xx.h>
 #include <linux/power/omap/clockdomain.h>
+#include <linux/power/omap/prcm44xx.h>
 
 #include "cm1_44xx.h"
 #include "cm2_44xx.h"
 
 #include "cm-regbits-44xx.h"
-#include "prcm44xx.h"
 #include "prcm_mpu44xx.h"
 
 /* Static Dependencies for OMAP4 Clock Domains */

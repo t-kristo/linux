@@ -15,8 +15,8 @@
  * PRCM_MPU, SCRM
  */
 
-#ifndef __ARCH_ARM_MACH_OMAP2_PRCM44XX_H
-#define __ARCH_ARM_MACH_OMAP2_PRCM44XX_H
+#ifndef __LINUX_POWER_OMAP_PRCM44XX_H
+#define __LINUX_POWER_OMAP_PRCM44XX_H
 
 /*
  * OMAP4 PRCM partition IDs
@@ -48,6 +48,5 @@
  * IDs, plus one
  */
 #define OMAP4_MAX_PRCM_PARTITIONS		6
-
 
 #endif

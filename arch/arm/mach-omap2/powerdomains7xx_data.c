@@ -24,8 +24,8 @@
 #include <linux/init.h>
 #include <linux/power/omap/prm7xx.h>
 #include <linux/power/omap/powerdomain.h>
+#include <linux/power/omap/prcm44xx.h>
 
-#include "prcm44xx.h"
 #include "prcm_mpu7xx.h"
 
 /* iva_7xx_pwrdm: IVA-HD power domain */

@@ -13,8 +13,6 @@
 #include <linux/power/omap/prcm43xx.h>
 #include <linux/power/omap/powerdomain.h>
 
-#include "prcm44xx.h"
-
 static struct powerdomain gfx_43xx_pwrdm = {
 	.name		  = "gfx_pwrdm",
 	.voltdm		  = { .name = "core" },
