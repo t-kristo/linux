@@ -392,6 +392,7 @@ static struct omap_prcm_plat_data prcm_pdata = {
 	.pcs_legacy_init = omap_pcs_legacy_init,
 	.voltdm_lookup = voltdm_lookup,
 	.pm_dbg_update_time = _pm_dbg_update_wrapper,
+	.xlate_irq = omap4_xlate_irq,
 };
 
 static int __init omap2_prcm_init(void)

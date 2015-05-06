@@ -548,6 +548,7 @@ struct omap_prcm_plat_data {
 	void (*pcs_legacy_init)(int irq, void (*rearm)(void));
 	struct voltagedomain * (*voltdm_lookup)(const char *name);
 	void (*pm_dbg_update_time)(struct powerdomain *pwrdm, int prev);
+	unsigned int (*xlate_irq)(unsigned int hwirq);
 };
 
 int __init omap2_prcm_register_pdata(struct omap_prcm_plat_data *data);

@@ -25,11 +25,6 @@
 #include <linux/power/omap/prcm44xx.h>
 #include <linux/power/omap/prcm_mpu_44xx_54xx.h>
 
-#include "soc.h"
-#include "iomap.h"
-#include "common.h"
-#include "vp.h"
-
 /* Static data */
 
 static void omap44xx_prm_read_pending_irqs(unsigned long *events);
@@ -42,6 +37,8 @@ static const struct omap_prcm_irq omap4_prcm_irqs[] = {
 	OMAP_PRCM_IRQ("io",     9,      1),
 };
 
+#define OMAP44XX_IRQ_GIC_START		32
+
 static struct omap_prcm_irq_setup omap4_prcm_irq_setup = {
 	.ack			= OMAP4_PRM_IRQSTATUS_MPU_OFFSET,
 	.mask			= OMAP4_PRM_IRQENABLE_MPU_OFFSET,
@@ -49,7 +46,6 @@ static struct omap_prcm_irq_setup omap4_prcm_irq_setup = {
 	.irqs			= omap4_prcm_irqs,
 	.nr_irqs		= ARRAY_SIZE(omap4_prcm_irqs),
 	.irq			= 11 + OMAP44XX_IRQ_GIC_START,
-	.xlate_irq		= omap4_xlate_irq,
 	.read_pending_irqs	= &omap44xx_prm_read_pending_irqs,
 	.ocp_barrier		= &omap44xx_prm_ocp_barrier,
 	.save_and_clear_irqen	= &omap44xx_prm_save_and_clear_irqen,
@@ -719,6 +715,8 @@ int __init omap44xx_prm_init(const struct omap_prcm_init_data *data)
 
 	omap4_prminst_set_prm_dev_inst(data->device_inst_offset);
 	omap4_prcm_mpu_set_cpu_context_offset(data->cpu_context_offset);
+
+	omap4_prcm_irq_setup.xlate_irq = omap_prcm_pdata->xlate_irq;
 
 	return omap_prm_register(&omap44xx_prm_ll_data);
 }
