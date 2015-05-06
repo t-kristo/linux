@@ -24,7 +24,7 @@
 
 #define AM33XX_PRM_RSTCTRL_OFFSET		0x0000
 
-#define AM33XX_RST_GLOBAL_WARM_SW_MASK		(1 << 0)
+#define AM33XX_RST_GLOBAL_WARM_SW_MASK		BIT(0)
 
 /* Read a register in a PRM instance */
 static u32 am33xx_prm_read_reg(s16 inst, u16 idx)
@@ -243,7 +243,7 @@ static int am33xx_pwrdm_read_logic_retst(struct powerdomain *pwrdm)
 }
 
 static int am33xx_pwrdm_set_mem_onst(struct powerdomain *pwrdm, u8 bank,
-		u8 pwrst)
+				     u8 pwrst)
 {
 	u32 m;
 
@@ -258,7 +258,7 @@ static int am33xx_pwrdm_set_mem_onst(struct powerdomain *pwrdm, u8 bank,
 }
 
 static int am33xx_pwrdm_set_mem_retst(struct powerdomain *pwrdm, u8 bank,
-					u8 pwrst)
+				      u8 pwrst)
 {
 	u32 m;
 
