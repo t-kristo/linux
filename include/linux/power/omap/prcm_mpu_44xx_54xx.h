@@ -26,10 +26,9 @@
 #ifndef __ASSEMBLER__
 extern void __iomem *prcm_mpu_base;
 
-u32 omap4_prcm_mpu_read_inst_reg(s16 inst, u16 idx);
-void omap4_prcm_mpu_write_inst_reg(u32 val, s16 inst, u16 idx);
-u32 omap4_prcm_mpu_rmw_inst_reg_bits(u32 mask, u32 bits, s16 inst,
-				     s16 idx);
+void omap4_prcm_mpu_set_cpu_context_offset(u16 offset);
+void omap4_prcm_mpu_clear_prev_cpu_logic_pwrst(unsigned int cpu_id);
+void omap5_prcm_mpu_enable_mercury_retention_mode(void);
 void __init omap2_set_globals_prcm_mpu(void __iomem *prcm_mpu);
 #endif
 

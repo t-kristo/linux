@@ -33,6 +33,9 @@
 #include <linux/power/omap/prm54xx.h>
 #include <linux/power/omap/prm7xx.h>
 #include <linux/power/omap/prcm43xx.h>
+#include <linux/power/omap/prcm_mpu44xx.h>
+#include <linux/power/omap/prcm_mpu54xx.h>
+#include <linux/power/omap/prcm_mpu7xx.h>
 
 /*
  * OMAP_PRCM_MAX_NR_PENDING_REG: maximum number of PRM_IRQ*_MPU regs
@@ -707,6 +710,7 @@ static struct omap_prcm_init_data omap4_prm_data __initdata = {
 	.index = TI_CLKM_PRM,
 	.init = omap44xx_prm_init,
 	.device_inst_offset = OMAP4430_PRM_DEVICE_INST,
+	.cpu_context_offset = OMAP4_RM_CPU0_CPU0_CONTEXT_OFFSET,
 	.flags = PRM_HAS_IO_WAKEUP | PRM_HAS_VOLTAGE | PRM_IRQ_DEFAULT,
 };
 #endif
@@ -716,6 +720,7 @@ static struct omap_prcm_init_data omap5_prm_data __initdata = {
 	.index = TI_CLKM_PRM,
 	.init = omap44xx_prm_init,
 	.device_inst_offset = OMAP54XX_PRM_DEVICE_INST,
+	.cpu_context_offset = OMAP54XX_RM_CPU0_CPU0_CONTEXT_OFFSET,
 	.flags = PRM_HAS_IO_WAKEUP | PRM_HAS_VOLTAGE,
 };
 #endif
@@ -725,6 +730,7 @@ static struct omap_prcm_init_data dra7_prm_data __initdata = {
 	.index = TI_CLKM_PRM,
 	.init = omap44xx_prm_init,
 	.device_inst_offset = DRA7XX_PRM_DEVICE_INST,
+	.cpu_context_offset = DRA7XX_RM_CPU0_CPU0_CONTEXT_OFFSET,
 	.flags = PRM_HAS_IO_WAKEUP,
 };
 #endif

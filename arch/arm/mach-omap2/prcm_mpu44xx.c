@@ -15,6 +15,7 @@
 #include <linux/err.h>
 #include <linux/io.h>
 #include <linux/power/omap/prcm_mpu44xx.h>
+#include <linux/power/omap/prcm_mpu54xx.h>
 
 #include "iomap.h"
 #include "common.h"
@@ -25,29 +26,69 @@
  *   block registers
  */
 void __iomem *prcm_mpu_base;
+static u16 cpu_context_offset;
 
 /* PRCM_MPU low-level functions */
 
-u32 omap4_prcm_mpu_read_inst_reg(s16 inst, u16 reg)
+static u32 omap4_prcm_mpu_read_inst_reg(s16 inst, u16 reg)
 {
 	return readl_relaxed(prcm_mpu_base + inst + reg);
 }
 
-void omap4_prcm_mpu_write_inst_reg(u32 val, s16 inst, u16 reg)
+static void omap4_prcm_mpu_write_inst_reg(u32 val, s16 inst, u16 reg)
 {
 	writel_relaxed(val, prcm_mpu_base + inst + reg);
 }
 
-u32 omap4_prcm_mpu_rmw_inst_reg_bits(u32 mask, u32 bits, s16 inst, s16 reg)
+/**
+ * omap4_prcm_mpu_set_cpu_context_offset - set CPU context offset
+ * @offset: offset from the instance base
+ *
+ * Sets CPU context offset within PRCM MPU instance.
+ */
+void omap4_prcm_mpu_set_cpu_context_offset(u16 offset)
 {
-	u32 v;
+	cpu_context_offset = offset;
+}
 
-	v = omap4_prcm_mpu_read_inst_reg(inst, reg);
-	v &= ~mask;
-	v |= bits;
-	omap4_prcm_mpu_write_inst_reg(v, inst, reg);
+/**
+ * omap4_prcm_mpu_clear_prev_cpu_logic_pwrst - clear previous CPU logic
+ *					       powerstate after idle
+ * @cpu_id: CPU to clear status for (0 or 1)
+ *
+ * Clears previous logic powerstate from hardware. Used for tracking
+ * purposes to see if the CPU has entered idle properly or not.
+ */
+void omap4_prcm_mpu_clear_prev_cpu_logic_pwrst(unsigned int cpu_id)
+{
+	u32 reg;
+	u16 inst;
 
-	return v;
+	if (cpu_id)
+		inst = OMAP4430_PRCM_MPU_CPU1_INST;
+	else
+		inst = OMAP4430_PRCM_MPU_CPU0_INST;
+
+	reg = omap4_prcm_mpu_read_inst_reg(inst, cpu_context_offset);
+	omap4_prcm_mpu_write_inst_reg(reg, inst, cpu_context_offset);
+}
+
+/**
+ * omap5_prcm_mpu_enable_mercury_retention_mode - enable mercury retention
+ *						  on MPU domain
+ *
+ * Enables fast mercury retention mode on MPU subsystem.
+ */
+void omap5_prcm_mpu_enable_mercury_retention_mode(void)
+{
+	u32 reg;
+
+	reg = omap4_prcm_mpu_read_inst_reg(OMAP54XX_PRCM_MPU_DEVICE_INST,
+					   OMAP54XX_PRCM_MPU_PRM_PSCON_COUNT_OFFSET);
+	/* Enable HG_EN, HG_RAMPUP = fast mode */
+	reg |= BIT(24) | BIT(25);
+	omap4_prcm_mpu_write_inst_reg(reg, OMAP54XX_PRCM_MPU_DEVICE_INST,
+				      OMAP54XX_PRCM_MPU_PRM_PSCON_COUNT_OFFSET);
 }
 
 /**

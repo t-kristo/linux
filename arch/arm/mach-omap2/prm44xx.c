@@ -23,6 +23,7 @@
 #include <linux/power/omap/powerdomain.h>
 #include <linux/power/omap/prm-regbits-44xx.h>
 #include <linux/power/omap/prcm44xx.h>
+#include <linux/power/omap/prcm_mpu_44xx_54xx.h>
 
 #include "soc.h"
 #include "iomap.h"
@@ -717,6 +718,7 @@ int __init omap44xx_prm_init(const struct omap_prcm_init_data *data)
 		prm_features |= PRM_HAS_VOLTAGE;
 
 	omap4_prminst_set_prm_dev_inst(data->device_inst_offset);
+	omap4_prcm_mpu_set_cpu_context_offset(data->cpu_context_offset);
 
 	return omap_prm_register(&omap44xx_prm_ll_data);
 }

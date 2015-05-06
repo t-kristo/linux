@@ -521,6 +521,7 @@ struct omap_prcm_irq_setup {
  * @offset: module base address offset from the IO base
  * @flags: PRCM module init flags
  * @device_inst_offset: device instance offset within the module address space
+ * @cpu_context_offset: CPU context offset within PRCM MPU partition
  * @init: low level PRCM init function for this module
  * @np: device node for this PRCM module
  */
@@ -530,6 +531,7 @@ struct omap_prcm_init_data {
 	s16 offset;
 	u16 flags;
 	s32 device_inst_offset;
+	u16 cpu_context_offset;
 	int (*init)(const struct omap_prcm_init_data *data);
 	struct device_node *np;
 };

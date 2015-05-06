@@ -89,7 +89,6 @@ struct cpu_pm_ops {
 static DEFINE_PER_CPU(struct omap4_cpu_pm_info, omap4_pm_info);
 static struct powerdomain *mpuss_pd;
 static void __iomem *sar_base;
-static u32 cpu_context_offset;
 
 static int default_finish_suspend(unsigned long cpu_state)
 {
@@ -146,23 +145,6 @@ static void scu_pwrst_prepare(unsigned int cpu_id, unsigned int cpu_state)
 
 	if (pm_info->scu_sar_addr)
 		writel_relaxed(scu_pwr_st, pm_info->scu_sar_addr);
-}
-
-static inline void cpu_clear_prev_logic_pwrst(unsigned int cpu_id)
-{
-	u32 reg;
-
-	if (cpu_id) {
-		reg = omap4_prcm_mpu_read_inst_reg(OMAP4430_PRCM_MPU_CPU1_INST,
-					cpu_context_offset);
-		omap4_prcm_mpu_write_inst_reg(reg, OMAP4430_PRCM_MPU_CPU1_INST,
-					cpu_context_offset);
-	} else {
-		reg = omap4_prcm_mpu_read_inst_reg(OMAP4430_PRCM_MPU_CPU0_INST,
-					cpu_context_offset);
-		omap4_prcm_mpu_write_inst_reg(reg, OMAP4430_PRCM_MPU_CPU0_INST,
-					cpu_context_offset);
-	}
 }
 
 /*
@@ -256,7 +238,7 @@ int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state)
 	    (omap_pwrdm_read_logic_retst(mpuss_pd) == PWRDM_POWER_OFF))
 		save_state = 2;
 
-	cpu_clear_prev_logic_pwrst(cpu);
+	omap4_prcm_mpu_clear_prev_cpu_logic_pwrst(cpu);
 	omap_pwrdm_set_next_pwrst(pm_info->pwrdm, power_state);
 	omap_pwrdm_set_logic_retst(pm_info->pwrdm, cpu_logic_state);
 	set_cpu_wakeup_addr(cpu, virt_to_phys(omap_pm_ops.resume));
@@ -325,22 +307,6 @@ int omap4_hotplug_cpu(unsigned int cpu, unsigned int power_state)
 	return 0;
 }
 
-
-/*
- * Enable Mercury Fast HG retention mode by default.
- */
-static void enable_mercury_retention_mode(void)
-{
-	u32 reg;
-
-	reg = omap4_prcm_mpu_read_inst_reg(OMAP54XX_PRCM_MPU_DEVICE_INST,
-				  OMAP54XX_PRCM_MPU_PRM_PSCON_COUNT_OFFSET);
-	/* Enable HG_EN, HG_RAMPUP = fast mode */
-	reg |= BIT(24) | BIT(25);
-	omap4_prcm_mpu_write_inst_reg(reg, OMAP54XX_PRCM_MPU_DEVICE_INST,
-				      OMAP54XX_PRCM_MPU_PRM_PSCON_COUNT_OFFSET);
-}
-
 /*
  * Initialise OMAP4 MPUSS
  */
@@ -372,7 +338,7 @@ int __init omap4_mpuss_init(void)
 
 	/* Clear CPU previous power domain state */
 	omap_pwrdm_clear_all_prev_pwrst(pm_info->pwrdm);
-	cpu_clear_prev_logic_pwrst(0);
+	omap4_prcm_mpu_clear_prev_cpu_logic_pwrst(0);
 
 	/* Initialise CPU0 power domain state to ON */
 	omap_pwrdm_set_next_pwrst(pm_info->pwrdm, PWRDM_POWER_ON);
@@ -393,7 +359,7 @@ int __init omap4_mpuss_init(void)
 
 	/* Clear CPU previous power domain state */
 	omap_pwrdm_clear_all_prev_pwrst(pm_info->pwrdm);
-	cpu_clear_prev_logic_pwrst(1);
+	omap4_prcm_mpu_clear_prev_cpu_logic_pwrst(1);
 
 	/* Initialise CPU1 power domain state to ON */
 	omap_pwrdm_set_next_pwrst(pm_info->pwrdm, PWRDM_POWER_ON);
@@ -418,10 +384,8 @@ int __init omap4_mpuss_init(void)
 		omap_pm_ops.resume = omap4_cpu_resume;
 		omap_pm_ops.scu_prepare = scu_pwrst_prepare;
 		omap_pm_ops.hotplug_restart = omap4_secondary_startup;
-		cpu_context_offset = OMAP4_RM_CPU0_CPU0_CONTEXT_OFFSET;
 	} else if (soc_is_omap54xx() || soc_is_dra7xx()) {
-		cpu_context_offset = OMAP54XX_RM_CPU0_CPU0_CONTEXT_OFFSET;
-		enable_mercury_retention_mode();
+		omap5_prcm_mpu_enable_mercury_retention_mode();
 	}
 
 	if (cpu_is_omap446x())
