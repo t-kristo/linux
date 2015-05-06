@@ -27,12 +27,6 @@
 #include "omap_device.h"
 #include "clock.h"
 
-/*
- * FIXME: Find a mechanism to enable/disable runtime the McBSP ICLK autoidle.
- * Sidetone needs non-gated ICLK and sidetone autoidle is broken.
- */
-#include "cm3xxx.h"
-
 static struct clk *mcbsp_iclks[5];
 
 static int omap3_enable_st_clock(unsigned int id, bool enable)

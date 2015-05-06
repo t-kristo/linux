@@ -26,6 +26,7 @@
 #include <linux/of_address.h>
 #include <linux/power/omap/cm.h>
 #include <linux/power/omap/clockdomain.h>
+#include <linux/power/omap/cm3xxx.h>
 #include <asm/cpu.h>
 
 #include <trace/events/power.h>
@@ -33,7 +34,6 @@
 #include "soc.h"
 #include "clock.h"
 #include "cm2xxx.h"
-#include "cm3xxx.h"
 #include "cm-regbits-24xx.h"
 #include "common.h"
 

@@ -22,11 +22,11 @@
 #include <linux/power/omap/powerdomain.h>
 #include <linux/power/omap/prm-regbits-34xx.h>
 #include <linux/power/omap/cm-regbits-34xx.h>
+#include <linux/power/omap/cm3xxx.h>
 
 #include "soc.h"
 #include "common.h"
 #include "vp.h"
-#include "cm3xxx.h"
 #include "clock.h"
 
 static void omap3xxx_prm_read_pending_irqs(unsigned long *events);

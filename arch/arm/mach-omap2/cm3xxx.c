@@ -21,9 +21,8 @@
 #include <linux/power/omap/prm2xxx_3xxx.h>
 #include <linux/power/omap/clockdomain.h>
 #include <linux/power/omap/cm-regbits-34xx.h>
+#include <linux/power/omap/cm3xxx.h>
 #include <linux/clk/ti.h>
-
-#include "cm3xxx.h"
 
 static const u8 omap3xxx_cm_idlest_offs[] = {
 	CM_IDLEST1, CM_IDLEST2, OMAP2430_CM_IDLEST3

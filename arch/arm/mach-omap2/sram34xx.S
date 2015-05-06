@@ -26,13 +26,13 @@
  * MA 02111-1307 USA
  */
 #include <linux/linkage.h>
+#include <linux/power/omap/cm3xxx.h>
 
 #include <asm/assembler.h>
 
 #include "soc.h"
 #include "iomap.h"
 #include "sdrc.h"
-#include "cm3xxx.h"
 
 /*
  * This file needs be built unconditionally as ARM to interoperate correctly

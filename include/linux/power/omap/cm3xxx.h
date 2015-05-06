@@ -13,8 +13,8 @@
  * other.  The CM modules/instances on OMAP4 are quite different, so
  * they are handled in a separate file.
  */
-#ifndef __ARCH_ASM_MACH_OMAP2_CM3XXX_H
-#define __ARCH_ASM_MACH_OMAP2_CM3XXX_H
+#ifndef __LINUX_POWER_OMAP_CM3XXX_H
+#define __LINUX_POWER_OMAP_CM3XXX_H
 
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/cm2xxx_3xxx.h>
@@ -55,17 +55,15 @@
 #define OMAP3430_CM_CLKSEL2_EMU				0x0050
 #define OMAP3430_CM_CLKSEL3_EMU				0x0054
 
-
 /* CM_IDLEST bit field values to indicate deasserted IdleReq */
 
 #define OMAP34XX_CM_IDLEST_VAL				1
 
-
 #ifndef __ASSEMBLER__
 
-extern void omap3_cm_save_context(void);
-extern void omap3_cm_restore_context(void);
-extern void omap3_cm_save_scratchpad_contents(u32 *ptr);
+void omap3_cm_save_context(void);
+void omap3_cm_restore_context(void);
+void omap3_cm_save_scratchpad_contents(u32 *ptr);
 
 int __init omap3xxx_cm_init(const struct omap_prcm_init_data *data);
 

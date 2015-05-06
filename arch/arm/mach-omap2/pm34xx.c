@@ -35,6 +35,7 @@
 #include <linux/power/omap/powerdomain.h>
 #include <linux/power/omap/clockdomain.h>
 #include <linux/power/omap/prm-regbits-34xx.h>
+#include <linux/power/omap/cm3xxx.h>
 
 #include <trace/events/power.h>
 
@@ -44,7 +45,6 @@
 
 #include "soc.h"
 #include "common.h"
-#include "cm3xxx.h"
 #include "pm.h"
 #include "sdrc.h"
 #include "sram.h"

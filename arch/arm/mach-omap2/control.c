@@ -18,11 +18,11 @@
 #include <linux/regmap.h>
 #include <linux/mfd/syscon.h>
 #include <linux/power/omap/prm-regbits-34xx.h>
+#include <linux/power/omap/cm3xxx.h>
 
 #include "soc.h"
 #include "iomap.h"
 #include "common.h"
-#include "cm3xxx.h"
 #include "sdrc.h"
 #include "pm.h"
 #include "control.h"
