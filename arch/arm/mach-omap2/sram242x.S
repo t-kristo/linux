@@ -30,12 +30,12 @@
  */
 #include <linux/linkage.h>
 #include <linux/power/omap/prm2xxx.h>
+#include <linux/power/omap/cm2xxx.h>
 
 #include <asm/assembler.h>
 
 #include "soc.h"
 #include "iomap.h"
-#include "cm2xxx.h"
 #include "sdrc.h"
 
 #define OMAP2420_CM_REGADDR(module, reg) \

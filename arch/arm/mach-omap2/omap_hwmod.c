@@ -152,7 +152,6 @@
 
 #include "soc.h"
 #include "common.h"
-#include "cm2xxx.h"
 #include "cm33xx.h"
 #include "mux.h"
 #include "pm.h"

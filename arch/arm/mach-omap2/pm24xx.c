@@ -31,6 +31,7 @@
 #include <linux/gpio.h>
 #include <linux/platform_data/gpio-omap.h>
 #include <linux/power/omap/prm2xxx.h>
+#include <linux/power/omap/cm2xxx.h>
 #include <linux/power/omap/powerdomain.h>
 #include <linux/power/omap/clockdomain.h>
 
@@ -46,7 +47,6 @@
 #include "soc.h"
 #include "common.h"
 #include "clock.h"
-#include "cm2xxx.h"
 #include "cm-regbits-24xx.h"
 #include "sdrc.h"
 #include "sram.h"

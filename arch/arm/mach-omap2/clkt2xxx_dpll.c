@@ -13,9 +13,9 @@
 #include <linux/errno.h>
 #include <linux/clk.h>
 #include <linux/io.h>
+#include <linux/power/omap/cm2xxx.h>
 
 #include "clock.h"
-#include "cm2xxx.h"
 #include "cm-regbits-24xx.h"
 
 /* Private functions */

@@ -13,8 +13,8 @@
  * other.  The CM modules/instances on OMAP4 are quite different, so
  * they are handled in a separate file.
  */
-#ifndef __ARCH_ASM_MACH_OMAP2_CM2XXX_H
-#define __ARCH_ASM_MACH_OMAP2_CM2XXX_H
+#ifndef __LINUX_POWER_OMAP_CM2XXX_H
+#define __LINUX_POWER_OMAP_CM2XXX_H
 
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/cm2xxx_3xxx.h>
@@ -36,27 +36,26 @@
 
 #define OMAP24XX_CM_IDLEST_VAL				0
 
-
 /* Clock management domain register get/set */
 
 #ifndef __ASSEMBLER__
 
-extern void omap2xxx_cm_set_dpll_disable_autoidle(void);
-extern void omap2xxx_cm_set_dpll_auto_low_power_stop(void);
+void omap2xxx_cm_set_dpll_disable_autoidle(void);
+void omap2xxx_cm_set_dpll_auto_low_power_stop(void);
 
-extern void omap2xxx_cm_set_apll54_disable_autoidle(void);
-extern void omap2xxx_cm_set_apll54_auto_low_power_stop(void);
-extern void omap2xxx_cm_set_apll96_disable_autoidle(void);
-extern void omap2xxx_cm_set_apll96_auto_low_power_stop(void);
+void omap2xxx_cm_set_apll54_disable_autoidle(void);
+void omap2xxx_cm_set_apll54_auto_low_power_stop(void);
+void omap2xxx_cm_set_apll96_disable_autoidle(void);
+void omap2xxx_cm_set_apll96_auto_low_power_stop(void);
 
 int omap2xxx_cm_wait_module_ready(u8 part, s16 prcm_mod, u16 idlest_id,
 				  u8 idlest_shift);
-extern int omap2xxx_cm_fclks_active(void);
-extern int omap2xxx_cm_mpu_retention_allowed(void);
-extern u32 omap2xxx_cm_get_core_clk_src(void);
-extern u32 omap2xxx_cm_get_core_pll_config(void);
-extern void omap2xxx_cm_set_mod_dividers(u32 mpu, u32 dsp, u32 gfx, u32 core,
-					 u32 mdm);
+int omap2xxx_cm_fclks_active(void);
+int omap2xxx_cm_mpu_retention_allowed(void);
+u32 omap2xxx_cm_get_core_clk_src(void);
+u32 omap2xxx_cm_get_core_pll_config(void);
+void omap2xxx_cm_set_mod_dividers(u32 mpu, u32 dsp, u32 gfx, u32 core,
+				  u32 mdm);
 
 int __init omap2xxx_cm_init(const struct omap_prcm_init_data *data);
 
