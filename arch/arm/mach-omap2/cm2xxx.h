@@ -19,11 +19,6 @@
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/cm2xxx_3xxx.h>
 
-#define OMAP2420_CM_REGADDR(module, reg)				\
-			OMAP2_L4_IO_ADDRESS(OMAP2420_CM_BASE + (module) + (reg))
-#define OMAP2430_CM_REGADDR(module, reg)				\
-			OMAP2_L4_IO_ADDRESS(OMAP2430_CM_BASE + (module) + (reg))
-
 /*
  * Module specific CM register offsets from CM_BASE + domain offset
  * Use cm_{read,write}_mod_reg() with these registers.

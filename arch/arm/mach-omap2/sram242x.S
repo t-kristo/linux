@@ -38,6 +38,9 @@
 #include "cm2xxx.h"
 #include "sdrc.h"
 
+#define OMAP2420_CM_REGADDR(module, reg) \
+	OMAP2_L4_IO_ADDRESS(OMAP2420_CM_BASE + (module) + (reg))
+
 #define OMAP2420_PRCM_VOLTCTRL \
 	OMAP2_L4_IO_ADDRESS(OMAP2420_PRM_BASE + OCP_MOD + \
 			    OMAP2_PRCM_VOLTCTRL_OFFSET)
