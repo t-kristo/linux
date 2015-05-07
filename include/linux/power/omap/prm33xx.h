@@ -81,6 +81,7 @@
 
 #ifndef __ASSEMBLER__
 int am33xx_prm_init(const struct omap_prcm_init_data *data);
+int ti81xx_prm_init(const struct omap_prcm_init_data *data);
 
 #endif /* ASSEMBLER */
 #endif

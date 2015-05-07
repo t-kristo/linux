@@ -12,9 +12,6 @@
 #include "common.h"
 #include "control.h"
 
-#define TI81XX_PRM_DEVICE_RSTCTRL	0x00a0
-#define TI81XX_GLOBAL_RST_COLD		BIT(1)
-
 /**
  * ti81xx_restart - trigger a software restart of the SoC
  * @mode: the "reboot mode", see arch/arm/kernel/{setup,process}.c
@@ -28,7 +25,6 @@
  */
 void ti81xx_restart(enum reboot_mode mode, const char *cmd)
 {
-	omap2_prm_set_mod_reg_bits(TI81XX_GLOBAL_RST_COLD, 0,
-				   TI81XX_PRM_DEVICE_RSTCTRL);
+	omap_prm_reset_system();
 	while (1);
 }

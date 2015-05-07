@@ -698,10 +698,17 @@ static struct omap_prcm_init_data omap3_prm_data __initdata = {
 };
 #endif
 
-#if defined(CONFIG_SOC_AM33XX) || defined(CONFIG_SOC_TI81XX)
+#if defined(CONFIG_SOC_AM33XX)
 static struct omap_prcm_init_data am3_prm_data __initdata = {
 	.index = TI_CLKM_PRM,
 	.init = am33xx_prm_init,
+};
+#endif
+
+#if defined(CONFIG_SOC_TI81XX)
+static struct omap_prcm_init_data ti81xx_prm_data __initdata = {
+	.index = TI_CLKM_PRM,
+	.init = ti81xx_prm_init,
 };
 #endif
 
@@ -757,8 +764,8 @@ static const struct of_device_id omap_prcm_dt_match_table[] __initconst = {
 	{ .compatible = "ti,am4-prcm", .data = &am4_prm_data },
 #endif
 #ifdef CONFIG_SOC_TI81XX
-	{ .compatible = "ti,dm814-prcm", .data = &am3_prm_data },
-	{ .compatible = "ti,dm816-prcm", .data = &am3_prm_data },
+	{ .compatible = "ti,dm814-prcm", .data = &ti81xx_prm_data },
+	{ .compatible = "ti,dm816-prcm", .data = &ti81xx_prm_data },
 #endif
 #ifdef CONFIG_ARCH_OMAP2
 	{ .compatible = "ti,omap2-prcm", .data = &omap2_prm_data },

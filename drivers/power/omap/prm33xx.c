@@ -26,6 +26,10 @@
 
 #define AM33XX_RST_GLOBAL_WARM_SW_MASK		BIT(0)
 
+#define TI81XX_PRM_DEVICE_RSTCTRL		0x00a0
+
+#define TI81XX_GLOBAL_RST_COLD			BIT(1)
+
 /* Read a register in a PRM instance */
 static u32 am33xx_prm_read_reg(s16 inst, u16 idx)
 {
@@ -352,6 +356,18 @@ static void am33xx_prm_global_warm_sw_reset(void)
 				  AM33XX_PRM_RSTCTRL_OFFSET);
 }
 
+/**
+ * ti81xx_prm_global_cold_sw_reset - reboot the device via cold reset
+ *
+ * Immediately reboots the device through cold reset. Warm reset does
+ * not appear to work on TI81xx.
+ */
+static void ti81xx_prm_global_cold_sw_reset(void)
+{
+	am33xx_prm_rmw_reg_bits(TI81XX_GLOBAL_RST_COLD, TI81XX_GLOBAL_RST_COLD,
+				0, TI81XX_PRM_DEVICE_RSTCTRL);
+}
+
 struct pwrdm_ops am33xx_pwrdm_operations = {
 	.pwrdm_set_next_pwrst		= am33xx_pwrdm_set_next_pwrst,
 	.pwrdm_read_next_pwrst		= am33xx_pwrdm_read_next_pwrst,
@@ -379,6 +395,13 @@ static struct prm_ll_data am33xx_prm_ll_data = {
 
 int __init am33xx_prm_init(const struct omap_prcm_init_data *data)
 {
+	return omap_prm_register(&am33xx_prm_ll_data);
+}
+
+int __init ti81xx_prm_init(const struct omap_prcm_init_data *data)
+{
+	/* Just modify the reset vector for TI81xx, re-use AM33xx on rest */
+	am33xx_prm_ll_data.reset_system = ti81xx_prm_global_cold_sw_reset;
 	return omap_prm_register(&am33xx_prm_ll_data);
 }
 
