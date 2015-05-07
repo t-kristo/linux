@@ -21,8 +21,7 @@
 #include <linux/power/omap/cm3xxx.h>
 #include <linux/power/omap/cm33xx.h>
 #include <linux/power/omap/cm44xx.h>
-
-#include "clock.h"
+#include <linux/clk/ti.h>
 
 /*
  * cm_ll_data: function pointers to SoC-specific implementations of
