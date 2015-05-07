@@ -21,8 +21,7 @@
 #include <linux/power/omap/prm2xxx.h>
 #include <linux/power/omap/clockdomain.h>
 #include <linux/power/omap/cm2xxx.h>
-
-#include "cm-regbits-24xx.h"
+#include <linux/power/omap/cm-regbits-24xx.h>
 
 /* CM_AUTOIDLE_PLL.AUTO_* bit values for DPLLs */
 #define DPLL_AUTOIDLE_DISABLE				0x0

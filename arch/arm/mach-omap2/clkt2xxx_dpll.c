@@ -16,7 +16,6 @@
 #include <linux/power/omap/cm2xxx.h>
 
 #include "clock.h"
-#include "cm-regbits-24xx.h"
 
 /* Private functions */
 

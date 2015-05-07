@@ -14,10 +14,10 @@
 #include <plat/dmtimer.h>
 #include <linux/platform_data/spi-omap2-mcspi.h>
 #include <linux/power/omap/prm-regbits-24xx.h>
+#include <linux/power/omap/cm-regbits-24xx.h>
 
 #include "omap_hwmod.h"
 #include "omap_hwmod_common_data.h"
-#include "cm-regbits-24xx.h"
 #include "wd_timer.h"
 
 struct omap_hwmod_dma_info omap2xxx_dss_sdma_chs[] = {

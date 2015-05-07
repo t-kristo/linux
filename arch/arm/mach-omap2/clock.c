@@ -34,7 +34,6 @@
 
 #include "soc.h"
 #include "clock.h"
-#include "cm-regbits-24xx.h"
 #include "common.h"
 
 u16 cpu_mask;

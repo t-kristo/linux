@@ -36,9 +36,9 @@
 #include <linux/io.h>
 #include <linux/power/omap/clockdomain.h>
 #include <linux/power/omap/prm-regbits-24xx.h>
+#include <linux/power/omap/cm-regbits-24xx.h>
 
 #include "soc.h"
-#include "cm-regbits-24xx.h"
 
 /*
  * Clockdomain dependencies for wkdeps

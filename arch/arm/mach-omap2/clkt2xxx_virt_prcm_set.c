@@ -33,12 +33,12 @@
 #include <linux/cpufreq.h>
 #include <linux/slab.h>
 #include <linux/power/omap/cm2xxx.h>
+#include <linux/power/omap/cm-regbits-24xx.h>
 
 #include "soc.h"
 #include "clock.h"
 #include "clock2xxx.h"
 #include "opp2xxx.h"
-#include "cm-regbits-24xx.h"
 #include "sdrc.h"
 #include "sram.h"
 
