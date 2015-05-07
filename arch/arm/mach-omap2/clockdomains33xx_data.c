@@ -17,8 +17,7 @@
 #include <linux/kernel.h>
 #include <linux/io.h>
 #include <linux/power/omap/clockdomain.h>
-
-#include "cm33xx.h"
+#include <linux/power/omap/cm33xx.h>
 
 static struct clockdomain l4ls_am33xx_clkdm = {
 	.name		= "l4ls_clkdm",

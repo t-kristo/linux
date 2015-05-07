@@ -49,7 +49,6 @@
 #include "control.h"
 #include "serial.h"
 #include "sram.h"
-#include "cm33xx.h"
 #include "opp2xxx.h"
 #include "pm.h"
 

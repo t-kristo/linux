@@ -20,11 +20,11 @@
 #include <linux/platform_data/gpio-omap.h>
 #include <linux/platform_data/spi-omap2-mcspi.h>
 #include <linux/power/omap/prm33xx.h>
+#include <linux/power/omap/cm33xx.h>
 
 #include "omap_hwmod_common_data.h"
 
 #include "control.h"
-#include "cm33xx.h"
 #include "i2c.h"
 #include "wd_timer.h"
 #include "omap_hwmod_33xx_43xx_common_data.h"

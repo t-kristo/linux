@@ -23,11 +23,10 @@
 #include <linux/io.h>
 #include <linux/power/omap/cm.h>
 #include <linux/power/omap/prm33xx.h>
+#include <linux/power/omap/cm33xx.h>
 #include <linux/power/omap/clockdomain.h>
 #include <linux/power/omap/cm-regbits-34xx.h>
 #include <linux/power/omap/cm-regbits-33xx.h>
-
-#include "cm33xx.h"
 
 /*
  * CLKCTRL_IDLEST_*: possible values for the CM_*_CLKCTRL.IDLEST bitfield:

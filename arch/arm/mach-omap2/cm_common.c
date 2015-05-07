@@ -19,9 +19,9 @@
 #include <linux/of_address.h>
 #include <linux/power/omap/cm2xxx.h>
 #include <linux/power/omap/cm3xxx.h>
+#include <linux/power/omap/cm33xx.h>
 #include <linux/power/omap/cm44xx.h>
 
-#include "cm33xx.h"
 #include "clock.h"
 
 /*

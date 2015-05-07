@@ -14,8 +14,8 @@
  * GNU General Public License for more details.
  */
 
-#ifndef __ARCH_ARM_MACH_OMAP2_CM_33XX_H
-#define __ARCH_ARM_MACH_OMAP2_CM_33XX_H
+#ifndef __LINUX_POWER_OMAP_CM_33XX_H
+#define __LINUX_POWER_OMAP_CM_33XX_H
 
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/cm.h>
@@ -206,7 +206,6 @@
 /* CM.CEFUSE_CM register offsets */
 #define AM33XX_CM_CEFUSE_CLKSTCTRL_OFFSET		0x0000
 #define AM33XX_CM_CEFUSE_CEFUSE_CLKCTRL_OFFSET		0x0020
-
 
 #ifndef __ASSEMBLER__
 int am33xx_cm_init(const struct omap_prcm_init_data *data);
