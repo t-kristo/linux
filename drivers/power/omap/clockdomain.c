@@ -74,7 +74,7 @@ static int _clkdm_register(struct clockdomain *clkdm)
 	pwrdm = omap_pwrdm_lookup(clkdm->pwrdm.name);
 	if (!pwrdm) {
 		pr_err("clockdomain: %s: powerdomain %s does not exist\n",
-			clkdm->name, clkdm->pwrdm.name);
+		       clkdm->name, clkdm->pwrdm.name);
 		return -EINVAL;
 	}
 	clkdm->pwrdm.ptr = pwrdm;
@@ -141,7 +141,7 @@ static void _autodep_lookup(struct clkdm_autodep *autodep)
 	clkdm = omap_clkdm_lookup(autodep->clkdm.name);
 	if (!clkdm) {
 		pr_err("clockdomain: autodeps: clockdomain %s does not exist\n",
-			 autodep->clkdm.name);
+		       autodep->clkdm.name);
 		clkdm = ERR_PTR(-ENOENT);
 	}
 	autodep->clkdm.ptr = clkdm;
@@ -533,7 +533,6 @@ int omap_clkdm_for_each(int (*fn)(struct clockdomain *clkdm, void *user),
 	return ret;
 }
 
-
 /**
  * omap_clkdm_get_pwrdm - return a ptr to the pwrdm that this clkdm resides in
  * @clkdm: struct clockdomain *
@@ -548,7 +547,6 @@ struct powerdomain *omap_clkdm_get_pwrdm(struct clockdomain *clkdm)
 
 	return clkdm->pwrdm.ptr;
 }
-
 
 /* Hardware clockdomain control */
 
@@ -1289,4 +1287,3 @@ int omap_clkdm_hwmod_disable(struct clockdomain *clkdm, struct omap_hwmod *oh)
 
 	return 0;
 }
-

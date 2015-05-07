@@ -1,4 +1,5 @@
-obj-y					+= prm_common.o cm_common.o
+obj-y					+= prm_common.o cm_common.o \
+					   clockdomain.o
 obj-$(CONFIG_ARCH_OMAP2)		+= cm2xxx.o prm2xxx.o prm2xxx_3xxx.o
 obj-$(CONFIG_ARCH_OMAP3)		+= cm3xxx.o prm2xxx_3xxx.o prm3xxx.o
 am33xx-43xx-prcm-common			+= cm33xx.o prm33xx.o

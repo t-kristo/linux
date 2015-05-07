@@ -150,25 +150,16 @@ obj-$(CONFIG_SOC_DRA7XX)		+= $(powerdomain-common)
 obj-$(CONFIG_SOC_DRA7XX)		+= powerdomains7xx_data.o
 
 # PRCM clockdomain control
-clockdomain-common			+= clockdomain.o
-obj-$(CONFIG_ARCH_OMAP2)		+= $(clockdomain-common)
 obj-$(CONFIG_ARCH_OMAP2)		+= clockdomains2xxx_3xxx_data.o
 obj-$(CONFIG_SOC_OMAP2420)		+= clockdomains2420_data.o
 obj-$(CONFIG_SOC_OMAP2430)		+= clockdomains2430_data.o
-obj-$(CONFIG_ARCH_OMAP3)		+= $(clockdomain-common)
 obj-$(CONFIG_ARCH_OMAP3)		+= clockdomains2xxx_3xxx_data.o
 obj-$(CONFIG_ARCH_OMAP3)		+= clockdomains3xxx_data.o
-obj-$(CONFIG_ARCH_OMAP4)		+= $(clockdomain-common)
 obj-$(CONFIG_ARCH_OMAP4)		+= clockdomains44xx_data.o
-obj-$(CONFIG_SOC_AM33XX)		+= $(clockdomain-common)
 obj-$(CONFIG_SOC_AM33XX)		+= clockdomains33xx_data.o
-obj-$(CONFIG_SOC_TI81XX)		+= $(clockdomain-common)
 obj-$(CONFIG_SOC_TI81XX)		+= clockdomains81xx_data.o
-obj-$(CONFIG_SOC_AM43XX)		+= $(clockdomain-common)
 obj-$(CONFIG_SOC_AM43XX)		+= clockdomains43xx_data.o
-obj-$(CONFIG_SOC_OMAP5)			+= $(clockdomain-common)
 obj-$(CONFIG_SOC_OMAP5)			+= clockdomains54xx_data.o
-obj-$(CONFIG_SOC_DRA7XX)		+= $(clockdomain-common)
 obj-$(CONFIG_SOC_DRA7XX)		+= clockdomains7xx_data.o
 
 # Clock framework
