@@ -28,9 +28,6 @@
 #include <linux/power/omap/prcm_mpu44xx.h>
 #include <linux/power/omap/cm-regbits-34xx.h>
 
-#include "cm1_44xx.h"
-#include "cm2_44xx.h"
-
 #define OMAP4430_IDLEST_SHIFT		16
 #define OMAP4430_IDLEST_MASK		(0x3 << 16)
 #define OMAP4430_CLKTRCTRL_SHIFT	0
@@ -86,6 +83,7 @@ static u32 omap4_cminst_read_inst_reg(u8 part, u16 inst, u16 idx);
 static u32 _clkctrl_idlest(u8 part, u16 inst, u16 clkctrl_offs)
 {
 	u32 v = omap4_cminst_read_inst_reg(part, inst, clkctrl_offs);
+
 	v &= OMAP4430_IDLEST_MASK;
 	v >>= OMAP4430_IDLEST_SHIFT;
 	return v;
@@ -355,7 +353,7 @@ static void omap4_cminst_module_disable(u8 part, u16 inst, u16 clkctrl_offs)
  */
 
 static int omap4_clkdm_add_wkup_sleep_dep(struct clockdomain *clkdm1,
-					struct clockdomain *clkdm2)
+					  struct clockdomain *clkdm2)
 {
 	omap4_cminst_set_inst_reg_bits((1 << clkdm2->dep_bit),
 				       clkdm1->prcm_partition,
@@ -365,7 +363,7 @@ static int omap4_clkdm_add_wkup_sleep_dep(struct clockdomain *clkdm1,
 }
 
 static int omap4_clkdm_del_wkup_sleep_dep(struct clockdomain *clkdm1,
-					struct clockdomain *clkdm2)
+					  struct clockdomain *clkdm2)
 {
 	omap4_cminst_clear_inst_reg_bits((1 << clkdm2->dep_bit),
 					 clkdm1->prcm_partition,
@@ -375,7 +373,7 @@ static int omap4_clkdm_del_wkup_sleep_dep(struct clockdomain *clkdm1,
 }
 
 static int omap4_clkdm_read_wkup_sleep_dep(struct clockdomain *clkdm1,
-					struct clockdomain *clkdm2)
+					   struct clockdomain *clkdm2)
 {
 	return omap4_cminst_read_inst_reg_bits(clkdm1->prcm_partition,
 					       clkdm1->cm_inst,
@@ -472,7 +470,8 @@ static int omap4_clkdm_clk_disable(struct clockdomain *clkdm)
 	}
 
 	hwsup = omap4_cminst_is_clkdm_in_hwsup(clkdm->prcm_partition,
-					clkdm->cm_inst, clkdm->clkdm_offs);
+					       clkdm->cm_inst,
+					       clkdm->clkdm_offs);
 
 	if (!hwsup && (clkdm->flags & CLKDM_CAN_FORCE_SLEEP))
 		omap4_clkdm_sleep(clkdm);
