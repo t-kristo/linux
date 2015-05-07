@@ -27,7 +27,7 @@
 
 #include <asm/cpu.h>
 
-#define PWRDM_TRACE_STATES_FLAG	(1<<31)
+#define PWRDM_TRACE_STATES_FLAG	BIT(31)
 
 enum {
 	PWRDM_STATE_NOW = 0,
@@ -142,10 +142,9 @@ static void _update_logic_membank_counters(struct powerdomain *pwrdm)
 
 static int _pwrdm_state_switch(struct powerdomain *pwrdm, int flag)
 {
-
 	int prev, next, state, trace_state = 0;
 
-	if (pwrdm == NULL)
+	if (!pwrdm)
 		return -EINVAL;
 
 	state = omap_pwrdm_read_pwrst(pwrdm);

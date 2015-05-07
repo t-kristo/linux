@@ -131,7 +131,7 @@ obj-$(CONFIG_SOC_OMAP5)                += voltagedomains54xx_data.o
 obj-$(CONFIG_SOC_DRA7XX)		+= $(voltagedomain-common)
 
 # OMAP powerdomain framework
-powerdomain-common			+= powerdomain.o powerdomain-common.o
+powerdomain-common			+= powerdomain-common.o
 obj-$(CONFIG_ARCH_OMAP2)		+= $(powerdomain-common)
 obj-$(CONFIG_ARCH_OMAP2)		+= powerdomains2xxx_data.o
 obj-$(CONFIG_ARCH_OMAP2)		+= powerdomains2xxx_3xxx_data.o
