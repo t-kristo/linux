@@ -82,6 +82,7 @@ static inline u32 am33xx_cm_rmw_reg_bits(u32 mask, u32 bits, s16 inst, s16 idx)
 static u32 _clkctrl_idlest(u16 inst, u16 clkctrl_offs)
 {
 	u32 v = am33xx_cm_read_reg(inst, clkctrl_offs);
+
 	v &= AM33XX_IDLEST_MASK;
 	v >>= AM33XX_IDLEST_SHIFT;
 	return v;
