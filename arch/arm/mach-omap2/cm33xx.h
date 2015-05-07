@@ -20,8 +20,6 @@
 #include <linux/power/omap/prcm-common.h>
 #include <linux/power/omap/cm.h>
 
-#include "cm-regbits-33xx.h"
-
 /* CM base address */
 #define AM33XX_CM_BASE		0x44e00000
 
