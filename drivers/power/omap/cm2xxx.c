@@ -23,6 +23,8 @@
 #include <linux/power/omap/cm2xxx.h>
 #include <linux/power/omap/cm-regbits-24xx.h>
 
+#include "cm.h"
+
 /* CM_AUTOIDLE_PLL.AUTO_* bit values for DPLLs */
 #define DPLL_AUTOIDLE_DISABLE				0x0
 #define OMAP2XXX_DPLL_AUTOIDLE_LOW_POWER_STOP		0x3

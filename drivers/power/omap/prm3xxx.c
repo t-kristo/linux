@@ -25,6 +25,8 @@
 #include <linux/power/omap/cm3xxx.h>
 #include <linux/clk/ti.h>
 
+#include "cm.h"
+
 #define OMAP_INTC_START		NR_IRQS
 
 static void omap3xxx_prm_read_pending_irqs(unsigned long *events);

@@ -24,6 +24,8 @@
 #include <linux/power/omap/cm3xxx.h>
 #include <linux/clk/ti.h>
 
+#include "cm.h"
+
 static const u8 omap3xxx_cm_idlest_offs[] = {
 	CM_IDLEST1, CM_IDLEST2, OMAP2430_CM_IDLEST3
 };
