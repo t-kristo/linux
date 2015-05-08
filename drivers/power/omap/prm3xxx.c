@@ -25,6 +25,7 @@
 #include <linux/power/omap/cm3xxx.h>
 #include <linux/clk/ti.h>
 
+#include "prm.h"
 #include "cm.h"
 
 #define OMAP_INTC_START		NR_IRQS

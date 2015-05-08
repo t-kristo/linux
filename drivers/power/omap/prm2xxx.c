@@ -22,6 +22,8 @@
 #include <linux/power/omap/clockdomain.h>
 #include <linux/power/omap/prm-regbits-24xx.h>
 
+#include "prm.h"
+
 /*
  * OMAP24xx PM_PWSTCTRL_*.POWERSTATE and PM_PWSTST_*.LASTSTATEENTERED bits -
  * these are reversed from the bits used on OMAP3+
