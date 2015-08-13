@@ -22,7 +22,6 @@
 #include <linux/of_address.h>
 #include <linux/list.h>
 #include <linux/regmap.h>
-#include <linux/bootmem.h>
 
 #include "clock.h"
 
@@ -247,7 +246,7 @@ void __init omap2_clk_legacy_provider_init(int index, void __iomem *mem)
 {
 	struct clk_iomap *io;
 
-	io = memblock_virt_alloc(sizeof(*io), 0);
+	io = kzalloc(sizeof(*io), GFP_KERNEL);
 
 	io->mem = mem;
 

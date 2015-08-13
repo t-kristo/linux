@@ -62,6 +62,12 @@
 static int (*omap_clk_soc_init)(void);
 
 /*
+ * prcm_data_init: points to a function that does the SoC-specific
+ * PRCM data (pwrdm/clkdm/hwmod) initializations
+ */
+static void (*prcm_data_init)(void);
+
+/*
  * The machine specific code may provide the extra mapping besides the
  * default mapping provided here.
  */
@@ -375,6 +381,16 @@ static void __init __maybe_unused omap_common_late_init(void)
 }
 
 #ifdef CONFIG_SOC_OMAP2420
+static void __init omap2420_prcm_data_init(void)
+{
+	omap2_prcm_base_init();
+	omap2xxx_voltagedomains_init();
+	omap242x_powerdomains_init();
+	omap242x_clockdomains_init();
+	omap2420_hwmod_init();
+	omap_hwmod_init_postsetup();
+}
+
 void __init omap2420_init_early(void)
 {
 	omap2_set_globals_tap(OMAP242X_CLASS, OMAP2_L4_IO_ADDRESS(0x48014000));
@@ -382,12 +398,7 @@ void __init omap2420_init_early(void)
 			       OMAP2_L3_IO_ADDRESS(OMAP2420_SMS_BASE));
 	omap2_control_base_init();
 	omap2xxx_check_revision();
-	omap2_prcm_base_init();
-	omap2xxx_voltagedomains_init();
-	omap242x_powerdomains_init();
-	omap242x_clockdomains_init();
-	omap2420_hwmod_init();
-	omap_hwmod_init_postsetup();
+	prcm_data_init = omap2420_prcm_data_init;
 	omap_clk_soc_init = omap2420_dt_clk_init;
 	rate_table = omap2420_rate_table;
 }
@@ -401,6 +412,16 @@ void __init omap2420_init_late(void)
 #endif
 
 #ifdef CONFIG_SOC_OMAP2430
+static void __init omap2430_prcm_data_init(void)
+{
+	omap2_prcm_base_init();
+	omap2xxx_voltagedomains_init();
+	omap243x_powerdomains_init();
+	omap243x_clockdomains_init();
+	omap2430_hwmod_init();
+	omap_hwmod_init_postsetup();
+}
+
 void __init omap2430_init_early(void)
 {
 	omap2_set_globals_tap(OMAP243X_CLASS, OMAP2_L4_IO_ADDRESS(0x4900a000));
@@ -408,12 +429,7 @@ void __init omap2430_init_early(void)
 			       OMAP2_L3_IO_ADDRESS(OMAP243X_SMS_BASE));
 	omap2_control_base_init();
 	omap2xxx_check_revision();
-	omap2_prcm_base_init();
-	omap2xxx_voltagedomains_init();
-	omap243x_powerdomains_init();
-	omap243x_clockdomains_init();
-	omap2430_hwmod_init();
-	omap_hwmod_init_postsetup();
+	prcm_data_init = omap2430_prcm_data_init;
 	omap_clk_soc_init = omap2430_dt_clk_init;
 	rate_table = omap2430_rate_table;
 }
@@ -431,22 +447,8 @@ void __init omap2430_init_late(void)
  * same machine_id for 34xx and 36xx beagle.. Will get fixed with DT.
  */
 #ifdef CONFIG_ARCH_OMAP3
-void __init omap3_init_early(void)
+static void __init omap3_prcm_data_init(void)
 {
-	omap2_set_globals_tap(OMAP343X_CLASS, OMAP2_L4_IO_ADDRESS(0x4830A000));
-	omap2_set_globals_sdrc(OMAP2_L3_IO_ADDRESS(OMAP343X_SDRC_BASE),
-			       OMAP2_L3_IO_ADDRESS(OMAP343X_SMS_BASE));
-	/* XXX: remove these once OMAP3 is DT only */
-	if (!of_have_populated_dt()) {
-		omap2_set_globals_control(
-			OMAP2_L4_IO_ADDRESS(OMAP343X_CTRL_BASE));
-		omap2_set_globals_prm(OMAP2_L4_IO_ADDRESS(OMAP3430_PRM_BASE));
-		omap2_set_globals_cm(OMAP2_L4_IO_ADDRESS(OMAP3430_CM_BASE),
-				     NULL);
-	}
-	omap2_control_base_init();
-	omap3xxx_check_revision();
-	omap3xxx_check_features();
 	omap2_prcm_base_init();
 	/* XXX: remove these once OMAP3 is DT only */
 	if (!of_have_populated_dt()) {
@@ -469,6 +471,25 @@ void __init omap3_init_early(void)
 		else
 			omap_clk_soc_init = omap3430_clk_legacy_init;
 	}
+}
+
+void __init omap3_init_early(void)
+{
+	omap2_set_globals_tap(OMAP343X_CLASS, OMAP2_L4_IO_ADDRESS(0x4830A000));
+	omap2_set_globals_sdrc(OMAP2_L3_IO_ADDRESS(OMAP343X_SDRC_BASE),
+			       OMAP2_L3_IO_ADDRESS(OMAP343X_SMS_BASE));
+	/* XXX: remove these once OMAP3 is DT only */
+	if (!of_have_populated_dt()) {
+		omap2_set_globals_control(
+			OMAP2_L4_IO_ADDRESS(OMAP343X_CTRL_BASE));
+		omap2_set_globals_prm(OMAP2_L4_IO_ADDRESS(OMAP3430_PRM_BASE));
+		omap2_set_globals_cm(OMAP2_L4_IO_ADDRESS(OMAP3430_CM_BASE),
+				     NULL);
+	}
+	omap2_control_base_init();
+	omap3xxx_check_revision();
+	omap3xxx_check_features();
+	prcm_data_init = omap3_prcm_data_init;
 }
 
 void __init omap3430_init_early(void)
@@ -542,13 +563,8 @@ void __init ti81xx_init_late(void)
 #endif
 
 #ifdef CONFIG_SOC_TI81XX
-void __init ti814x_init_early(void)
+void __init ti81xx_prcm_data_init(void)
 {
-	omap2_set_globals_tap(TI814X_CLASS,
-			      OMAP2_L4_IO_ADDRESS(TI81XX_TAP_BASE));
-	omap2_control_base_init();
-	omap3xxx_check_revision();
-	ti81xx_check_features();
 	omap2_prcm_base_init();
 	omap3xxx_voltagedomains_init();
 	omap3xxx_powerdomains_init();
@@ -557,6 +573,16 @@ void __init ti814x_init_early(void)
 	omap_hwmod_init_postsetup();
 	if (of_have_populated_dt())
 		omap_clk_soc_init = ti81xx_dt_clk_init;
+}
+
+void __init ti814x_init_early(void)
+{
+	omap2_set_globals_tap(TI814X_CLASS,
+			      OMAP2_L4_IO_ADDRESS(TI81XX_TAP_BASE));
+	omap2_control_base_init();
+	omap3xxx_check_revision();
+	ti81xx_check_features();
+	prcm_data_init = ti81xx_prcm_data_init;
 }
 
 void __init ti816x_init_early(void)
@@ -566,18 +592,20 @@ void __init ti816x_init_early(void)
 	omap2_control_base_init();
 	omap3xxx_check_revision();
 	ti81xx_check_features();
-	omap2_prcm_base_init();
-	omap3xxx_voltagedomains_init();
-	omap3xxx_powerdomains_init();
-	ti81xx_clockdomains_init();
-	ti81xx_hwmod_init();
-	omap_hwmod_init_postsetup();
-	if (of_have_populated_dt())
-		omap_clk_soc_init = ti81xx_dt_clk_init;
+	prcm_data_init = ti81xx_prcm_data_init;
 }
 #endif
 
 #ifdef CONFIG_SOC_AM33XX
+void __init am33xx_prcm_data_init(void)
+{
+	omap2_prcm_base_init();
+	am33xx_powerdomains_init();
+	am33xx_clockdomains_init();
+	am33xx_hwmod_init();
+	omap_hwmod_init_postsetup();
+}
+
 void __init am33xx_init_early(void)
 {
 	omap2_set_globals_tap(AM335X_CLASS,
@@ -585,11 +613,7 @@ void __init am33xx_init_early(void)
 	omap2_control_base_init();
 	omap3xxx_check_revision();
 	am33xx_check_features();
-	omap2_prcm_base_init();
-	am33xx_powerdomains_init();
-	am33xx_clockdomains_init();
-	am33xx_hwmod_init();
-	omap_hwmod_init_postsetup();
+	prcm_data_init = am33xx_prcm_data_init;
 	omap_clk_soc_init = am33xx_dt_clk_init;
 }
 
@@ -600,6 +624,15 @@ void __init am33xx_init_late(void)
 #endif
 
 #ifdef CONFIG_SOC_AM43XX
+void __init am43xx_prcm_data_init(void)
+{
+	omap2_prcm_base_init();
+	am43xx_powerdomains_init();
+	am43xx_clockdomains_init();
+	am43xx_hwmod_init();
+	omap_hwmod_init_postsetup();
+}
+
 void __init am43xx_init_early(void)
 {
 	omap2_set_globals_tap(AM335X_CLASS,
@@ -607,12 +640,8 @@ void __init am43xx_init_early(void)
 	omap2_control_base_init();
 	omap3xxx_check_revision();
 	am33xx_check_features();
-	omap2_prcm_base_init();
-	am43xx_powerdomains_init();
-	am43xx_clockdomains_init();
-	am43xx_hwmod_init();
-	omap_hwmod_init_postsetup();
 	omap_l2_cache_init();
+	prcm_data_init = am43xx_prcm_data_init;
 	omap_clk_soc_init = am43xx_dt_clk_init;
 }
 
@@ -623,13 +652,8 @@ void __init am43xx_init_late(void)
 #endif
 
 #ifdef CONFIG_ARCH_OMAP4
-void __init omap4430_init_early(void)
+void __init omap4430_prcm_data_init(void)
 {
-	omap2_set_globals_tap(OMAP443X_CLASS,
-			      OMAP2_L4_IO_ADDRESS(OMAP443X_SCM_BASE));
-	omap2_control_base_init();
-	omap4xxx_check_revision();
-	omap4xxx_check_features();
 	omap2_prcm_base_init();
 	omap4_pm_init_early();
 	omap44xx_voltagedomains_init();
@@ -637,7 +661,17 @@ void __init omap4430_init_early(void)
 	omap44xx_clockdomains_init();
 	omap44xx_hwmod_init();
 	omap_hwmod_init_postsetup();
+}
+
+void __init omap4430_init_early(void)
+{
+	omap2_set_globals_tap(OMAP443X_CLASS,
+			      OMAP2_L4_IO_ADDRESS(OMAP443X_SCM_BASE));
+	omap2_control_base_init();
+	omap4xxx_check_revision();
+	omap4xxx_check_features();
 	omap_l2_cache_init();
+	prcm_data_init = omap4430_prcm_data_init;
 	omap_clk_soc_init = omap4xxx_dt_clk_init;
 }
 
@@ -650,11 +684,8 @@ void __init omap4430_init_late(void)
 #endif
 
 #ifdef CONFIG_SOC_OMAP5
-void __init omap5_init_early(void)
+void __init omap5_prcm_data_init(void)
 {
-	omap2_set_globals_tap(OMAP54XX_CLASS,
-			      OMAP2_L4_IO_ADDRESS(OMAP54XX_SCM_BASE));
-	omap2_control_base_init();
 	omap4_pm_init_early();
 	omap2_prcm_base_init();
 	omap5xxx_check_revision();
@@ -663,6 +694,15 @@ void __init omap5_init_early(void)
 	omap54xx_clockdomains_init();
 	omap54xx_hwmod_init();
 	omap_hwmod_init_postsetup();
+}
+
+void __init omap5_init_early(void)
+{
+	omap2_set_globals_tap(OMAP54XX_CLASS,
+			      OMAP2_L4_IO_ADDRESS(OMAP54XX_SCM_BASE));
+	omap2_control_base_init();
+	omap5xxx_check_revision();
+	prcm_data_init = omap5_prcm_data_init;
 	omap_clk_soc_init = omap5xxx_dt_clk_init;
 }
 
@@ -675,17 +715,22 @@ void __init omap5_init_late(void)
 #endif
 
 #ifdef CONFIG_SOC_DRA7XX
-void __init dra7xx_init_early(void)
+void __init dra7xx_prcm_data_init(void)
 {
-	omap2_set_globals_tap(-1, OMAP2_L4_IO_ADDRESS(DRA7XX_TAP_BASE));
-	omap2_control_base_init();
 	omap4_pm_init_early();
 	omap2_prcm_base_init();
-	dra7xxx_check_revision();
 	dra7xx_powerdomains_init();
 	dra7xx_clockdomains_init();
 	dra7xx_hwmod_init();
 	omap_hwmod_init_postsetup();
+}
+
+void __init dra7xx_init_early(void)
+{
+	omap2_set_globals_tap(-1, OMAP2_L4_IO_ADDRESS(DRA7XX_TAP_BASE));
+	omap2_control_base_init();
+	dra7xxx_check_revision();
+	prcm_data_init = dra7xx_prcm_data_init;
 	omap_clk_soc_init = dra7xx_dt_clk_init;
 }
 
@@ -712,6 +757,11 @@ void __init omap_sdrc_init(struct omap_sdrc_params *sdrc_cs0,
 int __init omap_clk_init(void)
 {
 	int ret = 0;
+
+	if (!prcm_data_init)
+		return 0;
+
+	prcm_data_init();
 
 	if (!omap_clk_soc_init)
 		return 0;
