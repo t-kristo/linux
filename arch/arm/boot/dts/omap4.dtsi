@@ -72,6 +72,12 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges = <0 0x48243000 0x900>;
+
+		prcm_mpu_pm_domains: pm_domains {
+			#address-cells = <1>;
+			#size-cells = <1>;
+			ranges;
+		};
 	};
 
 	local-timer@48240600 {
@@ -141,26 +147,38 @@
 			cm1: cm1@4000 {
 				compatible = "ti,omap4-cm1";
 				reg = <0x4000 0x2000>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+				ranges = <0 0x4000 0x2000>;
 
 				cm1_clocks: clocks {
 					#address-cells = <1>;
 					#size-cells = <0>;
 				};
 
-				cm1_clockdomains: clockdomains {
+				cm1_pm_domains: pm_domains {
+					#address-cells = <1>;
+					#size-cells = <1>;
+					ranges;
 				};
 			};
 
 			cm2: cm2@8000 {
 				compatible = "ti,omap4-cm2";
 				reg = <0x8000 0x3000>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+				ranges = <0 0x8000 0x3000>;
 
 				cm2_clocks: clocks {
 					#address-cells = <1>;
 					#size-cells = <0>;
 				};
 
-				cm2_clockdomains: clockdomains {
+				cm2_pm_domains: pm_domains {
+					#address-cells = <1>;
+					#size-cells = <1>;
+					ranges;
 				};
 			};
 
@@ -233,13 +251,19 @@
 					compatible = "ti,omap4-prm";
 					reg = <0x6000 0x3000>;
 					interrupts = <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>;
+					#address-cells = <1>;
+					#size-cells = <1>;
+					ranges = <0 0x6000 0x3000>;
 
 					prm_clocks: clocks {
 						#address-cells = <1>;
 						#size-cells = <0>;
 					};
 
-					prm_clockdomains: clockdomains {
+					prm_pm_domains: pm_domains {
+						#address-cells = <1>;
+						#size-cells = <1>;
+						ranges;
 					};
 				};
 
@@ -252,7 +276,7 @@
 						#size-cells = <0>;
 					};
 
-					scrm_clockdomains: clockdomains {
+					scrm_pm_domains: pm_domains {
 					};
 				};
 

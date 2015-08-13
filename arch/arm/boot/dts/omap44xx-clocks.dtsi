@@ -744,10 +744,104 @@
 	};
 };
 
-&prm_clockdomains {
-	emu_sys_clkdm: emu_sys_clkdm {
-		compatible = "ti,clockdomain";
+&prm_pm_domains {
+	core_pwrdm: core_pwrdm@700 {
+		compatible = "ti,omap4-core-pwrdm";
+		reg = <0x700 0x1c>;
+		#power-domain-cells = <0>;
+	};
+
+	cefuse_pwrdm: cefuse_pwrdm@1600 {
+		compatible = "ti,omap4-cefuse-pwrdm";
+		reg = <0x1600 0x1c>;
+		#power-domain-cells = <0>;
+	};
+
+	l4per_pwrdm: l4per_pwrdm@1400 {
+		compatible = "ti,omap4-l4per-pwrdm";
+		reg = <0x1400 0x1c>;
+		#power-domain-cells = <0>;
+	};
+
+	tesla_pwrdm: tesla_pwrdm@400 {
+		compatible = "ti,omap4-tesla-pwrdm";
+		reg = <0x400 0x1c>;
+		#power-domain-cells = <0>;
+	};
+
+	l3init_pwrdm: l3init_pwrdm@1300 {
+		compatible = "ti,omap4-l3init-pwrdm";
+		reg = <0x1300 0x1c>;
+		#power-domain-cells = <0>;
+	};
+
+	ivahd_pwrdm: ivahd_pwrdm@f00 {
+		compatible = "ti,omap4-ivahd-pwrdm";
+		reg = <0xf00 0x1c>;
+		#power-domain-cells = <0>;
+	};
+
+	gfx_pwrdm: gfx_pwrdm@1200 {
+		compatible = "ti,omap4-gfx-pwrdm";
+		reg = <0x1200 0x1c>;
+		#power-domain-cells = <0>;
+	};
+
+	wkup_pwrdm: wkup_pwrdm@1700 {
+		compatible = "ti,omap4-wkup-pwrdm";
+		reg = <0x1700 0x1c>;
+		#power-domain-cells = <0>;
+	};
+
+	abe_pwrdm: abe_pwrdm@500 {
+		compatible = "ti,omap4-abe-pwrdm";
+		reg = <0x500 0x1c>;
+		#power-domain-cells = <0>;
+	};
+
+	mpu_pwrdm: mpu_pwrdm@300 {
+		compatible = "ti,omap4-mpu-pwrdm";
+		reg = <0x300 0x1c>;
+		#power-domain-cells = <0>;
+	};
+
+	always_on_core_pwrdm: always_on_core_pwrdm@600 {
+		compatible = "ti,omap4-alwon-core-pwrdm";
+		reg = <0x600 0x1c>;
+		#power-domain-cells = <0>;
+	};
+
+	cam_pwrdm: cam_pwrdm@1000 {
+		compatible = "ti,omap4-cam-pwrdm";
+		reg = <0x1000 0x1c>;
+		#power-domain-cells = <0>;
+	};
+
+	dss_pwrdm: dss_pwrdm@1100 {
+		compatible = "ti,omap4-dss-pwrdm";
+		reg = <0x1100 0x1c>;
+		#power-domain-cells = <0>;
+	};
+
+	emu_pwrdm: emu_pwrdm@1900 {
+		compatible = "ti,omap4-emu-pwrdm";
+		reg = <0x1900 0x1c>;
+		#power-domain-cells = <0>;
+	};
+
+	emu_sys_clkdm: emu_sys_clkdm@1a00 {
+		compatible = "ti,clockdomain", "ti,omap4-emu-sys-clkdm";
+		reg = <0x1a00 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&emu_pwrdm>;
 		clocks = <&trace_clk_div_ck>;
+	};
+
+	l4_wkup_clkdm: l4_wkup_clkdm@1800 {
+		compatible = "ti,omap4-l4-wkup-clkdm";
+		reg = <0x1800 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&wkup_pwrdm>;
 	};
 };
 
@@ -1399,10 +1493,176 @@
 	};
 };
 
-&cm2_clockdomains {
+&cm1_pm_domains {
+	tesla_clkdm: tesla_clkdm {
+		compatible = "ti,omap4-tesla-clkdm";
+		reg = <0x400 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&tesla_pwrdm>, <&abe_clkdm>, <&ivahd_clkdm>,
+				<&l3_1_clkdm>, <&l3_2_clkdm>, <&l3_emif_clkdm>,
+				<&l3_init_clkdm>, <&l4_cfg_clkdm>,
+				<&l4_per_clkdm>, <&l4_wkup_clkdm>;
+	};
+
+	abe_clkdm: abe_clkdm {
+		compatible = "ti,omap4-abe-clkdm";
+		reg = <0x500 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&abe_pwrdm>;
+	};
+
+	mpuss_clkdm: mpuss_clkdm {
+		compatible = "ti,omap4-mpuss-clkdm";
+		reg = <0x300 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&mpu_pwrdm>, <&abe_clkdm>, <&ducati_clkdm>,
+				<&ivahd_clkdm>, <&l3_1_clkdm>, <&l3_2_clkdm>,
+				<&l3_dss_clkdm>, <&l3_emif_clkdm>,
+				<&l3_gfx_clkdm>, <&l3_init_clkdm>,
+				<&l4_cfg_clkdm>, <&l4_per_clkdm>,
+				<&l4_secure_clkdm>, <&l4_wkup_clkdm>,
+				<&tesla_clkdm>;
+	};
+};
+
+&cm2_pm_domains {
 	l3_init_clkdm: l3_init_clkdm {
-		compatible = "ti,clockdomain";
+		compatible = "ti,clockdomain", "ti,omap4-l3-init-clkdm";
+		reg = <0x1300 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&l3init_pwrdm>, <&abe_clkdm>, <&ivahd_clkdm>,
+				<&l3_emif_clkdm>, <&l4_cfg_clkdm>,
+				<&l4_per_clkdm>, <&l4_secure_clkdm>,
+				<&l4_wkup_clkdm>;
 		clocks = <&dpll_usb_ck>, <&usb_host_fs_fck>;
+	};
+
+	l3_1_clkdm: l3_1_clkdm {
+		compatible = "ti,omap4-l3-1-clkdm";
+		reg = <0x700 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&core_pwrdm>;
+	};
+
+	l3_2_clkdm: l3_2_clkdm {
+		compatible = "ti,omap4-l3-2-clkdm";
+		reg = <0x800 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&core_pwrdm>;
+	};
+
+	l3_instr_clkdm: l3_instr_clkdm {
+		compatible = "ti,omap4-l3-instr-clkdm";
+		reg = <0xe00 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&core_pwrdm>;
+	};
+
+	l4_cfg_clkdm: l4_cfg_clkdm {
+		compatible = "ti,omap4-l4-cfg-clkdm";
+		reg = <0xd00 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&core_pwrdm>;
+	};
+
+	l3_emif_clkdm: l3_emif_clkdm {
+		compatible = "ti,omap4-l3-emif-clkdm";
+		reg = <0xb00 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&core_pwrdm>;
+	};
+
+	l3_dma_clkdm: l3_dma_clkdm {
+		compatible = "ti,omap4-l3-dma-clkdm";
+		reg = <0xa00 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&core_pwrdm>, <&abe_clkdm>, <&ducati_clkdm>,
+				<&ivahd_clkdm>, <&l3_1_clkdm>, <&l3_dss_clkdm>,
+				<&l3_emif_clkdm>, <&l3_init_clkdm>,
+				<&l4_cfg_clkdm>, <&l4_per_clkdm>,
+				<&l4_secure_clkdm>, <&l4_wkup_clkdm>;
+	};
+
+	ducati_clkdm: ducati_clkdm {
+		compatible = "ti,omap4-ducati-clkdm";
+		reg = <0x900 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&core_pwrdm>, <&abe_clkdm>, <&ivahd_clkdm>,
+				<&l3_1_clkdm>, <&l3_2_clkdm>, <&l3_dss_clkdm>,
+				<&l3_emif_clkdm>, <&l3_gfx_clkdm>,
+				<&l3_init_clkdm>, <&l4_cfg_clkdm>,
+				<&l4_per_clkdm>, <&l4_secure_clkdm>,
+				<&l4_wkup_clkdm>, <&tesla_clkdm>;
+	};
+
+	d2d_clkdm: d2d_clkdm {
+		compatible = "ti,omap4-d2d-clkdm";
+		reg = <0xc00 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&core_pwrdm>, <&abe_clkdm>, <&ivahd_clkdm>,
+				<&l3_1_clkdm>, <&l3_2_clkdm>, <&l3_emif_clkdm>,
+				<&l3_init_clkdm>, <&l4_cfg_clkdm>,
+				<&l4_per_clkdm>;
+	};
+
+	l4_cefuse_clkdm: l4_cefuse_clkdm {
+		compatible = "ti,omap4-l4-cefuse-clkdm";
+		reg = <0x1600 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&cefuse_pwrdm>;
+	};
+
+	l3_gfx_clkdm: l3_gfx_clkdm {
+		compatible = "ti,omap4-l3-gfx-clkdm";
+		reg = <0x1200 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&gfx_pwrdm>, <&ivahd_clkdm>, <&l3_1_clkdm>,
+				<&l3_emif_clkdm>;
+	};
+
+	ivahd_clkdm: ivahd_clkdm {
+		compatible = "ti,omap4-ivahd-clkdm";
+		reg = <0xf00 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&ivahd_pwrdm>, <&l3_1_clkdm>, <&l3_emif_clkdm>;
+	};
+
+	l4_secure_clkdm: l4_secure_clkdm {
+		compatible = "ti,omap4-l4-secure-clkdm";
+		reg = <0x1580 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&l4per_pwrdm>, <&l3_1_clkdm>, <&l3_emif_clkdm>,
+				<&l4_per_clkdm>;
+	};
+
+	l4_per_clkdm: l4_per_clkdm {
+		compatible = "ti,omap4-l4-per-clkdm";
+		reg = <0x1400 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&l4per_pwrdm>;
+	};
+
+	l4_ao_clkdm: l4_ao_clkdm {
+		compatible = "ti,omap4-l4-alwon-clkdm";
+		reg = <0x600 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&always_on_core_pwrdm>;
+	};
+
+	iss_clkdm: iss_clkdm {
+		compatible = "ti,omap4-iss-clkdm";
+		reg = <0x1000 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&cam_pwrdm>, <&ivahd_clkdm>, <&l3_1_clkdm>,
+				<&l3_emif_clkdm>;
+	};
+
+	l3_dss_clkdm: l3_dss_clkdm {
+		compatible = "ti,omap4-l3-dss-clkdm";
+		reg = <0x1100 0x20>;
+		#power-domain-cells = <0>;
+		power-domains = <&dss_pwrdm>, <&ivahd_clkdm>, <&l3_2_clkdm>,
+				<&l3_emif_clkdm>;
 	};
 };
 
@@ -1639,5 +1899,33 @@
 		clocks = <&auxclk0_ck>, <&auxclk1_ck>, <&auxclk2_ck>, <&auxclk3_ck>, <&auxclk4_ck>, <&auxclk5_ck>;
 		ti,bit-shift = <2>;
 		reg = <0x0224>;
+	};
+};
+
+&prcm_mpu_pm_domains {
+	cpu0_pwrdm: cpu0_pwrdm@400 {
+		compatible = "ti,omap4-cpu-pwrdm";
+		reg = <0x400 0x18>;
+		#power-domain-cells = <0>;
+	};
+
+	mpu0_clkdm: mpu0_clkdm@18 {
+		compatible = "ti,omap4-mpu-clkdm";
+		reg = <0x418 0x4>;
+		#power-domain-cells = <0>;
+		power-domains = <&cpu0_pwrdm>;
+	};
+
+	cpu1_pwrdm: cpu1_pwrdm@800 {
+		compatible = "ti,omap4-cpu-pwrdm";
+		reg = <0x800 0x18>;
+		#power-domain-cells = <0>;
+	};
+
+	mpu1_clkdm: mpu1_clkdm@18 {
+		compatible = "ti,omap4-mpu-clkdm";
+		reg = <0x818 0x4>;
+		#power-domain-cells = <0>;
+		power-domains = <&cpu1_pwrdm>;
 	};
 };
