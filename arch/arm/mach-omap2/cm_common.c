@@ -23,6 +23,8 @@
 #include "cm33xx.h"
 #include "cm44xx.h"
 #include "clock.h"
+#include "prcm43xx.h"
+#include "prcm44xx.h"
 
 /*
  * cm_ll_data: function pointers to SoC-specific implementations of
@@ -225,11 +227,13 @@ int cm_unregister(struct cm_ll_data *cld)
 static struct omap_prcm_init_data cm_data __initdata = {
 	.index = TI_CLKM_CM,
 	.init = omap4_cm_init,
+	.part = OMAP4430_CM1_PARTITION,
 };
 
 static struct omap_prcm_init_data cm2_data __initdata = {
 	.index = TI_CLKM_CM2,
 	.init = omap4_cm_init,
+	.part = OMAP4430_CM2_PARTITION,
 };
 #endif
 
@@ -268,6 +272,7 @@ static struct omap_prcm_init_data am4_prcm_data __initdata = {
 	.index = TI_CLKM_CM,
 	.flags = CM_NO_CLOCKS | CM_SINGLE_INSTANCE,
 	.init = omap4_cm_init,
+	.part = AM43XX_CM_PARTITION,
 };
 #endif
 
@@ -316,6 +321,7 @@ int __init omap2_cm_base_init(void)
 	const struct of_device_id *match;
 	struct omap_prcm_init_data *data;
 	void __iomem *mem;
+	int ret;
 
 	for_each_matching_node_and_match(np, omap_cm_dt_match_table, &match) {
 		data = (struct omap_prcm_init_data *)match->data;
@@ -337,6 +343,12 @@ int __init omap2_cm_base_init(void)
 		if (data->init && (data->flags & CM_SINGLE_INSTANCE ||
 				   (cm_base && cm2_base)))
 			data->init(data);
+
+		if (data->part) {
+			ret = omap_prcm_map_partition(np, data->part);
+			if (ret)
+				return ret;
+		}
 	}
 
 	return 0;

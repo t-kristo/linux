@@ -527,6 +527,7 @@ struct omap_prcm_irq_setup {
  * @device_inst_offset: device instance offset within the module address space
  * @init: low level PRCM init function for this module
  * @np: device node for this PRCM module
+ * @part: PRCM partition ID, applicable for OMAP4+ only
  */
 struct omap_prcm_init_data {
 	int index;
@@ -536,6 +537,7 @@ struct omap_prcm_init_data {
 	s32 device_inst_offset;
 	int (*init)(const struct omap_prcm_init_data *data);
 	struct device_node *np;
+	u8 part;
 };
 
 extern void omap_prcm_irq_cleanup(void);
@@ -544,6 +546,9 @@ extern int omap_prcm_register_chain_handler(
 extern int omap_prcm_event_to_irq(const char *event);
 extern void omap_prcm_irq_prepare(void);
 extern void omap_prcm_irq_complete(void);
+
+int omap_prcm_map_partition(struct device_node *np, u8 part);
+int omap_prcm_get_partition(struct device_node *np);
 
 # endif
 

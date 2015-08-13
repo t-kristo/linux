@@ -37,6 +37,7 @@
 #include "prm54xx.h"
 #include "prm7xx.h"
 #include "prcm43xx.h"
+#include "prcm44xx.h"
 #include "common.h"
 #include "clock.h"
 #include "cm.h"
@@ -76,6 +77,8 @@ u16 prm_features;
  */
 static struct prm_ll_data null_prm_ll_data;
 static struct prm_ll_data *prm_ll_data = &null_prm_ll_data;
+
+static struct device_node *prcm_base_nodes[OMAP4_MAX_PRCM_PARTITIONS];
 
 /* Private functions */
 
@@ -670,6 +673,7 @@ static struct omap_prcm_init_data omap4_prm_data __initdata = {
 	.init = omap44xx_prm_init,
 	.device_inst_offset = OMAP4430_PRM_DEVICE_INST,
 	.flags = PRM_HAS_IO_WAKEUP | PRM_HAS_VOLTAGE | PRM_IRQ_DEFAULT,
+	.part = OMAP4430_PRM_PARTITION,
 };
 #endif
 
@@ -679,6 +683,7 @@ static struct omap_prcm_init_data omap5_prm_data __initdata = {
 	.init = omap44xx_prm_init,
 	.device_inst_offset = OMAP54XX_PRM_DEVICE_INST,
 	.flags = PRM_HAS_IO_WAKEUP | PRM_HAS_VOLTAGE,
+	.part = OMAP54XX_PRM_PARTITION,
 };
 #endif
 
@@ -688,6 +693,7 @@ static struct omap_prcm_init_data dra7_prm_data __initdata = {
 	.init = omap44xx_prm_init,
 	.device_inst_offset = DRA7XX_PRM_DEVICE_INST,
 	.flags = PRM_HAS_IO_WAKEUP,
+	.part = DRA7XX_PRM_PARTITION,
 };
 #endif
 
@@ -696,12 +702,14 @@ static struct omap_prcm_init_data am4_prm_data __initdata = {
 	.index = TI_CLKM_PRM,
 	.init = omap44xx_prm_init,
 	.device_inst_offset = AM43XX_PRM_DEVICE_INST,
+	.part = AM43XX_PRM_PARTITION,
 };
 #endif
 
 #if defined(CONFIG_ARCH_OMAP4) || defined(CONFIG_SOC_OMAP5)
 static struct omap_prcm_init_data scrm_data __initdata = {
 	.index = TI_CLKM_SCRM,
+	.part = OMAP4430_SCRM_PARTITION,
 };
 #endif
 
@@ -749,6 +757,7 @@ int __init omap2_prm_base_init(void)
 	const struct of_device_id *match;
 	struct omap_prcm_init_data *data;
 	void __iomem *mem;
+	int ret;
 
 	for_each_matching_node_and_match(np, omap_prcm_dt_match_table, &match) {
 		data = (struct omap_prcm_init_data *)match->data;
@@ -766,6 +775,12 @@ int __init omap2_prm_base_init(void)
 
 		if (data->init)
 			data->init(data);
+
+		if (data->part) {
+			ret = omap_prcm_map_partition(np, data->part);
+			if (ret)
+				return ret;
+		}
 	}
 
 	return 0;
@@ -815,3 +830,41 @@ static int __init prm_late_init(void)
 	return 0;
 }
 subsys_initcall(prm_late_init);
+
+/**
+ * omap_prcm_map_partition - maps a PRCM partition for a DT node
+ * @np: device node to map
+ * @part: PRCM partition ID for this node
+ *
+ * Maps a device tree node against a particular PRCM partition. This
+ * mapping can be used to determine the PRCM partition for the
+ * children of this node later on. Returns 0 on success, negative error
+ * value in failure.
+ */
+int __init omap_prcm_map_partition(struct device_node *np, u8 part)
+{
+	if (prcm_base_nodes[part])
+		return -EBUSY;
+
+	prcm_base_nodes[part] = np;
+
+	return 0;
+}
+
+/**
+ * omap_prcm_get_partition - gets PRCM partition ID for a DT node
+ * @np: device node to get PRCM partition for
+ *
+ * Gets the PRCM partition ID for a device tree node. Returns the
+ * partition ID, or negative error value in failure.
+ */
+int __init omap_prcm_get_partition(struct device_node *np)
+{
+	int i;
+
+	for (i = 0; i < OMAP4_MAX_PRCM_PARTITIONS; i++)
+		if (np == prcm_base_nodes[i])
+			return i;
+
+	return -ENOENT;
+}
