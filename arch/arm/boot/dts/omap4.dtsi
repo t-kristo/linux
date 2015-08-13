@@ -66,6 +66,14 @@
 		cache-level = <2>;
 	};
 
+	prcm_mpu: prcm_mpu@48243000 {
+		compatible = "ti,omap4-prcm-mpu", "simple-bus";
+		reg = <0x48243000 0x900>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges = <0 0x48243000 0x900>;
+	};
+
 	local-timer@48240600 {
 		compatible = "arm,cortex-a9-twd-timer";
 		clocks = <&mpu_periphclk>;

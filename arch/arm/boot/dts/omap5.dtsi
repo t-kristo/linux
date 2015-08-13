@@ -99,6 +99,14 @@
 		interrupt-parent = <&gic>;
 	};
 
+	prcm_mpu: prcm_mpu@48243000 {
+		compatible = "ti,omap4-prcm-mpu", "simple-bus";
+		reg = <0x48243000 0xb00>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges = <0 0x48243000 0xb00>;
+	};
+
 	wakeupgen: interrupt-controller@48281000 {
 		compatible = "ti,omap5-wugen-mpu", "ti,omap4-wugen-mpu";
 		interrupt-controller;
