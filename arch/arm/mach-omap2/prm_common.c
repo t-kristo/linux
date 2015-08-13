@@ -38,6 +38,7 @@
 #include "prm7xx.h"
 #include "prcm43xx.h"
 #include "prcm44xx.h"
+#include "prcm_mpu44xx.h"
 #include "common.h"
 #include "clock.h"
 #include "cm.h"
@@ -697,6 +698,13 @@ static struct omap_prcm_init_data dra7_prm_data __initdata = {
 };
 #endif
 
+#if defined(CONFIG_ARCH_OMAP4) || defined(CONFIG_SOC_OMAP5) || \
+	defined(CONFIG_SOC_DRA7XX)
+static struct omap_prcm_init_data omap4_prcm_mpu_data __initdata = {
+	.part = OMAP4430_PRCM_MPU_PARTITION,
+};
+#endif
+
 #ifdef CONFIG_SOC_AM43XX
 static struct omap_prcm_init_data am4_prm_data __initdata = {
 	.index = TI_CLKM_PRM,
@@ -741,6 +749,10 @@ static const struct of_device_id omap_prcm_dt_match_table[] __initconst = {
 #ifdef CONFIG_SOC_DRA7XX
 	{ .compatible = "ti,dra7-prm", .data = &dra7_prm_data },
 #endif
+#if defined(CONFIG_ARCH_OMAP4) || defined(CONFIG_SOC_OMAP5) || \
+	defined(CONFIG_SOC_DRA7XX)
+	{ .compatible = "ti,omap4-prcm-mpu", .data = &omap4_prcm_mpu_data },
+#endif
 	{ }
 };
 
@@ -768,6 +780,9 @@ int __init omap2_prm_base_init(void)
 
 		if (data->index == TI_CLKM_PRM)
 			prm_base = mem + data->offset;
+
+		if (data->part == OMAP4430_PRCM_MPU_PARTITION)
+			omap2_set_globals_prcm_mpu(mem);
 
 		data->mem = mem;
 
@@ -812,6 +827,9 @@ int __init omap_prcm_init(void)
 
 	for_each_matching_node_and_match(np, omap_prcm_dt_match_table, &match) {
 		data = match->data;
+
+		if (data->part == OMAP4430_PRCM_MPU_PARTITION)
+			continue;
 
 		ret = omap2_clk_provider_init(np, data->index, NULL, data->mem);
 		if (ret)

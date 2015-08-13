@@ -48,7 +48,6 @@
 #include "cm44xx.h"
 #include "prm.h"
 #include "cm.h"
-#include "prcm_mpu44xx.h"
 #include "prminst44xx.h"
 #include "prm2xxx.h"
 #include "prm3xxx.h"
@@ -628,7 +627,6 @@ void __init omap4430_init_early(void)
 {
 	omap2_set_globals_tap(OMAP443X_CLASS,
 			      OMAP2_L4_IO_ADDRESS(OMAP443X_SCM_BASE));
-	omap2_set_globals_prcm_mpu(OMAP2_L4_IO_ADDRESS(OMAP4430_PRCM_MPU_BASE));
 	omap2_control_base_init();
 	omap4xxx_check_revision();
 	omap4xxx_check_features();
@@ -656,7 +654,6 @@ void __init omap5_init_early(void)
 {
 	omap2_set_globals_tap(OMAP54XX_CLASS,
 			      OMAP2_L4_IO_ADDRESS(OMAP54XX_SCM_BASE));
-	omap2_set_globals_prcm_mpu(OMAP2_L4_IO_ADDRESS(OMAP54XX_PRCM_MPU_BASE));
 	omap2_control_base_init();
 	omap4_pm_init_early();
 	omap2_prcm_base_init();
@@ -681,7 +678,6 @@ void __init omap5_init_late(void)
 void __init dra7xx_init_early(void)
 {
 	omap2_set_globals_tap(-1, OMAP2_L4_IO_ADDRESS(DRA7XX_TAP_BASE));
-	omap2_set_globals_prcm_mpu(OMAP2_L4_IO_ADDRESS(OMAP54XX_PRCM_MPU_BASE));
 	omap2_control_base_init();
 	omap4_pm_init_early();
 	omap2_prcm_base_init();
