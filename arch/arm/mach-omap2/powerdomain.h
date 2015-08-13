@@ -75,6 +75,7 @@
 struct clockdomain;
 struct powerdomain;
 struct voltagedomain;
+struct of_device_id;
 
 /**
  * struct powerdomain - OMAP powerdomain
@@ -110,19 +111,19 @@ struct voltagedomain;
  * @prcm_partition possible values are defined in mach-omap2/prcm44xx.h.
  */
 struct powerdomain {
-	const char *name;
+	char *name;
 	union {
 		const char *name;
 		struct voltagedomain *ptr;
 	} voltdm;
-	const s16 prcm_offs;
+	s16 prcm_offs;
 	const u8 pwrsts;
 	const u8 pwrsts_logic_ret;
 	const u8 flags;
 	const u8 banks;
 	const u8 pwrsts_mem_ret[PWRDM_MAX_MEM_BANKS];
 	const u8 pwrsts_mem_on[PWRDM_MAX_MEM_BANKS];
-	const u8 prcm_partition;
+	u8 prcm_partition;
 	struct clockdomain *pwrdm_clkdms[PWRDM_MAX_CLKDMS];
 	struct list_head node;
 	struct list_head voltdm_node;
@@ -272,5 +273,7 @@ extern struct powerdomain gfx_omap2_pwrdm;
 
 extern void pwrdm_lock(struct powerdomain *pwrdm);
 extern void pwrdm_unlock(struct powerdomain *pwrdm);
+
+int of_omap_powerdomain_init(const struct of_device_id *match);
 
 #endif

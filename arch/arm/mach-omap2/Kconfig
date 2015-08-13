@@ -24,6 +24,7 @@ config ARCH_OMAP4
 	select ARCH_OMAP2PLUS
 	select ARCH_NEEDS_CPU_IDLE_COUPLED if SMP
 	select ARM_CPU_SUSPEND if PM
+	select PM_GENERIC_DOMAINS if PM
 	select ARM_ERRATA_720789
 	select ARM_GIC
 	select HAVE_ARM_SCU if SMP

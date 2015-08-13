@@ -123,7 +123,7 @@ struct omap_hwmod;
  *     definitions (OMAP4 only)
  */
 struct clockdomain {
-	const char *name;
+	char *name;
 	union {
 		const char *name;
 		struct powerdomain *ptr;
@@ -132,9 +132,9 @@ struct clockdomain {
 	const u8 flags;
 	u8 _flags;
 	const u8 dep_bit;
-	const u8 prcm_partition;
-	const u16 cm_inst;
-	const u16 clkdm_offs;
+	u8 prcm_partition;
+	u16 cm_inst;
+	u16 clkdm_offs;
 	struct clkdm_dep *wkdep_srcs;
 	struct clkdm_dep *sleepdep_srcs;
 	int usecount;
@@ -234,5 +234,7 @@ extern struct clkdm_ops am43xx_clkdm_operations;
 extern struct clkdm_dep gfx_24xx_wkdeps[];
 extern struct clkdm_dep dsp_24xx_wkdeps[];
 extern struct clockdomain wkup_common_clkdm;
+
+int of_omap_clockdomain_init(const struct of_device_id *match);
 
 #endif
