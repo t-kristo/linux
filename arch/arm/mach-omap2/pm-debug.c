@@ -26,11 +26,15 @@
 #include <linux/io.h>
 #include <linux/module.h>
 #include <linux/slab.h>
+#include <linux/reset.h>
+#include <linux/of.h>
+#include <linux/uaccess.h>
 
 #include "clock.h"
 #include "powerdomain.h"
 #include "clockdomain.h"
 #include "omap-pm.h"
+#include "omap_hwmod.h"
 
 #include "soc.h"
 #include "cm2xxx_3xxx.h"
@@ -253,6 +257,201 @@ static int option_set(void *data, u64 val)
 
 DEFINE_SIMPLE_ATTRIBUTE(pm_dbg_option_fops, option_get, option_set, "%llu\n");
 
+static int hwmod_get(void *data, u64 *val)
+{
+	*val = 0;
+
+	return 0;
+}
+
+static int hwmod_set(void *data, u64 val)
+{
+	struct omap_hwmod *oh = data;
+
+	if (val)
+		omap_hwmod_enable(oh);
+	else
+		omap_hwmod_idle(oh);
+
+	return 0;
+}
+
+DEFINE_SIMPLE_ATTRIBUTE(hwmod_control_fops, hwmod_get, hwmod_set, "%llu\n");
+
+static int hwmod_reset_get(void *data, u64 *val)
+{
+	*val = 0;
+	return 0;
+}
+
+static int hwmod_reset_set(void *data, u64 val)
+{
+	struct omap_hwmod *oh = data;
+	int i;
+
+	if (val)
+		for (i = 0; i < oh->rst_lines_cnt; i++)
+			omap_hwmod_assert_hardreset(oh, oh->rst_lines[i].name);
+	else
+		for (i = 0; i < oh->rst_lines_cnt; i++) {
+			omap_hwmod_deassert_hardreset(oh,
+						      oh->rst_lines[i].name);
+		}
+
+	return 0;
+}
+
+DEFINE_SIMPLE_ATTRIBUTE(hwmod_reset_fops, hwmod_reset_get, hwmod_reset_set,
+			"%llu\n");
+
+static int reset_get(void *data, u64 *val)
+{
+	struct reset_control *rc = data;
+
+	*val = reset_control_status(rc);
+
+	return 0;
+}
+
+static int reset_set(void *data, u64 val)
+{
+	struct reset_control *rc = data;
+
+	if (val)
+		reset_control_assert(rc);
+	else
+		reset_control_deassert(rc);
+
+	return 0;
+}
+
+DEFINE_SIMPLE_ATTRIBUTE(reset_control_fops, reset_get, reset_set, "%llu\n");
+
+static int reset_signal_show(struct seq_file *s, void *unused)
+{
+	return 0;
+}
+
+static int reset_create_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, reset_signal_show, inode->i_private);
+}
+
+static ssize_t reset_create_write(struct file *file,
+				  const char __user *user_buf,
+				  size_t count, loff_t *ppos)
+{
+	char *buf;
+	struct omap_hwmod *oh;
+	struct reset_control *reset;
+	const char *reset_name;
+	const char *oh_name;
+	int i;
+	int ret;
+	struct dentry *d = ((struct seq_file *)file->private_data)->private;
+	struct device_node *np;
+	int idx;
+	char *c;
+
+	buf = kmalloc(count, GFP_KERNEL);
+
+	ret = copy_from_user(buf, user_buf, count);
+	if (ret)
+		goto cleanup;
+
+	buf[count - 1] = 0;
+
+	c = buf;
+	idx = 0;
+
+	while (*c) {
+		if (*c == ':') {
+			*c = 0;
+			c++;
+			ret = kstrtoint(c, 10, &idx);
+			if (ret) {
+				pr_err("%s: bad index: %s\n", __func__, c);
+				goto cleanup;
+			}
+			break;
+		}
+		c++;
+	}
+
+	pr_info("%s: looking up %s:%d...\n", __func__, buf, idx);
+
+	np = NULL;
+
+	while (idx >= 0) {
+		np = of_find_node_by_name(np, buf);
+		idx--;
+		if (!np)
+			break;
+	}
+
+	if (!np) {
+		pr_err("%s: node %s not found\n", __func__, buf);
+		ret = -EINVAL;
+		goto cleanup;
+	}
+
+	of_property_read_string_index(np, "ti,hwmods", 0, &oh_name);
+
+	oh = omap_hwmod_lookup(oh_name);
+	if (!oh) {
+		pr_err("%s: hwmod %s for %s not found\n", __func__,
+		       oh_name, buf);
+		ret = -EINVAL;
+		goto cleanup;
+	}
+
+	d = debugfs_create_dir(oh_name, d);
+
+	debugfs_create_file("hwmod_enable", S_IRUGO | S_IWUSR, d, (void *)oh,
+			    &hwmod_control_fops);
+
+	debugfs_create_file("hwmod_hardreset", S_IRUGO | S_IWUSR, d,
+			    (void *)oh, &hwmod_reset_fops);
+
+	i = 0;
+
+	while (1) {
+		ret = of_property_read_string_index(np, "reset-names", i,
+						    &reset_name);
+		if (ret) {
+			ret = 0;
+			pr_info("%s: created %s\n", __func__, oh_name);
+			goto cleanup;
+		}
+
+		reset = of_reset_control_get(np, reset_name);
+		if (IS_ERR(reset)) {
+			ret = PTR_ERR(reset);
+			goto cleanup;
+		}
+
+		debugfs_create_file(reset_name, S_IRUGO | S_IWUSR, d,
+				    (void *)reset, &reset_control_fops);
+		i++;
+	}
+
+cleanup:
+	kfree(buf);
+
+	if (ret)
+		return ret;
+
+	return count;
+}
+
+static const struct file_operations reset_create_fops = {
+	.open		= reset_create_open,
+	.read		= seq_read,
+	.write		= reset_create_write,
+	.llseek		= seq_lseek,
+	.release	= single_release,
+};
+
 static int __init pm_dbg_init(void)
 {
 	struct dentry *d;
@@ -273,6 +472,14 @@ static int __init pm_dbg_init(void)
 
 	(void) debugfs_create_file("enable_off_mode", S_IRUGO | S_IWUSR, d,
 				   &enable_off_mode, &pm_dbg_option_fops);
+
+	d = debugfs_create_dir("resets", d);
+
+	pr_info("%s: resets-dir=%08x\n", __func__, (u32)d);
+
+	(void)debugfs_create_file("create", S_IRUGO | S_IWUSR, d,
+				  d, &reset_create_fops);
+
 	pm_dbg_init_done = 1;
 
 	return 0;
