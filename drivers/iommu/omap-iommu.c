@@ -168,6 +168,7 @@ static void omap2_iommu_disable(struct omap_iommu *obj)
 static int iommu_enable(struct omap_iommu *obj)
 {
 	int err;
+	/*
 	struct platform_device *pdev = to_platform_device(obj->dev);
 	struct iommu_platform_data *pdata = dev_get_platdata(&pdev->dev);
 
@@ -178,7 +179,13 @@ static int iommu_enable(struct omap_iommu *obj)
 			return err;
 		}
 	}
+	*/
 
+	err = reset_control_deassert(obj->rstctrl);
+	if (err) {
+		dev_err(obj->dev, "reset_control_deassert failed: %d\n", err);
+		return err;
+	}
 	pm_runtime_get_sync(obj->dev);
 
 	err = omap2_iommu_enable(obj);
@@ -188,15 +195,20 @@ static int iommu_enable(struct omap_iommu *obj)
 
 static void iommu_disable(struct omap_iommu *obj)
 {
+	/*
 	struct platform_device *pdev = to_platform_device(obj->dev);
 	struct iommu_platform_data *pdata = dev_get_platdata(&pdev->dev);
+	*/
 
 	omap2_iommu_disable(obj);
 
 	pm_runtime_put_sync(obj->dev);
 
-	if (pdata && pdata->assert_reset)
-		pdata->assert_reset(pdev, pdata->reset_name);
+	if (reset_control_assert(obj->rstctrl))
+		dev_err(obj->dev, "reset_control_assert failed\n");
+
+	/*if (pdata && pdata->assert_reset)
+		pdata->assert_reset(pdev, pdata->reset_name);*/
 }
 
 /*
@@ -891,6 +903,10 @@ static int omap_iommu_probe(struct platform_device *pdev)
 			return -EINVAL;
 		if (of_find_property(of, "ti,iommu-bus-err-back", NULL))
 			obj->has_bus_err_back = MMU_GP_REG_BUS_ERR_BACK_EN;
+
+		obj->rstctrl = of_reset_control_get(of, NULL);
+		if (IS_ERR(obj->rstctrl))
+			return PTR_ERR(obj->rstctrl);
 	} else {
 		obj->nr_tlb_entries = pdata->nr_tlb_entries;
 		obj->name = pdata->name;
@@ -931,6 +947,10 @@ static int omap_iommu_remove(struct platform_device *pdev)
 	struct omap_iommu *obj = platform_get_drvdata(pdev);
 
 	iopgtable_clear_entry_all(obj);
+
+	if (obj->rstctrl)
+		reset_control_put(obj->rstctrl);
+
 	omap_iommu_debugfs_remove(obj);
 
 	pm_runtime_disable(obj->dev);

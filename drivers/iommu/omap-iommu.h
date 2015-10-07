@@ -14,6 +14,7 @@
 #define _OMAP_IOMMU_H
 
 #include <linux/bitops.h>
+#include <linux/reset.h>
 
 #define for_each_iotlb_cr(obj, n, __i, cr)				\
 	for (__i = 0;							\
@@ -33,6 +34,7 @@ struct omap_iommu {
 	struct device	*dev;
 	struct iommu_domain *domain;
 	struct dentry	*debug_dir;
+	struct reset_control	*rstctrl;
 
 	spinlock_t	iommu_lock;	/* global for this whole object */
 
