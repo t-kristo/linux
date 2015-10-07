@@ -1035,6 +1035,12 @@
 			};
 		};
 	};
+
+	iommu_test {
+		compatible = "ti,omap-iommu-test";
+		iommus = <&mmu_dsp>;
+		/* iommus = <&mmu_ipu>; */
+	};
 };
 
 /include/ "omap44xx-clocks.dtsi"
