@@ -311,6 +311,8 @@ static void _write_sysconfig(u32 v, struct omap_hwmod *oh)
 	if (oh->class->unlock)
 		oh->class->unlock(oh);
 
+	if (oh->rst_lines_cnt)
+		pr_info("%s: %s: writing sysc=%08x\n", __func__, oh->name, v);
 	omap_hwmod_write(v, oh, oh->class->sysc->sysc_offs);
 
 	if (oh->class->lock)
@@ -1652,6 +1654,8 @@ static int _assert_hardreset(struct omap_hwmod *oh, const char *name)
 	if (ret < 0)
 		return ret;
 
+	pr_info("%s: %s - %s\n", __func__, oh->name, name);
+
 	ret = soc_ops.assert_hardreset(oh, &ohri);
 
 	return ret;
@@ -1660,6 +1664,8 @@ static int _assert_hardreset(struct omap_hwmod *oh, const char *name)
 static int _deassert_hardreset_prepare(struct omap_hwmod *oh, int *hwsup)
 {
 	int ret;
+
+	pr_info("%s: %s\n", __func__, oh->name);
 
 	*hwsup = 0;
 
@@ -1690,6 +1696,8 @@ static int _deassert_hardreset_prepare(struct omap_hwmod *oh, int *hwsup)
 
 static void _deassert_hardreset_complete(struct omap_hwmod *oh, int hwsup)
 {
+	pr_info("%s: %s, hwsup=%d\n", __func__, oh->name, hwsup);
+
 	if (soc_ops.disable_module && oh->_state != _HWMOD_STATE_ENABLED)
 		soc_ops.disable_module(oh);
 
@@ -1735,6 +1743,8 @@ static int _deassert_hardreset(struct omap_hwmod *oh, const char *name)
 	ret = _lookup_hardreset(oh, name, &ohri);
 	if (ret < 0)
 		return ret;
+
+	pr_info("%s: %s - %s\n", __func__, oh->name, name);
 
 	_deassert_hardreset_prepare(oh, &hwsup);
 
@@ -1848,6 +1858,8 @@ int _reset_notify(int id, int msg, ...)
 
 	spin_lock_irqsave(&notify_lock, flags);
 
+	pr_info("%s: id=%d, msg=%d\n", __func__, id, msg);
+
 	va_start(arg_list, msg);
 
 	switch (msg) {
@@ -1868,6 +1880,8 @@ int _reset_notify(int id, int msg, ...)
 
 	case TI_RESET_POST_INIT:
 		if (index >= 0) {
+			pr_info("%s: mapping reset %d to %s\n", __func__,
+				index, oh->name);
 			reset = kzalloc(sizeof(*reset), GFP_ATOMIC);
 			if (!reset)
 				return -ENOMEM;
@@ -2178,7 +2192,8 @@ static int _enable(struct omap_hwmod *oh)
 	int r;
 	int hwsup = 0;
 
-	pr_debug("omap_hwmod: %s: enabling\n", oh->name);
+	if (oh->rst_lines_cnt)
+		pr_info("omap_hwmod: %s: enabling\n", oh->name);
 
 	/*
 	 * hwmods with HWMOD_INIT_NO_IDLE flag set are left in enabled
@@ -2298,7 +2313,8 @@ static int _enable(struct omap_hwmod *oh)
  */
 static int _idle(struct omap_hwmod *oh)
 {
-	pr_debug("omap_hwmod: %s: idling\n", oh->name);
+	if (oh->rst_lines_cnt)
+		pr_info("omap_hwmod: %s: idling\n", oh->name);
 
 	if (oh->_state != _HWMOD_STATE_ENABLED) {
 		WARN(1, "omap_hwmod: %s: idle state can only be entered from enabled state\n",
