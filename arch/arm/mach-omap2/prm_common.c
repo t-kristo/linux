@@ -761,6 +761,42 @@ struct ti_reset_ctrl {
 	s16 offset;
 };
 
+struct ti_reset_notifier {
+	int (*func)(int id, int msg);
+	struct list_head node;
+};
+
+static LIST_HEAD(reset_notifier_list);
+
+static int ti_reset_notify(int id, int msg)
+{
+	struct ti_reset_notifier *notifier;
+	int ret;
+
+	list_for_each_entry(notifier, &reset_notifier_list, node) {
+		ret = notifier->func(id, msg);
+		if (ret)
+			return ret;
+	}
+
+	return 0;
+}
+
+int omap_prcm_register_reset_notifier(int (*func)(int id, int msg))
+{
+	struct ti_reset_notifier *notifier;
+
+	notifier = kzalloc(sizeof(*notifier), GFP_KERNEL);
+
+	if (!notifier)
+		return -ENOMEM;
+
+	notifier->func = func;
+	list_add_tail(&notifier->node, &reset_notifier_list);
+
+	return 0;
+}
+
 #define to_ti_reset_ctrl(_rcdev) container_of(_rcdev, struct ti_reset_ctrl, \
 					      rcdev)
 
@@ -776,19 +812,33 @@ static int ti_reset_assert(struct reset_controller_dev *rcdev,
 			   unsigned long id)
 {
 	struct ti_reset_data *reset = _get_reset(rcdev, id);
+	int ret;
 
-	return omap_prm_assert_hardreset(reset->shift, reset->part,
-					 reset->module, reset->offset);
+	ti_reset_notify(id, TI_RESET_PRE_ASSERT);
+
+	ret = omap_prm_assert_hardreset(reset->shift, reset->part,
+					reset->module, reset->offset);
+
+	ti_reset_notify(id, TI_RESET_POST_ASSERT);
+
+	return ret;
 }
 
 static int ti_reset_deassert(struct reset_controller_dev *rcdev,
 			     unsigned long id)
 {
 	struct ti_reset_data *reset = _get_reset(rcdev, id);
+	int ret;
 
-	return omap_prm_deassert_hardreset(reset->shift, reset->st_shift,
-					   reset->part, reset->module,
-					   reset->offset, reset->st_offset);
+	ti_reset_notify(id, TI_RESET_PRE_DEASSERT);
+
+	ret = omap_prm_deassert_hardreset(reset->shift, reset->st_shift,
+					  reset->part, reset->module,
+					  reset->offset, reset->st_offset);
+
+	ti_reset_notify(id, TI_RESET_POST_DEASSERT);
+
+	return ret;
 }
 
 static int ti_reset_status(struct reset_controller_dev *rcdev,
@@ -864,6 +914,8 @@ static int ti_reset_xlate(struct reset_controller_dev *rcdev,
 
 	ctrl->resets[index] = reset;
 	ctrl->num_resets++;
+
+	ti_reset_notify(index, TI_RESET_INIT);
 
 	return index;
 }

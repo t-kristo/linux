@@ -553,6 +553,18 @@ extern int omap_prcm_event_to_irq(const char *event);
 extern void omap_prcm_irq_prepare(void);
 extern void omap_prcm_irq_complete(void);
 
+enum {
+	TI_RESET_PRE_INIT,
+	TI_RESET_INIT,
+	TI_RESET_POST_INIT,
+	TI_RESET_PRE_ASSERT,
+	TI_RESET_POST_ASSERT,
+	TI_RESET_PRE_DEASSERT,
+	TI_RESET_POST_DEASSERT
+};
+
+int omap_prcm_register_reset_notifier(int (*func)(int id, int msg));
+
 # endif
 
 #endif
