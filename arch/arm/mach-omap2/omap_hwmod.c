@@ -1828,6 +1828,88 @@ static bool _are_any_hardreset_lines_asserted(struct omap_hwmod *oh)
 	return (rst_cnt) ? true : false;
 }
 
+struct hwmod_reset_data {
+	struct omap_hwmod *oh;
+	int index;
+	int hwsup;
+	struct list_head node;
+};
+
+int _reset_notify(int id, int msg, ...)
+{
+	va_list arg_list;
+	static struct omap_hwmod *oh;
+	static int index = -ENOENT;
+	int ret = 0;
+	static DEFINE_SPINLOCK(notify_lock);
+	unsigned long flags;
+	static LIST_HEAD(resets_list);
+	struct hwmod_reset_data *reset;
+
+	spin_lock_irqsave(&notify_lock, flags);
+
+	va_start(arg_list, msg);
+
+	switch (msg) {
+	case TI_RESET_PRE_INIT:
+		oh = va_arg(arg_list, struct omap_hwmod *);
+		break;
+
+	case TI_RESET_INIT:
+		if (oh) {
+			if (index != -ENOENT) {
+				ret = -EAGAIN;
+				index = -EAGAIN;
+			} else {
+				index = id;
+			}
+		}
+		break;
+
+	case TI_RESET_POST_INIT:
+		if (index >= 0) {
+			reset = kzalloc(sizeof(*reset), GFP_ATOMIC);
+			if (!reset)
+				return -ENOMEM;
+
+			reset->oh = oh;
+			reset->index = index;
+
+			list_add_tail(&reset->node, &resets_list);
+
+			index = -ENOENT;
+			oh = NULL;
+		}
+		break;
+
+	case TI_RESET_PRE_DEASSERT:
+		list_for_each_entry(reset, &resets_list, node) {
+			if (reset->index == id) {
+				_deassert_hardreset_prepare(reset->oh,
+							    &reset->hwsup);
+				break;
+			}
+		}
+		break;
+
+	case TI_RESET_POST_DEASSERT:
+		list_for_each_entry(reset, &resets_list, node) {
+			if (reset->index == id) {
+				_deassert_hardreset_complete(reset->oh,
+							     reset->hwsup);
+				break;
+			}
+		}
+		break;
+	}
+
+	va_end(arg_list);
+
+	spin_unlock_irqrestore(&notify_lock, flags);
+
+	return ret;
+}
+
 /**
  * _omap4_disable_module - enable CLKCTRL modulemode on OMAP4
  * @oh: struct omap_hwmod *
@@ -2480,6 +2562,7 @@ static int __init _init_resets(struct omap_hwmod *oh, struct device_node *np)
 	int ret;
 	const char *reset_name;
 	struct reset_control *rc;
+	int retries;
 
 	num = of_property_count_strings(np, "reset-names");
 	if (num < 1)
@@ -2489,14 +2572,30 @@ static int __init _init_resets(struct omap_hwmod *oh, struct device_node *np)
 				GFP_KERNEL);
 
 	for (i = 0; i < num; i++) {
+		retries = 5;
 		ret = of_property_read_string_index(np, "reset-names", i,
 						    &reset_name);
 		if (ret)
 			goto cleanup;
 
+retry:
+		_reset_notify(0, TI_RESET_PRE_INIT, oh);
 		rc = of_reset_control_get(np, reset_name);
+		ret = _reset_notify(0, TI_RESET_POST_INIT, oh);
 		if (IS_ERR(rc)) {
 			ret = PTR_ERR(rc);
+			goto cleanup;
+		}
+
+		if (ret) {
+			if (ret == -EAGAIN) {
+				retries--;
+				if (retries) {
+					reset_control_put(rc);
+					goto retry;
+				}
+				ret = -EBUSY;
+			}
 			goto cleanup;
 		}
 
@@ -3324,6 +3423,8 @@ int __init omap_hwmod_setup_one(const char *oh_name)
 static int __init omap_hwmod_setup_all(void)
 {
 	_ensure_mpu_hwmod_is_setup(NULL);
+
+	omap_prcm_register_reset_notifier((int (*)(int, int))_reset_notify);
 
 	omap_hwmod_for_each(_init, NULL);
 	omap_hwmod_for_each(_setup, NULL);
