@@ -789,11 +789,20 @@ static int _init_main_clk(struct omap_hwmod *oh)
 	if (!oh->main_clk)
 		return 0;
 
-	oh->_clk = clk_get(NULL, oh->main_clk);
-	if (IS_ERR(oh->_clk)) {
-		pr_warn("omap_hwmod: %s: cannot clk_get main_clk %s\n",
-			oh->name, oh->main_clk);
-		return -EINVAL;
+	if (of_have_populated_dt()) {
+		struct of_phandle_args clkspec;
+
+		clkspec.np = of_find_node_by_name(NULL, oh->main_clk);
+		oh->_clk = of_clk_get_from_provider(&clkspec);
+	}
+
+	if (!oh->_clk) {
+		oh->_clk = clk_get(NULL, oh->main_clk);
+		if (IS_ERR(oh->_clk)) {
+			pr_warn("omap_hwmod: %s: cannot clk_get main_clk %s\n",
+				oh->name, oh->main_clk);
+			return -EINVAL;
+		}
 	}
 	/*
 	 * HACK: This needs a re-visit once clk_prepare() is implemented
