@@ -1,0 +1,59 @@
+Binding for Texas Instruments module clock.
+
+Binding status: Unstable - ABI compatibility may be broken in the future
+
+This binding uses the common clock binding[1]. This clock is
+quite much similar to the basic gate-clock [2], however, internally
+it controls an OMAP module clock, which effectively handles
+both interface and functional clocks for a single module. In some
+cases, support for mux clock [3] is composited to the same clock node,
+currently only needed for proper support of timer module clocks.
+
+[1] Documentation/devicetree/bindings/clock/clock-bindings.txt
+[2] Documentation/devicetree/bindings/clock/ti/gate.txt
+[3] Documentation/devicetree/bindings/clock/ti/mux.txt
+
+Required properties:
+- compatible : shall be one of:
+  "ti,omap4-mod-clock" - basic module clock, no gating supported
+  "ti,omap4-hw-mod-clock" - module clock with hardware gating support
+  "ti,omap4-sw-mod-clock" - module clock with software forced gating support
+  "ti,omap4-sw-no-idlest-mod-clock" - module clock with software forced gating
+				      support, misses idlest
+  "ti,omap4-mux-mod-clock" - composite clock with mux and module clocks, no
+			     gating supported
+  "ti,omap4-hw-mux-mod-clock" - composite clock with mux and module clocks,
+				with hardware gating
+  "ti,omap4-sw-mux-mod-clock" - composite clock with mux and module clocks,
+				with software forced gating
+
+- #clock-cells : from common clock binding; shall be set to 0
+- clocks : link to phandle of parent clock(s)
+- reg : offset for register controlling adjustable gate and optional mux
+
+Optional properties:
+- ti,bit-shift : bit shift for programming the clock mux, only needed for
+		 the nodes of the mux variant
+
+Examples:
+	timer6_mod_ck: timer6_mod_ck {
+		#clock-cells = <0>;
+		compatible = "ti,omap4-sw-mux-mod-clock";
+		reg = <0x0570>;
+		clocks = <&syc_clk_div_ck>, <&sys_32k_ck>;
+		ti,bit-shift = <24>;
+	};
+
+	i2c1_mod_ck: i2c1_mod_ck {
+		#clock-cells = <0>;
+		compatible = "ti,omap4-sw-mod-clock";
+		reg = <0x14a0>;
+		clocks = <&func_96m_fclk>;
+	};
+
+	hsi_mod_ck: hsi_mod_ck {
+		#clock-cells = <0>;
+		compatible = "ti,omap4-hw-mod-clock";
+		reg = <0x1338>;
+		clocks = <&hsi_fck>;
+	};
