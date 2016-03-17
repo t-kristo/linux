@@ -124,7 +124,7 @@
 		};
 
 		k2g_clks: k2g_clks {
-			compatible = "ti,sci-clk";
+			compatible = "ti,k2g-sci-clk";
 			ti,sci = <&pmmc>;
 			#clock-cells = <2>;
 		};
