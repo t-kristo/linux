@@ -220,8 +220,8 @@ struct clk *ti_clk_register_dpll(struct ti_clk *setup)
 	if (dpll->num_parents < 2)
 		return ERR_PTR(-EINVAL);
 
-	clk_ref = clk_get_sys(NULL, dpll->parents[0]);
-	clk_bypass = clk_get_sys(NULL, dpll->parents[1]);
+	clk_ref = ti_clk_get(dpll->parents[0]);
+	clk_bypass = ti_clk_get(dpll->parents[1]);
 
 	if (IS_ERR_OR_NULL(clk_ref) || IS_ERR_OR_NULL(clk_bypass))
 		return ERR_PTR(-EAGAIN);
