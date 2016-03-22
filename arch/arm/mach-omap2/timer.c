@@ -42,6 +42,7 @@
 #include <linux/platform_device.h>
 #include <linux/platform_data/dmtimer-omap.h>
 #include <linux/sched_clock.h>
+#include <linux/clk/ti.h>
 
 #include <asm/mach/time.h>
 #include <asm/smp_twd.h>
@@ -290,11 +291,11 @@ static int __init omap_dm_timer_init_one(struct omap_dm_timer *timer,
 		return -ENXIO;
 
 	/* After the dmtimer is using hwmod these clocks won't be needed */
-	timer->fclk = clk_get(NULL, omap_hwmod_get_main_clk(oh));
+	timer->fclk = ti_clk_get(omap_hwmod_get_main_clk(oh));
 	if (IS_ERR(timer->fclk))
 		return PTR_ERR(timer->fclk);
 
-	src = clk_get(NULL, fck_source);
+	src = ti_clk_get(fck_source);
 	if (IS_ERR(src))
 		return PTR_ERR(src);
 
@@ -556,7 +557,7 @@ static void __init realtime_counter_init(void)
 		pr_err("%s: ioremap failed\n", __func__);
 		return;
 	}
-	sys_clk = clk_get(NULL, "sys_clkin");
+	sys_clk = ti_clk_get("sys_clkin");
 	if (IS_ERR(sys_clk)) {
 		pr_err("%s: failed to get system clock handle\n", __func__);
 		iounmap(base);

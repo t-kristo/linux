@@ -12,6 +12,7 @@
 #include <linux/init.h>
 #include <linux/clk.h>
 #include <linux/io.h>
+#include <linux/clk/ti.h>
 
 #include "soc.h"
 #include "common.h"
@@ -52,11 +53,11 @@ void omap2xxx_restart(enum reboot_mode mode, const char *cmd)
  */
 static int __init omap2xxx_common_look_up_clks_for_reset(void)
 {
-	reset_virt_prcm_set_ck = clk_get(NULL, "virt_prcm_set");
+	reset_virt_prcm_set_ck = ti_clk_get("virt_prcm_set");
 	if (IS_ERR(reset_virt_prcm_set_ck))
 		return -EINVAL;
 
-	reset_sys_ck = clk_get(NULL, "sys_ck");
+	reset_sys_ck = ti_clk_get("sys_ck");
 	if (IS_ERR(reset_sys_ck))
 		return -EINVAL;
 
