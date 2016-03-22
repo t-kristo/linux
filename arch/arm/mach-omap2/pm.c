@@ -164,7 +164,7 @@ static int __init omap2_set_init_voltage(char *vdd_name, char *clk_name,
 		goto exit;
 	}
 
-	clk =  clk_get(NULL, clk_name);
+	clk =  ti_clk_get(clk_name);
 	if (IS_ERR(clk)) {
 		pr_err("%s: unable to get clk %s\n", __func__, clk_name);
 		goto exit;

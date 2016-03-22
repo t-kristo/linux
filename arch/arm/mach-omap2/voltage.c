@@ -26,6 +26,7 @@
 #include <linux/debugfs.h>
 #include <linux/slab.h>
 #include <linux/clk.h>
+#include <linux/clk/ti.h>
 
 #include "common.h"
 
@@ -246,7 +247,7 @@ int __init omap_voltage_late_init(void)
 		if (!voltdm->scalable)
 			continue;
 
-		sys_ck = clk_get(NULL, voltdm->sys_clk.name);
+		sys_ck = ti_clk_get(voltdm->sys_clk.name);
 		if (IS_ERR(sys_ck)) {
 			pr_warn("%s: Could not get sys clk.\n", __func__);
 			return -EINVAL;

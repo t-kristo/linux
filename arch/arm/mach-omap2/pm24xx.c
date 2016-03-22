@@ -286,14 +286,14 @@ int __init omap2_pm_init(void)
 		pr_err("PM: gfx_clkdm not found\n");
 
 
-	osc_ck = clk_get(NULL, "osc_ck");
+	osc_ck = ti_clk_get("osc_ck");
 	if (IS_ERR(osc_ck)) {
 		printk(KERN_ERR "could not get osc_ck\n");
 		return -ENODEV;
 	}
 
 	if (cpu_is_omap242x()) {
-		emul_ck = clk_get(NULL, "emul_ck");
+		emul_ck = ti_clk_get("emul_ck");
 		if (IS_ERR(emul_ck)) {
 			printk(KERN_ERR "could not get emul_ck\n");
 			clk_put(osc_ck);

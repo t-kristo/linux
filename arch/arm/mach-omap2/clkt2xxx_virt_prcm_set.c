@@ -200,7 +200,7 @@ void omap2xxx_clkt_vps_late_init(void)
 {
 	struct clk *c;
 
-	c = clk_get(NULL, "sys_ck");
+	c = ti_clk_get("sys_ck");
 	if (IS_ERR(c)) {
 		WARN(1, "could not locate sys_ck\n");
 	} else {
