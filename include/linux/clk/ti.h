@@ -292,6 +292,8 @@ struct ti_clk_features {
 void ti_clk_setup_features(struct ti_clk_features *features);
 const struct ti_clk_features *ti_clk_get_features(void);
 
+struct clk *ti_clk_get(const char *name);
+
 extern const struct clk_hw_omap_ops clkhwops_omap2xxx_dpll;
 
 #ifdef CONFIG_ATAGS
