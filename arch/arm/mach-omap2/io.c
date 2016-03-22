@@ -389,7 +389,7 @@ static int __init _omap2_init_reprogram_sdrc(void)
 	if (!cpu_is_omap34xx())
 		return 0;
 
-	dpll3_m2_ck = clk_get(NULL, "dpll3_m2_ck");
+	dpll3_m2_ck = ti_clk_get("dpll3_m2_ck");
 	if (IS_ERR(dpll3_m2_ck))
 		return -EINVAL;
 

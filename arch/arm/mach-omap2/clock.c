@@ -151,15 +151,15 @@ void __init omap2_clk_print_new_rates(const char *hfclkin_ck_name,
 	struct clk *hfclkin_ck, *core_ck, *mpu_ck;
 	unsigned long hfclkin_rate;
 
-	mpu_ck = clk_get(NULL, mpu_ck_name);
+	mpu_ck = ti_clk_get(mpu_ck_name);
 	if (WARN(IS_ERR(mpu_ck), "clock: failed to get %s.\n", mpu_ck_name))
 		return;
 
-	core_ck = clk_get(NULL, core_ck_name);
+	core_ck = ti_clk_get(core_ck_name);
 	if (WARN(IS_ERR(core_ck), "clock: failed to get %s.\n", core_ck_name))
 		return;
 
-	hfclkin_ck = clk_get(NULL, hfclkin_ck_name);
+	hfclkin_ck = ti_clk_get(hfclkin_ck_name);
 	if (WARN(IS_ERR(hfclkin_ck), "Failed to get %s.\n", hfclkin_ck_name))
 		return;
 
