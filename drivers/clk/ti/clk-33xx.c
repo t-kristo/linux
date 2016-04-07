@@ -65,10 +65,10 @@ int __init am33xx_dt_clk_init(void)
 	 */
 
 	clk1 = ti_clk_get("sys_clkin_ck");
-	clk2 = ti_clk_get("timer3_fck");
+	clk2 = ti_clk_get("timer3_mod_ck");
 	clk_set_parent(clk2, clk1);
 
-	clk2 = ti_clk_get("timer6_fck");
+	clk2 = ti_clk_get("timer6_mod_ck");
 	clk_set_parent(clk2, clk1);
 	/*
 	 * The On-Chip 32K RC Osc clock is not an accurate clock-source as per
