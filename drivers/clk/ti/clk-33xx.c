@@ -144,9 +144,15 @@ int __init am33xx_dt_clk_init(void)
 
 	clk1 = clk_get_sys(NULL, "sys_clkin_ck");
 	clk2 = clk_get_sys(NULL, "timer3_fck");
+	if (IS_ERR(clk2))
+		clk2 = clk_get_sys(NULL, "timer3_mod_ck");
+
 	clk_set_parent(clk2, clk1);
 
 	clk2 = clk_get_sys(NULL, "timer6_fck");
+	if (IS_ERR(clk2))
+		clk2 = clk_get_sys(NULL, "timer6_mod_ck");
+
 	clk_set_parent(clk2, clk1);
 	/*
 	 * The On-Chip 32K RC Osc clock is not an accurate clock-source as per
