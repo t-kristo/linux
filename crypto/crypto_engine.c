@@ -136,6 +136,14 @@ static void crypto_pump_work(struct kthread_work *work)
 	crypto_pump_requests(engine, true);
 }
 
+static void queue_pump_work(struct crypto_engine *engine)
+{
+	if (in_interrupt())
+		queue_kthread_work(&engine->kworker, &engine->pump_requests);
+	else
+		crypto_pump_requests(engine, true);
+}
+
 /**
  * crypto_transfer_request - transfer the new request into the engine queue
  * @engine: the hardware engine
@@ -156,10 +164,11 @@ int crypto_transfer_request(struct crypto_engine *engine,
 
 	ret = ablkcipher_enqueue_request(&engine->queue, req);
 
-	if (!engine->busy && need_pump)
-		queue_kthread_work(&engine->kworker, &engine->pump_requests);
-
 	spin_unlock_irqrestore(&engine->queue_lock, flags);
+
+	if (!engine->busy && need_pump)
+		queue_pump_work(engine);
+
 	return ret;
 }
 EXPORT_SYMBOL_GPL(crypto_transfer_request);
@@ -210,7 +219,7 @@ void crypto_finalize_request(struct crypto_engine *engine,
 
 	req->base.complete(&req->base, err);
 
-	queue_kthread_work(&engine->kworker, &engine->pump_requests);
+	queue_pump_work(engine);
 }
 EXPORT_SYMBOL_GPL(crypto_finalize_request);
 
@@ -234,7 +243,7 @@ int crypto_engine_start(struct crypto_engine *engine)
 	engine->running = true;
 	spin_unlock_irqrestore(&engine->queue_lock, flags);
 
-	queue_kthread_work(&engine->kworker, &engine->pump_requests);
+	queue_pump_work(engine);
 
 	return 0;
 }
