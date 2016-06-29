@@ -26,6 +26,8 @@
 
 static LIST_HEAD(clocks);
 static DEFINE_MUTEX(clocks_mutex);
+static struct clk * (*clkdev_get_helper)(const char *dev_id,
+					 const char *con_id);
 
 #if defined(CONFIG_OF) && defined(CONFIG_COMMON_CLK)
 static struct clk *__of_clk_get(struct device_node *np, int index,
@@ -190,7 +192,13 @@ struct clk *clk_get_sys(const char *dev_id, const char *con_id)
 out:
 	mutex_unlock(&clocks_mutex);
 
-	return cl ? clk : ERR_PTR(-ENOENT);
+	if (cl)
+		return clk;
+
+	if (clkdev_get_helper)
+		return clkdev_get_helper(dev_id, con_id);
+
+	return ERR_PTR(-ENOENT);
 }
 EXPORT_SYMBOL(clk_get_sys);
 
@@ -208,6 +216,18 @@ struct clk *clk_get(struct device *dev, const char *con_id)
 	return clk_get_sys(dev_id, con_id);
 }
 EXPORT_SYMBOL(clk_get);
+
+int clkdev_helper_register(struct clk * (*helper)(const char *,
+						  const char *))
+{
+	if (clkdev_get_helper)
+		return -EBUSY;
+
+	clkdev_get_helper = helper;
+
+	return 0;
+}
+EXPORT_SYMBOL(clkdev_helper_register);
 
 void clk_put(struct clk *clk)
 {

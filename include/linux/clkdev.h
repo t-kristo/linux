@@ -51,6 +51,7 @@ int clk_add_alias(const char *, const char *, const char *, struct device *);
 
 int clk_register_clkdev(struct clk *, const char *, const char *);
 int clk_hw_register_clkdev(struct clk_hw *, const char *, const char *);
+int clkdev_helper_register(struct clk * (*)(const char *, const char *));
 
 #ifdef CONFIG_COMMON_CLK
 int __clk_get(struct clk *clk);
