@@ -4600,9 +4600,9 @@ int __init omap3430es1_clk_legacy_init(void)
 {
 	int r;
 
-	r = ti_clk_register_legacy_clks(omap3430es1_clks);
-	r |= ti_clk_register_legacy_clks(omap34xx_omap36xx_clks);
-	r |= ti_clk_register_legacy_clks(omap3xxx_clks);
+	r = ti_clk_register_clks(omap3430es1_clks);
+	r |= ti_clk_register_clks(omap34xx_omap36xx_clks);
+	r |= ti_clk_register_clks(omap3xxx_clks);
 
 	omap3_clk_legacy_common_init();
 
@@ -4613,10 +4613,10 @@ int __init omap3430_clk_legacy_init(void)
 {
 	int r;
 
-	r = ti_clk_register_legacy_clks(omap34xx_omap36xx_clks);
-	r |= ti_clk_register_legacy_clks(omap36xx_omap3430es2plus_clks);
-	r |= ti_clk_register_legacy_clks(omap36xx_am35xx_omap3430es2plus_clks);
-	r |= ti_clk_register_legacy_clks(omap3xxx_clks);
+	r = ti_clk_register_clks(omap34xx_omap36xx_clks);
+	r |= ti_clk_register_clks(omap36xx_omap3430es2plus_clks);
+	r |= ti_clk_register_clks(omap36xx_am35xx_omap3430es2plus_clks);
+	r |= ti_clk_register_clks(omap3xxx_clks);
 
 	omap3_clk_legacy_common_init();
 	omap3_clk_lock_dpll5();
@@ -4629,11 +4629,11 @@ int __init omap36xx_clk_legacy_init(void)
 	int r;
 
 	ti_clk_patch_legacy_clks(omap36xx_clk_patches);
-	r = ti_clk_register_legacy_clks(omap36xx_clks);
-	r |= ti_clk_register_legacy_clks(omap36xx_omap3430es2plus_clks);
-	r |= ti_clk_register_legacy_clks(omap34xx_omap36xx_clks);
-	r |= ti_clk_register_legacy_clks(omap36xx_am35xx_omap3430es2plus_clks);
-	r |= ti_clk_register_legacy_clks(omap3xxx_clks);
+	r = ti_clk_register_clks(omap36xx_clks);
+	r |= ti_clk_register_clks(omap36xx_omap3430es2plus_clks);
+	r |= ti_clk_register_clks(omap34xx_omap36xx_clks);
+	r |= ti_clk_register_clks(omap36xx_am35xx_omap3430es2plus_clks);
+	r |= ti_clk_register_clks(omap3xxx_clks);
 
 	omap3_clk_legacy_common_init();
 	omap3_clk_lock_dpll5();
@@ -4645,9 +4645,9 @@ int __init am35xx_clk_legacy_init(void)
 {
 	int r;
 
-	r = ti_clk_register_legacy_clks(am35xx_clks);
-	r |= ti_clk_register_legacy_clks(omap36xx_am35xx_omap3430es2plus_clks);
-	r |= ti_clk_register_legacy_clks(omap3xxx_clks);
+	r = ti_clk_register_clks(am35xx_clks);
+	r |= ti_clk_register_clks(omap36xx_am35xx_omap3430es2plus_clks);
+	r |= ti_clk_register_clks(omap3xxx_clks);
 
 	omap3_clk_legacy_common_init();
 	omap3_clk_lock_dpll5();

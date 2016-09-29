@@ -291,6 +291,7 @@ void __init ti_clk_patch_legacy_clks(struct ti_clk **patch)
 		patch++;
 	}
 }
+#endif
 
 struct clk __init *ti_clk_register_clk(struct ti_clk *setup)
 {
@@ -376,7 +377,7 @@ static const struct of_device_id simple_clk_match_table[] __initconst = {
 	{ }
 };
 
-int __init ti_clk_register_legacy_clks(struct ti_clk_alias *clks)
+int __init ti_clk_register_clks(struct ti_clk_alias *clks)
 {
 	struct clk *clk;
 	bool retry;
@@ -443,7 +444,6 @@ add_aliases:
 
 	return 0;
 }
-#endif
 
 /**
  * ti_clk_setup_features - setup clock features flags
