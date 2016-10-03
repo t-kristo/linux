@@ -9,6 +9,7 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/pinctrl/omap.h>
+#include <dt-bindings/clock/ti,omap44xx.h>
 
 / {
 	compatible = "ti,omap4430", "ti,omap4";
@@ -80,6 +81,12 @@
 		#interrupt-cells = <3>;
 		reg = <0x48281000 0x1000>;
 		interrupt-parent = <&gic>;
+	};
+
+	debugger: debugger {
+		compatible = "ti,debugger";
+		clocks = <&l4_per_clkdm OMAP44XX_L4_PER_UART3>,
+			 <&mpuss_clkdm OMAP44XX_MPUSS_MPU>;
 	};
 
 	/*
