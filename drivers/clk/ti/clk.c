@@ -39,6 +39,7 @@ static struct ti_clk_features ti_clk_features;
 struct clk_iomap {
 	struct regmap *regmap;
 	void __iomem *mem;
+	struct device_node *node;
 };
 
 static struct clk_iomap *clk_memmaps[CLK_MAX_MEMMAPS];
@@ -199,6 +200,28 @@ void __iomem *ti_clk_get_reg_addr(struct device_node *node, int index)
 }
 
 /**
+ * ti_clk_get_memmap_index - get memory mapping index for a node
+ * @node: device node pointer to find memmap index for
+ *
+ * Finds a matching memory mapping index for a node. Returns the index
+ * to the mapping, or negative error value in failure.
+ */
+int ti_clk_get_memmap_index(struct device_node *node)
+{
+	int i;
+
+	for (i = 0; i < CLK_MAX_MEMMAPS; i++) {
+		if (!clk_memmaps[i])
+			continue;
+
+		if (clk_memmaps[i]->node == node)
+			return i;
+	}
+
+	return -ENOENT;
+}
+
+/**
  * omap2_clk_provider_init - init master clock provider
  * @parent: master node
  * @index: internal index for clk_reg_ops
@@ -234,6 +257,7 @@ int __init omap2_clk_provider_init(struct device_node *parent, int index,
 
 	io->regmap = syscon;
 	io->mem = mem;
+	io->node = parent;
 
 	clk_memmaps[index] = io;
 

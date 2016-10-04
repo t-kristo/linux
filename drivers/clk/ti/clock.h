@@ -203,6 +203,7 @@ void ti_clk_patch_legacy_clks(struct ti_clk **patch);
 struct clk *ti_clk_register_clk(struct ti_clk *setup);
 int ti_clk_register_clks(struct ti_clk_alias *clks);
 
+int ti_clk_get_memmap_index(struct device_node *node);
 void __iomem *ti_clk_get_reg_addr(struct device_node *node, int index);
 void ti_dt_clocks_register(struct ti_dt_clk *oclks);
 int ti_clk_retry_init(struct device_node *node, struct clk_hw *hw,
