@@ -26,6 +26,8 @@ enum {
 	TI_CLK_FIXED_FACTOR,
 	TI_CLK_GATE,
 	TI_CLK_DPLL,
+	TI_CLK_HWMOD,
+	TI_CLK_HWMOD_MUX,
 };
 
 /* Global flags */
@@ -53,6 +55,11 @@ enum {
 #define CLKF_PER			(1 << 8)
 #define CLKF_CORE			(1 << 9)
 #define CLKF_J_TYPE			(1 << 10)
+
+/* HWMOD clk flags */
+#define CLKF_SW_SUP			BIT(5)
+#define CLKF_HW_SUP			BIT(6)
+#define CLKF_NO_IDLEST			BIT(7)
 
 #define CLK(dev, con, ck)		\
 	{				\
@@ -156,6 +163,21 @@ struct ti_clk_dpll {
 	u8 recal_st_bit;
 };
 
+struct ti_clk_hwmod {
+	u16 reg;
+	u16 flags;
+	const char *parent;
+};
+
+struct ti_clk_hwmod_mux {
+	u16 mux_reg;
+	u16 mod_reg;
+	u16 flags;
+	u8 shift;
+	u8 num_parents;
+	const char * const *parents;
+};
+
 /* Composite clock component types */
 enum {
 	CLK_COMPONENT_TYPE_GATE = 0,
@@ -191,6 +213,8 @@ struct clk *ti_clk_register_mux(struct ti_clk *setup);
 struct clk *ti_clk_register_divider(struct ti_clk *setup);
 struct clk *ti_clk_register_composite(struct ti_clk *setup);
 struct clk *ti_clk_register_dpll(struct ti_clk *setup);
+struct clk *ti_clk_register_hwmod(struct ti_clk *setup);
+struct clk *ti_clk_register_hwmod_mux(struct ti_clk *setup);
 struct clk *ti_clk_register(struct device *dev, struct clk_hw *hw,
 			    const char *con);
 int ti_clk_add_alias(struct device *dev, struct clk *clk, const char *con);
