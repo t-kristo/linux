@@ -125,6 +125,7 @@ struct clk_hw_omap_ops {
 /**
  * struct clk_hw_omap - OMAP struct clk
  * @node: list_head connecting this clock into the full clock list
+ * @clkdm_link: list_head connecting this clock into the clockdomain
  * @enable_reg: register to write to enable the clock (see @enable_bit)
  * @enable_bit: bitshift to write to enable/disable the clock (see @enable_reg)
  * @flags: see "struct clk.flags possibilities" above
@@ -137,6 +138,7 @@ struct clk_hw_omap_ops {
 struct clk_hw_omap {
 	struct clk_hw		hw;
 	struct list_head	node;
+	struct list_head	clkdm_link;
 	unsigned long		fixed_rate;
 	u8			fixed_div;
 	void __iomem		*enable_reg;
@@ -251,6 +253,7 @@ void omap2xxx_clkt_vps_init(void);
 unsigned long omap2_get_dpll_rate(struct clk_hw_omap *clk);
 
 void ti_dt_clk_init_retry_clks(void);
+void ti_dt_clockdomains_early_setup(void);
 void ti_dt_clockdomains_setup(void);
 int ti_clk_setup_ll_ops(struct ti_clk_ll_ops *ops);
 

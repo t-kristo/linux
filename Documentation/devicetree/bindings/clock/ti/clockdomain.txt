@@ -14,11 +14,21 @@ hardware hierarchy.
 
 Required properties:
 - compatible : shall be "ti,clockdomain"
-- #clock-cells : from common clock binding; shall be set to 0.
+- #clock-cells : from common clock binding; shall be set to 1 if this
+		 clockdomain acts as a clock provider.
+
+Optional properties:
 - clocks : link phandles of clocks within this domain
+- reg : address for the clockdomain
 
 Examples:
 	dss_clkdm: dss_clkdm {
 		compatible = "ti,clockdomain";
 		clocks = <&dss1_alwon_fck_3430es2>, <&dss_ick_3430es2>;
+	};
+
+	l4_per_clkdm: l4_per_clkdm {
+		compatible = "ti,clockdomain";
+		#clock-cells = <1>;
+		reg = <0x1400 0x200>;
 	};

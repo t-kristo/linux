@@ -28,6 +28,23 @@
 #define pr_fmt(fmt) "%s: " fmt, __func__
 
 /**
+ * struct ti_clkdm - TI clockdomain data structure
+ * @name: name of the clockdomain
+ * @index: index of the clk_iomap struct for this clkdm
+ * @offset: clockdomain offset from the beginning of the iomap
+ * @link: link to the list
+ */
+struct ti_clkdm {
+	const char *name;
+	int index;
+	u32 offset;
+	struct list_head link;
+	struct list_head clocks;
+};
+
+static LIST_HEAD(clkdms);
+
+/**
  * omap2_clkops_enable_clkdm - increment usecount on clkdm of @hw
  * @hw: struct clk_hw * of the clock being enabled
  *
@@ -116,6 +133,8 @@ void omap2_init_clk_clkdm(struct clk_hw *hw)
 	struct clk_hw_omap *clk = to_clk_hw_omap(hw);
 	struct clockdomain *clkdm;
 	const char *clk_name;
+	struct ti_clkdm *ti_clkdm;
+	bool match = false;
 
 	if (!clk->clkdm_name)
 		return;
@@ -130,7 +149,21 @@ void omap2_init_clk_clkdm(struct clk_hw *hw)
 	} else {
 		pr_debug("clock: could not associate clk %s to clkdm %s\n",
 			 clk_name, clk->clkdm_name);
+		return;
 	}
+
+	list_for_each_entry(ti_clkdm, &clkdms, link) {
+		if (!strcmp(ti_clkdm->name, clk->clkdm_name)) {
+			match = true;
+			break;
+		}
+	}
+
+	if (!match)
+		return;
+
+	/* Add clock to the list of provided clocks */
+	list_add(&clk->clkdm_link, &ti_clkdm->clocks);
 }
 
 static void __init of_ti_clockdomain_setup(struct device_node *node)
@@ -161,10 +194,124 @@ static void __init of_ti_clockdomain_setup(struct device_node *node)
 	}
 }
 
+static struct clk_hw *clkdm_clk_xlate(struct of_phandle_args *clkspec,
+				      void *data)
+{
+	struct ti_clkdm *clkdm = data;
+	struct clk_hw_omap *clk;
+	u16 offset = clkspec->args[0];
+
+	list_for_each_entry(clk, &clkdm->clocks, clkdm_link)
+		if (((u32)clk->enable_reg & 0xffff) - clkdm->offset == offset)
+			return &clk->hw;
+
+	return ERR_PTR(-EINVAL);
+}
+
+static int ti_clk_register_clkdm(struct device_node *node)
+{
+	u64 clkdm_addr;
+	u64 inst_addr;
+	const __be32 *reg;
+	u32 offset;
+	int idx;
+	struct ti_clkdm *clkdm;
+	int ret;
+
+	reg = of_get_address(node, 0, NULL, NULL);
+	if (!reg)
+		return -ENOENT;
+
+	clkdm_addr = of_translate_address(node, reg);
+
+	reg = of_get_address(node->parent, 0, NULL, NULL);
+	if (!reg)
+		return -EINVAL;
+
+	inst_addr = of_translate_address(node->parent, reg);
+
+	offset = clkdm_addr - inst_addr;
+
+	idx = ti_clk_get_memmap_index(node->parent);
+
+	if (idx < 0) {
+		pr_err("bad memmap index for %s\n", node->name);
+		return idx;
+	}
+
+	clkdm = kzalloc(sizeof(*clkdm), GFP_KERNEL);
+	if (!clkdm)
+		return -ENOMEM;
+
+	clkdm->name = node->name;
+	clkdm->index = idx;
+	clkdm->offset = offset;
+
+	INIT_LIST_HEAD(&clkdm->clocks);
+
+	list_add(&clkdm->link, &clkdms);
+
+	ret = of_clk_add_hw_provider(node, clkdm_clk_xlate, clkdm);
+	if (ret) {
+		list_del(&clkdm->link);
+		kfree(clkdm);
+		return ret;
+	}
+
+	return 0;
+}
+
+/**
+ * ti_clk_get_reg_addr_clkdm - get register address relative to clockdomain
+ * @clkdm_name: parent clockdomain
+ * @offset: offset from the clockdomain
+ *
+ * Gets a register address relative to parent clockdomain. Searches the
+ * list of available clockdomain, and if match is found, calculates the
+ * register address from the iomap relative to the clockdomain.
+ * Returns the register address, or NULL if not found.
+ */
+void __iomem *ti_clk_get_reg_addr_clkdm(const char *clkdm_name, u16 offset)
+{
+	u32 reg;
+	struct clk_omap_reg *reg_setup;
+	struct ti_clkdm *clkdm;
+	bool match = false;
+
+	reg_setup = (struct clk_omap_reg *)&reg;
+
+	/* XXX: get offset from clkdm, get base for instance */
+	list_for_each_entry(clkdm, &clkdms, link) {
+		if (!strcmp(clkdm->name, clkdm_name)) {
+			match = true;
+			break;
+		}
+	}
+
+	if (!match) {
+		pr_err("%s: no entry for %s\n", __func__, clkdm_name);
+		return NULL;
+	}
+
+	reg_setup->offset = clkdm->offset + offset;
+	reg_setup->index = clkdm->index;
+
+	return (void __iomem *)reg;
+}
+
 static const struct of_device_id ti_clkdm_match_table[] __initconst = {
 	{ .compatible = "ti,clockdomain" },
 	{ }
 };
+
+void __init ti_dt_clockdomains_early_setup(void)
+{
+	struct device_node *np;
+
+	for_each_matching_node(np, ti_clkdm_match_table) {
+		ti_clk_register_clkdm(np);
+	}
+}
 
 /**
  * ti_dt_clockdomains_setup - setup device tree clockdomains

@@ -794,6 +794,8 @@ int __init omap_clk_init(void)
 		if (ret)
 			return ret;
 
+		ti_dt_clockdomains_early_setup();
+
 		of_clk_init(NULL);
 
 		ti_dt_clk_init_retry_clks();
