@@ -95,7 +95,8 @@
 			reg-io-width = <4>;
 			reg = <0x02530c00 0x100>;
 			interrupts = <GIC_SPI 164 IRQ_TYPE_EDGE_RISING>;
-			clock-frequency = <200000000>;
+			clocks = <&k2g_clks 0x2c 0>;
+			clock-names = "fck";
 			status = "disabled";
 		};
 
