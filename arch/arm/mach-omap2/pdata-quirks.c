@@ -27,6 +27,7 @@
 #include <linux/platform_data/pwm_omap_dmtimer.h>
 #include <linux/platform_data/media/ir-rx51.h>
 #include <linux/platform_data/asoc-ti-mcbsp.h>
+#include <linux/platform_data/omap_pm_domains.h>
 #include <plat/dmtimer.h>
 
 #include "common.h"
@@ -37,6 +38,8 @@
 #include "omap-secure.h"
 #include "soc.h"
 #include "hsmmc.h"
+#include "clockdomain.h"
+#include "powerdomain.h"
 
 static struct omap_hsmmc_platform_data __maybe_unused mmc_pdata[2];
 
@@ -457,6 +460,13 @@ void omap_auxdata_legacy_init(struct device *dev)
 	dev->platform_data = &twl_gpio_auxdata;
 }
 
+static struct omap_pm_domains_pdata pm_domains_pdata = {
+	.clkdm_lookup = clkdm_lookup,
+	.pwrdm_lookup = pwrdm_lookup,
+	.clkdm_deny_idle = clkdm_deny_idle,
+	.clkdm_allow_idle = clkdm_allow_idle,
+};
+
 /* Dual mode timer PWM callbacks platdata */
 #if IS_ENABLED(CONFIG_OMAP_DM_TIMER)
 static struct pwm_omap_dmtimer_pdata pwm_dmtimer_pdata = {
@@ -563,6 +573,7 @@ static struct of_dev_auxdata omap_auxdata_lookup[] __initdata = {
 #endif
 	/* Common auxdata */
 	OF_DEV_AUXDATA("pinctrl-single", 0, NULL, &pcs_pdata),
+	OF_DEV_AUXDATA("ti,omap4-prcm", 0, NULL, &pm_domains_pdata),
 	{ /* sentinel */ },
 };
 

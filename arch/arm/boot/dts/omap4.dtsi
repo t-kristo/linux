@@ -74,6 +74,14 @@
 		interrupt-parent = <&gic>;
 	};
 
+	prcm_mpu: prcm_mpu@48243000 {
+		compatible = "ti,omap4-prcm-mpu", "ti,omap4-prcm", "simple-bus";
+		reg = <0x48243000 0xb00>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges = <0 0x48243000 0xb00>;
+	};
+
 	wakeupgen: interrupt-controller@48281000 {
 		compatible = "ti,omap4-wugen-mpu";
 		interrupt-controller;
@@ -131,28 +139,24 @@
 			ranges = <0 0x4a000000 0x1000000>;
 
 			cm1: cm1@4000 {
-				compatible = "ti,omap4-cm1";
+				compatible = "ti,omap4-cm1", "ti,omap4-prcm",
+					      "simple-bus";
 				reg = <0x4000 0x2000>;
 
 				cm1_clocks: clocks {
 					#address-cells = <1>;
 					#size-cells = <0>;
 				};
-
-				cm1_clockdomains: clockdomains {
-				};
 			};
 
 			cm2: cm2@8000 {
-				compatible = "ti,omap4-cm2";
+				compatible = "ti,omap4-cm2", "ti,omap4-prcm",
+					     "simple-bus";
 				reg = <0x8000 0x3000>;
 
 				cm2_clocks: clocks {
 					#address-cells = <1>;
 					#size-cells = <0>;
-				};
-
-				cm2_clockdomains: clockdomains {
 				};
 			};
 
@@ -225,16 +229,15 @@
 				};
 
 				prm: prm@6000 {
-					compatible = "ti,omap4-prm";
+					compatible = "ti,omap4-prm",
+						     "ti,omap4-prcm",
+						     "simple-bus";
 					reg = <0x6000 0x3000>;
 					interrupts = <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>;
 
 					prm_clocks: clocks {
 						#address-cells = <1>;
 						#size-cells = <0>;
-					};
-
-					prm_clockdomains: clockdomains {
 					};
 				};
 

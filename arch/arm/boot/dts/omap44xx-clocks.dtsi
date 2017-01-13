@@ -622,6 +622,24 @@
 		clock-frequency = <0>;
 	};
 };
+
+&cm1 {
+	tesla_clkdm: tesla_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	abe_clkdm: abe_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	mpuss_clkdm: mpuss_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+};
+
 &prm_clocks {
 	sys_clkin_ck: sys_clkin_ck@110 {
 		#clock-cells = <0>;
@@ -744,10 +762,16 @@
 	};
 };
 
-&prm_clockdomains {
+&prm {
 	emu_sys_clkdm: emu_sys_clkdm {
 		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
 		clocks = <&trace_clk_div_ck>;
+	};
+
+	l4_wkup_clkdm: l4_wkup_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
 	};
 };
 
@@ -1399,10 +1423,91 @@
 	};
 };
 
-&cm2_clockdomains {
+&cm2 {
 	l3_init_clkdm: l3_init_clkdm {
 		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
 		clocks = <&dpll_usb_ck>, <&usb_host_fs_fck>;
+	};
+
+	l4_cefuse_clkdm: l4_cefuse_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	l4_cfg_clkdm: l4_cfg_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	l3_gfx_clkdm: l3_gfx_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	ivahd_clkdm: ivahd_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	l4_secure_clkdm: l4_secure_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	l4_per_clkdm: l4_per_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	l3_instr_clkdm: l3_instr_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	d2d_clkdm: d2d_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	l3_emif_clkdm: l3_emif_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	l4_ao_clkdm: l4_ao_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	ducati_clkdm: ducati_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	l3_1_clkdm: l3_1_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	l3_2_clkdm: l3_2_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	iss_clkdm: iss_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	l3_dss_clkdm: l3_dss_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	l3_dma_clkdm: l3_dma_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
 	};
 };
 
@@ -1639,5 +1744,17 @@
 		clocks = <&auxclk0_ck>, <&auxclk1_ck>, <&auxclk2_ck>, <&auxclk3_ck>, <&auxclk4_ck>, <&auxclk5_ck>;
 		ti,bit-shift = <2>;
 		reg = <0x0224>;
+	};
+};
+
+&prcm_mpu {
+	mpu0_clkdm: mpu0_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
+	};
+
+	mpu1_clkdm: mpu1_clkdm {
+		compatible = "ti,clockdomain";
+		#power-domain-cells = <0>;
 	};
 };
