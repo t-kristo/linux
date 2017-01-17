@@ -92,6 +92,8 @@ int __init omap4xxx_dt_clk_init(void)
 
 	omap2_clk_disable_autoidle_all();
 
+	ti_clk_add_aliases();
+
 	/*
 	 * Lock USB DPLL on OMAP4 devices so that the L3INIT power
 	 * domain can transition to retention state when not in use.
