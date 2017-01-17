@@ -382,8 +382,6 @@ int __init ti_clk_register_legacy_clks(struct ti_clk_alias *clks)
 	bool retry;
 	struct ti_clk_alias *retry_clk;
 	struct ti_clk_alias *tmp;
-	struct device_node *np;
-	int ret = 0;
 
 	while (clks->clk) {
 		clk = ti_clk_register_clk(clks->clk);
@@ -393,14 +391,7 @@ int __init ti_clk_register_legacy_clks(struct ti_clk_alias *clks)
 			} else {
 				pr_err("register for %s failed: %ld\n",
 				       clks->clk->name, PTR_ERR(clk));
-				ret = PTR_ERR(clk);
-				/*
-				 * Aliases still need to be added here,
-				 * as we might be running on a
-				 * transitional system that has old DT
-				 * clock data in place.
-				 */
-				goto add_aliases;
+				return PTR_ERR(clk);
 			}
 		}
 		clks++;
@@ -429,21 +420,29 @@ int __init ti_clk_register_legacy_clks(struct ti_clk_alias *clks)
 		}
 	}
 
-add_aliases:
-	/* add clock aliases for any fixed-clocks / fixed-factor-clocks */
-	if (of_have_populated_dt())
-		for_each_matching_node(np, simple_clk_match_table) {
-			struct of_phandle_args clkspec;
-
-			clkspec.np = np;
-			clk = of_clk_get_from_provider(&clkspec);
-
-			ti_clk_add_alias(NULL, clk, np->name);
-		}
-
 	return 0;
 }
 #endif
+
+/**
+ * ti_clk_add_aliases - setup clock aliases
+ *
+ * Sets up any missing clock aliases. No return value.
+ */
+void ti_clk_add_aliases(void)
+{
+	struct device_node *np;
+	struct clk *clk;
+
+	for_each_matching_node(np, simple_clk_match_table) {
+		struct of_phandle_args clkspec;
+
+		clkspec.np = np;
+		clk = of_clk_get_from_provider(&clkspec);
+
+		ti_clk_add_alias(NULL, clk, np->name);
+	}
+}
 
 /**
  * ti_clk_setup_features - setup clock features flags
