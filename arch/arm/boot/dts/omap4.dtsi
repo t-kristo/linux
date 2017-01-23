@@ -153,10 +153,27 @@
 				compatible = "ti,omap4-cm2", "ti,omap4-prcm",
 					     "simple-bus";
 				reg = <0x8000 0x3000>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+				ranges = <0 0x8000 0x3000>;
 
 				cm2_clocks: clocks {
 					#address-cells = <1>;
 					#size-cells = <0>;
+				};
+
+				cm_l4per: cm_l4per@0 {
+					compatible = "ti,omap4-cm";
+					reg = <0x1400 0x200>;
+					#address-cells = <1>;
+					#size-cells = <1>;
+					ranges = <0 0x1400 0x200>;
+
+					cm_l4per_clkctrl: cm_l4per_clkctrl@20 {
+						compatible = "ti,omap4-clkctrl";
+						reg = <0x20 0x1b0>;
+						#clock-cells = <2>;
+					};
 				};
 			};
 
@@ -307,6 +324,8 @@
 			#gpio-cells = <2>;
 			interrupt-controller;
 			#interrupt-cells = <2>;
+			clocks = <&cm_l4per_clkctrl 0x40 0>;
+			clock-names = "hwmod-ck";
 		};
 
 		gpio3: gpio@48057000 {
@@ -318,6 +337,8 @@
 			#gpio-cells = <2>;
 			interrupt-controller;
 			#interrupt-cells = <2>;
+			clocks = <&cm_l4per_clkctrl 0x48 0>;
+			clock-names = "hwmod-ck";
 		};
 
 		gpio4: gpio@48059000 {
@@ -403,6 +424,8 @@
 			interrupts = <GIC_SPI 74 IRQ_TYPE_LEVEL_HIGH>;
 			ti,hwmods = "uart3";
 			clock-frequency = <48000000>;
+			clocks = <&cm_l4per_clkctrl 0x130 0>;
+			clock-names = "hwmod-ck";
 		};
 
 		uart4: serial@4806e000 {
