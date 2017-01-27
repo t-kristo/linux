@@ -9,6 +9,7 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/pinctrl/omap.h>
+#include <dt-bindings/clk/omap4.h>
 
 / {
 	compatible = "ti,omap4430", "ti,omap4";
@@ -324,7 +325,7 @@
 			#gpio-cells = <2>;
 			interrupt-controller;
 			#interrupt-cells = <2>;
-			clocks = <&cm_l4per_clkctrl 0x40 0>;
+			clocks = <&cm_l4per_clkctrl OMAP4_GPIO2_CLKCTRL 0>;
 			clock-names = "hwmod-ck";
 		};
 
@@ -337,7 +338,7 @@
 			#gpio-cells = <2>;
 			interrupt-controller;
 			#interrupt-cells = <2>;
-			clocks = <&cm_l4per_clkctrl 0x48 0>;
+			clocks = <&cm_l4per_clkctrl OMAP4_GPIO3_CLKCTRL 0>;
 			clock-names = "hwmod-ck";
 		};
 
@@ -408,6 +409,8 @@
 			interrupts = <GIC_SPI 72 IRQ_TYPE_LEVEL_HIGH>;
 			ti,hwmods = "uart1";
 			clock-frequency = <48000000>;
+			clocks = <&cm_l4per_clkctrl OMAP4_UART1_CLKCTRL 0>;
+			clock-names = "hwmod-ck";
 		};
 
 		uart2: serial@4806c000 {
@@ -416,6 +419,8 @@
 			interrupts = <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
 			ti,hwmods = "uart2";
 			clock-frequency = <48000000>;
+			clocks = <&cm_l4per_clkctrl OMAP4_UART2_CLKCTRL 0>;
+			clock-names = "hwmod-ck";
 		};
 
 		uart3: serial@48020000 {
@@ -424,7 +429,7 @@
 			interrupts = <GIC_SPI 74 IRQ_TYPE_LEVEL_HIGH>;
 			ti,hwmods = "uart3";
 			clock-frequency = <48000000>;
-			clocks = <&cm_l4per_clkctrl 0x130 0>;
+			clocks = <&cm_l4per_clkctrl OMAP4_UART3_CLKCTRL 0>;
 			clock-names = "hwmod-ck";
 		};
 
@@ -434,6 +439,8 @@
 			interrupts = <GIC_SPI 70 IRQ_TYPE_LEVEL_HIGH>;
 			ti,hwmods = "uart4";
 			clock-frequency = <48000000>;
+			clocks = <&cm_l4per_clkctrl OMAP4_UART4_CLKCTRL 0>;
+			clock-names = "hwmod-ck";
 		};
 
 		hwspinlock: spinlock@4a0f6000 {
@@ -450,6 +457,8 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			ti,hwmods = "i2c1";
+			clocks = <&cm_l4per_clkctrl OMAP4_I2C1_CLKCTRL 0>;
+			clock-names = "hwmod-ck";
 		};
 
 		i2c2: i2c@48072000 {
@@ -459,6 +468,8 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			ti,hwmods = "i2c2";
+			clocks = <&cm_l4per_clkctrl OMAP4_I2C2_CLKCTRL 0>;
+			clock-names = "hwmod-ck";
 		};
 
 		i2c3: i2c@48060000 {
@@ -468,6 +479,8 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			ti,hwmods = "i2c3";
+			clocks = <&cm_l4per_clkctrl OMAP4_I2C3_CLKCTRL 0>;
+			clock-names = "hwmod-ck";
 		};
 
 		i2c4: i2c@48350000 {
@@ -477,6 +490,8 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			ti,hwmods = "i2c4";
+			clocks = <&cm_l4per_clkctrl OMAP4_I2C4_CLKCTRL 0>;
+			clock-names = "hwmod-ck";
 		};
 
 		mcspi1: spi@48098000 {
@@ -548,6 +563,7 @@
 			dmas = <&sdma 61>, <&sdma 62>;
 			dma-names = "tx", "rx";
 			pbias-supply = <&pbias_mmc_reg>;
+
 		};
 
 		mmc2: mmc@480b4000 {
@@ -568,6 +584,8 @@
 			ti,needs-special-reset;
 			dmas = <&sdma 77>, <&sdma 78>;
 			dma-names = "tx", "rx";
+			clocks = <&cm_l4per_clkctrl OMAP4_MMC3_CLKCTRL 0>;
+			clock-names = "hwmod-ck";
 		};
 
 		mmc4: mmc@480d1000 {
@@ -578,6 +596,8 @@
 			ti,needs-special-reset;
 			dmas = <&sdma 57>, <&sdma 58>;
 			dma-names = "tx", "rx";
+			clocks = <&cm_l4per_clkctrl OMAP4_MMC4_CLKCTRL 0>;
+			clock-names = "hwmod-ck";
 		};
 
 		mmc5: mmc@480d5000 {
@@ -588,6 +608,8 @@
 			ti,needs-special-reset;
 			dmas = <&sdma 59>, <&sdma 60>;
 			dma-names = "tx", "rx";
+			clocks = <&cm_l4per_clkctrl OMAP4_MMC5_CLKCTRL 0>;
+			clock-names = "hwmod-ck";
 		};
 
 		mmu_dsp: mmu@4a066000 {

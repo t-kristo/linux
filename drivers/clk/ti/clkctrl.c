@@ -217,56 +217,8 @@ static const struct clk_ops omap4_module_clk_ops = {
 	.is_enabled	= _omap4_hwmod_clk_is_enabled,
 };
 
-struct omap_clkctrl_reg_data {
-	u16 offset;
-	void *data;
-	u16 flags;
-	const char *parent;
-};
-
-struct omap_clkctrl_data {
-	u32 addr;
-	struct omap_clkctrl_reg_data *regs;
-};
-
-#define CLKF_SW_SUP	BIT(0)
-#define CLKF_HW_SUP	BIT(1)
-#define CLKF_NO_IDLEST	BIT(2)
-
-#define OMAP4_GPTIMER10_CLKCTRL		0x08
-#define OMAP4_GPTIMER11_CLKCTRL		0x10
-#define OMAP4_GPTIMER2_CLKCTRL		0x18
-#define OMAP4_GPTIMER3_CLKCTRL		0x20
-#define OMAP4_GPTIMER4_CLKCTRL		0x28
-#define OMAP4_GPTIMER9_CLKCTRL		0x30
-#define OMAP4_ELM_CLKCTRL		0x38
-#define OMAP4_GPIO2_CLKCTRL		0x40
-#define OMAP4_GPIO3_CLKCTRL		0x48
-#define OMAP4_GPIO4_CLKCTRL		0x50
-#define OMAP4_UART3_CLKCTRL		0x130
-
-struct omap_clkctrl_reg_data omap4_l4_per_clkctrl_regs[] = {
-	{ OMAP4_GPTIMER10_CLKCTRL, NULL, CLKF_SW_SUP, "cm2_dm10_mux" },
-	{ OMAP4_GPTIMER11_CLKCTRL, NULL, CLKF_SW_SUP, "cm2_dm11_mux" },
-	{ OMAP4_GPTIMER2_CLKCTRL, NULL, CLKF_SW_SUP, "cm2_dm2_mux" },
-	{ OMAP4_GPTIMER3_CLKCTRL, NULL, CLKF_SW_SUP, "cm2_dm3_mux" },
-	{ OMAP4_GPTIMER4_CLKCTRL, NULL, CLKF_SW_SUP, "cm2_dm4_mux" },
-	{ OMAP4_GPTIMER9_CLKCTRL, NULL, CLKF_SW_SUP, "cm2_dm9_mux" },
-	{ OMAP4_ELM_CLKCTRL, NULL, 0, "l4_div_ck" },
-	{ OMAP4_GPIO2_CLKCTRL, NULL, CLKF_HW_SUP, "l4_div_ck" },
-	{ OMAP4_GPIO3_CLKCTRL, NULL, CLKF_HW_SUP, "l4_div_ck" },
-	{ OMAP4_GPIO4_CLKCTRL, NULL, CLKF_HW_SUP, "l4_div_ck" },
-	{ OMAP4_UART3_CLKCTRL, NULL, CLKF_SW_SUP, "func_48m_fclk" },
-	{ 0 },
-};
-
-struct omap_clkctrl_data omap4_clkctrl_data[] = {
-	{ 0x4a009420, omap4_l4_per_clkctrl_regs },
-	{ 0 },
-};
-
-struct clk_hw *_ti_omap4_clkctrl_xlate(struct of_phandle_args *clkspec,
-				       void *data)
+static struct clk_hw *_ti_omap4_clkctrl_xlate(struct of_phandle_args *clkspec,
+					      void *data)
 {
 	struct omap_clkctrl_provider *provider = data;
 	struct omap_clkctrl_clk *entry;
@@ -289,7 +241,32 @@ struct clk_hw *_ti_omap4_clkctrl_xlate(struct of_phandle_args *clkspec,
 	return &entry->clk->hw;
 }
 
-void __init _ti_omap4_clkctrl_setup(struct device_node *node)
+static void __init _ti_clkctrl_setup_subclks(struct omap_clkctrl_reg_data *data,
+					     void __iomem *reg)
+{
+	struct omap_clkctrl_bit_data *bits = data->bit_data;
+
+	if (!bits)
+		return;
+
+	while (bits->bit) {
+		switch (bits->type) {
+		case TI_CLK_GATE:
+
+		case TI_CLK_DIVIDER:
+
+		case TI_CLK_MUX:
+
+		default:
+			pr_err("%s: bad subclk type: %d\n", __func__,
+			       bits->type);
+			return;
+		}
+		bits++;
+	}
+}
+
+static void __init _ti_omap4_clkctrl_setup(struct device_node *node)
 {
 	struct omap_clkctrl_provider *provider;
 	struct omap_clkctrl_data *data;
@@ -307,7 +284,10 @@ void __init _ti_omap4_clkctrl_setup(struct device_node *node)
 
 	pr_info("physical addr for %s = %x\n", node->name, addr);
 
-	data = omap4_clkctrl_data;
+	if (of_machine_is_compatible("ti,omap4"))
+		data = omap4_clkctrl_data;
+	else
+		return;
 
 	while (data->addr) {
 		pr_info("checking %x against %x\n", addr, data->addr);
@@ -322,8 +302,6 @@ void __init _ti_omap4_clkctrl_setup(struct device_node *node)
 		return;
 	}
 
-	buf = kzalloc(strlen(node->name) + strlen(":0000:00"), GFP_KERNEL);
-
 	provider = kzalloc(sizeof(*provider), GFP_KERNEL);
 	if (!provider)
 		return;
@@ -335,12 +313,14 @@ void __init _ti_omap4_clkctrl_setup(struct device_node *node)
 	/* Generate clocks */
 	reg_data = data->regs;
 
-	while (reg_data->offset) {
+	while (reg_data->parent) {
 		hw = kzalloc(sizeof(*hw), GFP_KERNEL);
 		if (!hw)
 			return;
 
 		hw->enable_reg = provider->base + reg_data->offset;
+
+		_ti_clkctrl_setup_subclks(reg_data, hw->enable_reg);
 
 		if (reg_data->flags & CLKF_SW_SUP)
 			hw->enable_bit = MODULEMODE_SWCTRL;
@@ -352,6 +332,8 @@ void __init _ti_omap4_clkctrl_setup(struct device_node *node)
 		init.parent_names = &reg_data->parent;
 		init.num_parents = 1;
 		init.flags = 0;
+	        buf = kzalloc(strlen(node->name) + strlen(":0000:00"),
+			      GFP_KERNEL);
 		sprintf(buf, "%s:%04x:%d", node->name, reg_data->offset, 0);
 		init.name = buf;
 		init.ops = &omap4_module_clk_ops;
