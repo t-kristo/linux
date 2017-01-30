@@ -41,10 +41,6 @@
 #define OMAP4_MAX_MODULE_READY_TIME	2000
 #define OMAP4_MAX_MODULE_DISABLE_TIME	5000
 
-enum {
-	CLKCTRL_CLK_TYPE_MODULE,
-};
-
 static bool _early_timeout = true;
 
 struct omap_clkctrl_provider {
@@ -241,27 +237,89 @@ static struct clk_hw *_ti_omap4_clkctrl_xlate(struct of_phandle_args *clkspec,
 	return &entry->clk->hw;
 }
 
-static void __init _ti_clkctrl_setup_subclks(struct omap_clkctrl_reg_data *data,
+static struct clk_hw_omap * __init
+_ti_clkctrl_setup_gate(char *name, struct omap_clkctrl_bit_data *data,
+		       void __iomem *reg)
+{
+	struct clk_init_data init = { NULL };
+	struct clk_hw_omap *clk_hw;
+	struct clk *clk;
+
+	clk_hw = kzalloc(sizeof(*clk_hw), GFP_KERNEL);
+	if (!clk_hw)
+		return ERR_PTR(-ENOMEM);
+
+	clk_hw->hw.init = &init;
+
+	init.name = name;
+	init.ops = &clk_gate_ops;
+
+	clk_hw->enable_reg = reg;
+	clk_hw->flags = REG_ACCESS_DIRECT;
+
+	init.parent_names = data->parents;
+	init.num_parents = 1;
+
+	clk = ti_clk_register(NULL, &clk_hw->hw, name);
+
+	if (IS_ERR(clk)) {
+		kfree(clk_hw);
+		return NULL;
+	}
+
+	return clk_hw;
+}
+
+static void __init _ti_clkctrl_setup_subclks(struct device_node *node,
+					     struct omap_clkctrl_reg_data *data,
 					     void __iomem *reg)
 {
 	struct omap_clkctrl_bit_data *bits = data->bit_data;
+	struct clk_hw_omap *hw;
+	struct omap_clkctrl_clk *clkctrl_clk;
+	char *name;
 
 	if (!bits)
 		return;
 
 	while (bits->bit) {
+		name = kzalloc(strlen(node->name) + strlen(":0000:00"),
+			       GFP_KERNEL);
+		sprintf(name, "%s:%04x:%d", node->name, data->offset,
+			bits->bit);
+
 		switch (bits->type) {
 		case TI_CLK_GATE:
+			hw = _ti_clkctrl_setup_gate(name, bits, reg);
+			break;
 
 		case TI_CLK_DIVIDER:
+			hw = NULL;
+			break;
 
 		case TI_CLK_MUX:
+			hw = NULL;
+			break;
 
 		default:
 			pr_err("%s: bad subclk type: %d\n", __func__,
 			       bits->type);
 			return;
 		}
+
+		if (IS_ERR_OR_NULL(hw)) {
+			kfree(name);
+			return;
+		}
+
+		clkctrl_clk = kzalloc(sizeof(*clkctrl_clk), GFP_KERNEL);
+		if (!clkctrl_clk)
+			return;
+
+		clkctrl_clk->reg_offset = data->offset;
+		clkctrl_clk->type = bits->type;
+		clkctrl_clk->clk = hw;
+
 		bits++;
 	}
 }
@@ -320,7 +378,7 @@ static void __init _ti_omap4_clkctrl_setup(struct device_node *node)
 
 		hw->enable_reg = provider->base + reg_data->offset;
 
-		_ti_clkctrl_setup_subclks(reg_data, hw->enable_reg);
+		_ti_clkctrl_setup_subclks(node, reg_data, hw->enable_reg);
 
 		if (reg_data->flags & CLKF_SW_SUP)
 			hw->enable_bit = MODULEMODE_SWCTRL;
@@ -349,7 +407,7 @@ static void __init _ti_omap4_clkctrl_setup(struct device_node *node)
 			return;
 
 		clkctrl_clk->reg_offset = reg_data->offset;
-		clkctrl_clk->type = CLKCTRL_CLK_TYPE_MODULE;
+		clkctrl_clk->type = TI_CLK_MODULE;
 		clkctrl_clk->clk = hw;
 
 		list_add(&clkctrl_clk->node, &provider->clocks);

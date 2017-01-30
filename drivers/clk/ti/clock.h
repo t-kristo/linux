@@ -26,6 +26,7 @@ enum {
 	TI_CLK_FIXED_FACTOR,
 	TI_CLK_GATE,
 	TI_CLK_DPLL,
+	TI_CLK_MODULE,
 };
 
 /* Global flags */
