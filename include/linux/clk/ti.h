@@ -168,7 +168,6 @@ struct clk_hw_omap {
  *     should be used.  This is a temporary solution - a better approach
  *     would be to associate clock type-specific data with the clock,
  *     similar to the struct dpll_data approach.
- * REG_ACCESS_DIRECT: Use direct register access for this clock.
  */
 #define ENABLE_REG_32BIT	(1 << 0)	/* Use 32-bit access */
 #define CLOCK_IDLE_CONTROL	(1 << 1)
@@ -176,7 +175,6 @@ struct clk_hw_omap {
 #define ENABLE_ON_INIT		(1 << 3)	/* Enable upon framework init */
 #define INVERT_ENABLE		(1 << 4)	/* 0 enables, 1 disables */
 #define CLOCK_CLKOUTX2		(1 << 5)
-#define REG_ACCESS_DIRECT	(1 << 6)
 
 /* CM_CLKEN_PLL*.EN* bit values - not all are available for every DPLL */
 #define DPLL_LOW_POWER_STOP	0x1
