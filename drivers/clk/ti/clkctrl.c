@@ -139,20 +139,18 @@ static int _omap4_hwmod_clk_enable(struct clk_hw *hw)
 		}
 	}
 
-	val = readl_relaxed(clk->enable_reg);
+	val = ti_clk_ll_ops->clk_readl(&clk->enable_reg);
 
 	val &= ~OMAP4_MODULEMODE_MASK;
 	val |= clk->enable_bit;
 
-	writel_relaxed(val, clk->enable_reg);
-
-	pr_info("%s: wrote %x to %p\n", __func__, val, clk->enable_reg);
+	ti_clk_ll_ops->clk_writel(val, &clk->enable_reg);
 
 	if (clk->flags & NO_IDLEST)
 		return 0;
 
 	/* Wait until module is enabled */
-	while (!_omap4_is_ready(readl_relaxed(clk->enable_reg))) {
+	while (!_omap4_is_ready(ti_clk_ll_ops->clk_readl(&clk->enable_reg))) {
 		if (_omap4_is_timeout(&timeout, OMAP4_MAX_MODULE_READY_TIME)) {
 			pr_err("%s: failed to enable\n", clk_hw_get_name(hw));
 			return -EBUSY;
@@ -171,19 +169,17 @@ static void _omap4_hwmod_clk_disable(struct clk_hw *hw)
 	if (!clk->enable_bit)
 		return;
 
-	val = readl_relaxed(clk->enable_reg);
+	val = ti_clk_ll_ops->clk_readl(&clk->enable_reg);
 
 	val &= ~OMAP4_MODULEMODE_MASK;
 
-	writel_relaxed(val, clk->enable_reg);
-
-	pr_info("%s: wrote %x to %p\n", __func__, val, clk->enable_reg);
+	ti_clk_ll_ops->clk_writel(val, &clk->enable_reg);
 
 	if (clk->flags & NO_IDLEST)
 		goto exit;
 
 	/* Wait until module is disabled */
-	while (!_omap4_is_idle(readl_relaxed(clk->enable_reg))) {
+	while (!_omap4_is_idle(ti_clk_ll_ops->clk_readl(&clk->enable_reg))) {
 		if (_omap4_is_timeout(&timeout,
 				      OMAP4_MAX_MODULE_DISABLE_TIME)) {
 			pr_err("%s: failed to disable\n", clk_hw_get_name(hw));
@@ -201,9 +197,7 @@ static int _omap4_hwmod_clk_is_enabled(struct clk_hw *hw)
 	struct clk_hw_omap *clk = to_clk_hw_omap(hw);
 	u32 val;
 
-	val = readl_relaxed(clk->enable_reg);
-
-	pr_info("%s: val=%x, ptr=%p\n", __func__, val, clk->enable_reg);
+	val = ti_clk_ll_ops->clk_readl(&clk->enable_reg);
 
 	if (val & clk->enable_bit)
 		return 1;
@@ -318,9 +312,9 @@ static void __init _ti_omap4_clkctrl_setup(struct device_node *node)
 		if (!hw)
 			return;
 
-		hw->enable_reg = provider->base + reg_data->offset;
+		hw->enable_reg.ptr = provider->base + reg_data->offset;
 
-		_ti_clkctrl_setup_subclks(reg_data, hw->enable_reg);
+		_ti_clkctrl_setup_subclks(reg_data, hw->enable_reg.ptr);
 
 		if (reg_data->flags & CLKF_SW_SUP)
 			hw->enable_bit = MODULEMODE_SWCTRL;
