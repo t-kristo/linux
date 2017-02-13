@@ -517,9 +517,7 @@ static struct omap_hwmod omap44xx_dmic_hwmod = {
 	.main_clk	= "func_dmic_abe_gfclk",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM1_ABE_DMIC_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_ABE_DMIC_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_SWCTRL,
 		},
 	},
 };
@@ -1060,9 +1058,7 @@ static struct omap_hwmod omap44xx_gpio2_hwmod = {
 	.main_clk	= "l4_div_ck",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM_L4PER_GPIO2_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_L4PER_GPIO2_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_HWCTRL,
 		},
 	},
 	.opt_clks	= gpio2_opt_clks,
@@ -1083,9 +1079,7 @@ static struct omap_hwmod omap44xx_gpio3_hwmod = {
 	.main_clk	= "l4_div_ck",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM_L4PER_GPIO3_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_L4PER_GPIO3_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_HWCTRL,
 		},
 	},
 	.opt_clks	= gpio3_opt_clks,
@@ -1361,9 +1355,7 @@ static struct omap_hwmod omap44xx_i2c2_hwmod = {
 	.main_clk	= "func_96m_fclk",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM_L4PER_I2C2_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_L4PER_I2C2_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_SWCTRL,
 		},
 	},
 	.dev_attr	= &i2c_dev_attr,
@@ -1378,9 +1370,7 @@ static struct omap_hwmod omap44xx_i2c3_hwmod = {
 	.main_clk	= "func_96m_fclk",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM_L4PER_I2C3_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_L4PER_I2C3_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_SWCTRL,
 		},
 	},
 	.dev_attr	= &i2c_dev_attr,
@@ -1395,9 +1385,7 @@ static struct omap_hwmod omap44xx_i2c4_hwmod = {
 	.main_clk	= "func_96m_fclk",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM_L4PER_I2C4_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_L4PER_I2C4_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_SWCTRL,
 		},
 	},
 	.dev_attr	= &i2c_dev_attr,
@@ -1659,9 +1647,7 @@ static struct omap_hwmod omap44xx_mcbsp1_hwmod = {
 	.main_clk	= "func_mcbsp1_gfclk",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM1_ABE_MCBSP1_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_ABE_MCBSP1_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_SWCTRL,
 		},
 	},
 	.opt_clks	= mcbsp1_opt_clks,
@@ -1775,9 +1761,7 @@ static struct omap_hwmod omap44xx_mcpdm_hwmod = {
 	.main_clk	= "pad_clks_ck",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM1_ABE_PDM_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_ABE_PDM_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_SWCTRL,
 		},
 	},
 };
@@ -2013,9 +1997,7 @@ static struct omap_hwmod omap44xx_mmc3_hwmod = {
 	.main_clk	= "func_48m_fclk",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM_L4PER_MMCSD3_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_L4PER_MMCSD3_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_SWCTRL,
 		},
 	},
 };
@@ -2035,9 +2017,7 @@ static struct omap_hwmod omap44xx_mmc4_hwmod = {
 	.main_clk	= "func_48m_fclk",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM_L4PER_MMCSD4_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_L4PER_MMCSD4_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_SWCTRL,
 		},
 	},
 };
@@ -2057,9 +2037,7 @@ static struct omap_hwmod omap44xx_mmc5_hwmod = {
 	.main_clk	= "func_48m_fclk",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM_L4PER_MMCSD5_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_L4PER_MMCSD5_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_SWCTRL,
 		},
 	},
 };
@@ -2799,9 +2777,7 @@ static struct omap_hwmod omap44xx_uart1_hwmod = {
 	.main_clk	= "func_48m_fclk",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM_L4PER_UART1_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_L4PER_UART1_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_SWCTRL,
 		},
 	},
 };
@@ -2815,9 +2791,7 @@ static struct omap_hwmod omap44xx_uart2_hwmod = {
 	.main_clk	= "func_48m_fclk",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM_L4PER_UART2_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_L4PER_UART2_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_SWCTRL,
 		},
 	},
 };
@@ -2831,9 +2805,7 @@ static struct omap_hwmod omap44xx_uart3_hwmod = {
 	.main_clk	= "func_48m_fclk",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM_L4PER_UART3_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_L4PER_UART3_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_SWCTRL,
 		},
 	},
 };
@@ -2847,9 +2819,7 @@ static struct omap_hwmod omap44xx_uart4_hwmod = {
 	.main_clk	= "func_48m_fclk",
 	.prcm = {
 		.omap4 = {
-			.clkctrl_offs = OMAP4_CM_L4PER_UART4_CLKCTRL_OFFSET,
 			.context_offs = OMAP4_RM_L4PER_UART4_CONTEXT_OFFSET,
-			.modulemode   = MODULEMODE_SWCTRL,
 		},
 	},
 };
