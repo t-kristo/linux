@@ -872,6 +872,50 @@ static struct omap_hwmod omap44xx_dss_venc_hwmod = {
 	.parent_hwmod	= &omap44xx_dss_hwmod,
 };
 
+/* AES (the 'P' (public) device) */
+static struct omap_hwmod_class_sysconfig omap44xx_aes_sysc = {
+	.rev_offs	= 0x0080,
+	.sysc_offs	= 0x0084,
+	.syss_offs	= 0x0088,
+	.sysc_flags	= SYSS_HAS_RESET_STATUS,
+};
+
+static struct omap_hwmod_class omap44xx_aes_hwmod_class = {
+	.name	= "aes",
+	.sysc	= &omap44xx_aes_sysc,
+	.rev	= 2,
+};
+
+/* AES1 */
+static struct omap_hwmod omap44xx_aes1_hwmod = {
+	.name		= "aes1",
+	.class		= &omap44xx_aes_hwmod_class,
+	.clkdm_name	= "l4_secure_clkdm",
+	.main_clk	= "l3_div_ck",
+	.prcm = {
+		.omap4 = {
+			.clkctrl_offs = OMAP4_CM_L4SEC_AES1_CLKCTRL_OFFSET,
+			.context_offs = OMAP4_RM_L4SEC_AES1_CONTEXT_OFFSET,
+			.modulemode   = MODULEMODE_SWCTRL,
+		},
+	},
+};
+
+/* AES2 */
+static struct omap_hwmod omap44xx_aes2_hwmod = {
+	.name		= "aes2",
+	.class		= &omap44xx_aes_hwmod_class,
+	.clkdm_name	= "l4_secure_clkdm",
+	.main_clk	= "l3_div_ck",
+	.prcm = {
+		.omap4 = {
+			.clkctrl_offs = OMAP4_CM_L4SEC_AES2_CLKCTRL_OFFSET,
+			.context_offs = OMAP4_RM_L4SEC_AES2_CONTEXT_OFFSET,
+			.modulemode   = MODULEMODE_SWCTRL,
+		},
+	},
+};
+
 /*
  * 'elm' class
  * bch error location module
@@ -3884,6 +3928,22 @@ static struct omap_hwmod_ocp_if omap44xx_l4_per__dss_venc = {
 	.user		= OCP_USER_MPU,
 };
 
+/* l3_main_2 -> aes1 */
+static struct omap_hwmod_ocp_if omap44xx_l3_main_2__aes1 = {
+        .master         = &omap44xx_l3_main_2_hwmod,
+        .slave          = &omap44xx_aes1_hwmod,
+        .clk            = "l3_div_ck",
+        .user           = OCP_USER_MPU | OCP_USER_SDMA,
+};
+
+/* l3_main_2 -> aes2 */
+static struct omap_hwmod_ocp_if omap44xx_l3_main_2__aes2 = {
+	.master		= &omap44xx_l3_main_2_hwmod,
+	.slave		= &omap44xx_aes2_hwmod,
+	.clk		= "l3_div_ck",
+	.user		= OCP_USER_MPU | OCP_USER_SDMA,
+};
+
 /* l4_per -> elm */
 static struct omap_hwmod_ocp_if omap44xx_l4_per__elm = {
 	.master		= &omap44xx_l4_per_hwmod,
@@ -4688,6 +4748,8 @@ static struct omap_hwmod_ocp_if *omap44xx_hwmod_ocp_ifs[] __initdata = {
 	&omap44xx_l4_cfg__l4_wkup,
 	&omap44xx_mpu__mpu_private,
 	&omap44xx_l4_cfg__ocp_wp_noc,
+	&omap44xx_l3_main_2__aes1,
+	&omap44xx_l3_main_2__aes2,
 	&omap44xx_l4_abe__aess,
 	&omap44xx_l4_abe__aess_dma,
 	&omap44xx_l3_main_2__c2c,
