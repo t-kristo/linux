@@ -120,8 +120,6 @@ static struct ti_dt_clk omap44xx_clks[] = {
 	DT_CLK(NULL, "per_abe_24m_fclk", "per_abe_24m_fclk"),
 	DT_CLK(NULL, "per_abe_nc_fclk", "per_abe_nc_fclk"),
 	DT_CLK(NULL, "syc_clk_div_ck", "syc_clk_div_ck"),
-	DT_CLK(NULL, "aes1_fck", "aes1_fck"),
-	DT_CLK(NULL, "aes2_fck", "aes2_fck"),
 	DT_CLK(NULL, "dmic_sync_mux_ck", "dmic_sync_mux_ck"),
 	DT_CLK(NULL, "func_dmic_abe_gfclk", "func_dmic_abe_gfclk"),
 	DT_CLK(NULL, "dss_sys_clk", "dss_sys_clk"),
