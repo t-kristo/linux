@@ -34,10 +34,13 @@
  * struct omap_rproc_boot_data - boot data structure for the DSP omap rprocs
  * @syscon: regmap handle for the system control configuration module
  * @boot_reg: boot register offset within the @syscon regmap
+ * @boot_reg_shift: bit-field shift required for the boot address value in
+ *		    @boot_reg
  */
 struct omap_rproc_boot_data {
 	struct regmap *syscon;
 	unsigned int boot_reg;
+	unsigned int boot_reg_shift;
 };
 
 /*
@@ -78,12 +81,14 @@ struct omap_rproc {
  * struct omap_rproc_dev_data - device data for the omap remote processor
  * @device_name: device name of the remote processor
  * @has_bootreg: true if this remote processor has boot register
+ * @boot_reg_shift: bit shift for the boot register mask
  * @mem_names: memory names for this remote processor
  * @dev_addrs: device addresses corresponding to the memory names
  */
 struct omap_rproc_dev_data {
 	const char *device_name;
 	bool has_bootreg;
+	int boot_reg_shift;
 	const char * const *mem_names;
 	const u32 *dev_addrs;
 };
@@ -153,6 +158,8 @@ static int omap_rproc_write_dsp_boot_addr(struct rproc *rproc)
 	struct omap_rproc *oproc = rproc->priv;
 	struct omap_rproc_boot_data *bdata = oproc->boot_data;
 	u32 offset = bdata->boot_reg;
+	u32 value;
+	u32 mask;
 
 	if (rproc->bootaddr & (SZ_1K - 1)) {
 		dev_err(dev, "invalid boot address 0x%x, must be aligned on a 1KB boundary\n",
@@ -160,7 +167,10 @@ static int omap_rproc_write_dsp_boot_addr(struct rproc *rproc)
 		return -EINVAL;
 	}
 
-	regmap_write(bdata->syscon, offset, rproc->bootaddr);
+	value = rproc->bootaddr >> bdata->boot_reg_shift;
+	mask = ~(SZ_1K - 1) >> bdata->boot_reg_shift;
+
+	regmap_update_bits(bdata->syscon, offset, mask, value);
 
 	return 0;
 }
@@ -286,6 +296,14 @@ static const u32 ipu_dev_addrs[] = {
 	0x20000000,
 };
 
+static const char * const dra7_dsp_mem_names[] = {
+	"l2ram", "l1pram", "l1dram", NULL
+};
+
+static const u32 dra7_dsp_dev_addrs[] = {
+	0x800000, 0xe00000, 0xf00000,
+};
+
 static const struct omap_rproc_dev_data omap4_dsp_dev_data = {
 	.device_name	= "dsp",
 	.has_bootreg	= true,
@@ -308,6 +326,20 @@ static const struct omap_rproc_dev_data omap5_ipu_dev_data = {
 	.dev_addrs	= ipu_dev_addrs,
 };
 
+static const struct omap_rproc_dev_data dra7_dsp_dev_data = {
+	.device_name	= "dsp",
+	.has_bootreg	= true,
+	.boot_reg_shift	= 10,
+	.mem_names	= dra7_dsp_mem_names,
+	.dev_addrs	= dra7_dsp_dev_addrs,
+};
+
+static const struct omap_rproc_dev_data dra7_ipu_dev_data = {
+	.device_name	= "ipu",
+	.mem_names	= ipu_mem_names,
+	.dev_addrs	= ipu_dev_addrs,
+};
+
 static const struct of_device_id omap_rproc_of_match[] = {
 	{
 		.compatible     = "ti,omap4-dsp",
@@ -324,6 +356,14 @@ static const struct of_device_id omap_rproc_of_match[] = {
 	{
 		.compatible     = "ti,omap5-ipu",
 		.data           = &omap5_ipu_dev_data,
+	},
+	{
+		.compatible     = "ti,dra7-dsp",
+		.data           = &dra7_dsp_dev_data,
+	},
+	{
+		.compatible     = "ti,dra7-ipu",
+		.data           = &dra7_ipu_dev_data,
 	},
 	{
 		/* end */
@@ -381,6 +421,8 @@ static int omap_rproc_get_boot_data(struct platform_device *pdev,
 		dev_err(&pdev->dev, "couldn't get the boot register\n");
 		return -EINVAL;
 	}
+
+	oproc->boot_data->boot_reg_shift = data->boot_reg_shift;
 
 	return 0;
 }
