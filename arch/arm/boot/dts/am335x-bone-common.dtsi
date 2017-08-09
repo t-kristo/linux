@@ -409,6 +409,6 @@
 };
 
 &rtc {
-	clocks = <&clk_32768_ck>, <&clkdiv32k_ick>;
+	clocks = <&clk_32768_ck>, <&l4_per_clkctrl 0x138 0>;
 	clock-names = "ext-clk", "int-clk";
 };
