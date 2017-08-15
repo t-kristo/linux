@@ -21,6 +21,7 @@
 #include <linux/of_address.h>
 #include <linux/clk/ti.h>
 #include <linux/delay.h>
+#include <linux/timekeeping.h>
 #include "clock.h"
 
 #define NO_IDLEST			0x1
@@ -89,7 +90,7 @@ static bool _omap4_is_ready(u32 val)
 
 static bool _omap4_is_timeout(union omap4_timeout *time, u32 timeout)
 {
-	if (unlikely(_early_timeout)) {
+	if (unlikely(_early_timeout || timekeeping_suspended)) {
 		if (time->cycles++ < timeout) {
 			udelay(1);
 			return false;
