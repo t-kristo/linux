@@ -84,6 +84,13 @@
 		interrupt-parent = <&gic>;
 	};
 
+	debugger: debugger {
+		compatible = "ti,debugger";
+		clock-names = "clkctrl";
+		clocks = <&l4_per_clkctrl OMAP4_UART3_CLKCTRL 0>,
+			 <&mpuss_clkctrl OMAP4_MPU_CLKCTRL 0>;
+	};
+
 	/*
 	 * The soc node represents the soc top level view. It is used for IPs
 	 * that are not memory mapped in the MPU view or for the MPU itself.
