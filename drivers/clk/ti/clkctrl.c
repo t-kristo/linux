@@ -452,7 +452,7 @@ static void __init _ti_omap4_clkctrl_setup(struct device_node *node)
 	}
 
 	if (!data->addr) {
-		pr_err("%s not found from clkctrl data.\n", node->name);
+		pr_err("%s not found from clkctrl data.\n", node->parent->name);
 		return;
 	}
 
