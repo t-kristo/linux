@@ -9,6 +9,7 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/pinctrl/omap.h>
+#include <dt-bindings/clock/omap4.h>
 
 / {
 	compatible = "ti,omap4430", "ti,omap4";
@@ -132,8 +133,11 @@
 			ranges = <0 0x4a000000 0x1000000>;
 
 			cm1: cm1@4000 {
-				compatible = "ti,omap4-cm1";
+				compatible = "ti,omap4-cm1", "simple-bus";
 				reg = <0x4000 0x2000>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+				ranges = <0 0x4000 0x2000>;
 
 				cm1_clocks: clocks {
 					#address-cells = <1>;
@@ -145,8 +149,11 @@
 			};
 
 			cm2: cm2@8000 {
-				compatible = "ti,omap4-cm2";
+				compatible = "ti,omap4-cm2", "simple-bus";
 				reg = <0x8000 0x3000>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+				ranges = <0 0x8000 0x3000>;
 
 				cm2_clocks: clocks {
 					#address-cells = <1>;
@@ -229,6 +236,9 @@
 					compatible = "ti,omap4-prm";
 					reg = <0x6000 0x3000>;
 					interrupts = <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>;
+					#address-cells = <1>;
+					#size-cells = <1>;
+					ranges = <0 0x6000 0x3000>;
 
 					prm_clocks: clocks {
 						#address-cells = <1>;
@@ -753,6 +763,8 @@
 			interrupts = <GIC_SPI 37 IRQ_TYPE_LEVEL_HIGH>;
 			ti,hwmods = "timer1";
 			ti,timer-alwon;
+			clocks = <&l4_wkup_clkctrl 0x20 24>;
+			clock-names = "fck";
 		};
 
 		timer2: timer@48032000 {
@@ -967,7 +979,7 @@
 			reg = <0x58000000 0x80>;
 			status = "disabled";
 			ti,hwmods = "dss_core";
-			clocks = <&dss_dss_clk>;
+			clocks = <&l3_dss_clkctrl 0 8>;
 			clock-names = "fck";
 			#address-cells = <1>;
 			#size-cells = <1>;
@@ -978,7 +990,7 @@
 				reg = <0x58001000 0x1000>;
 				interrupts = <GIC_SPI 25 IRQ_TYPE_LEVEL_HIGH>;
 				ti,hwmods = "dss_dispc";
-				clocks = <&dss_dss_clk>;
+				clocks = <&l3_dss_clkctrl 0 8>;
 				clock-names = "fck";
 			};
 
@@ -987,7 +999,7 @@
 				reg = <0x58002000 0x1000>;
 				status = "disabled";
 				ti,hwmods = "dss_rfbi";
-				clocks = <&dss_dss_clk>, <&l3_div_ck>;
+				clocks = <&l3_dss_clkctrl 0 8>, <&l3_div_ck>;
 				clock-names = "fck", "ick";
 			};
 
@@ -996,7 +1008,7 @@
 				reg = <0x58003000 0x1000>;
 				status = "disabled";
 				ti,hwmods = "dss_venc";
-				clocks = <&dss_tv_clk>;
+				clocks = <&l3_dss_clkctrl 0 11>;
 				clock-names = "fck";
 			};
 
@@ -1009,7 +1021,8 @@
 				interrupts = <GIC_SPI 53 IRQ_TYPE_LEVEL_HIGH>;
 				status = "disabled";
 				ti,hwmods = "dss_dsi1";
-				clocks = <&dss_dss_clk>, <&dss_sys_clk>;
+				clocks = <&l3_dss_clkctrl 0 8>,
+					 <&l3_dss_clkctrl 0 10>;
 				clock-names = "fck", "sys_clk";
 			};
 
@@ -1022,7 +1035,8 @@
 				interrupts = <GIC_SPI 84 IRQ_TYPE_LEVEL_HIGH>;
 				status = "disabled";
 				ti,hwmods = "dss_dsi2";
-				clocks = <&dss_dss_clk>, <&dss_sys_clk>;
+				clocks = <&l3_dss_clkctrl 0 8>,
+					 <&l3_dss_clkctrl 0 10>;
 				clock-names = "fck", "sys_clk";
 			};
 
@@ -1036,7 +1050,8 @@
 				interrupts = <GIC_SPI 101 IRQ_TYPE_LEVEL_HIGH>;
 				status = "disabled";
 				ti,hwmods = "dss_hdmi";
-				clocks = <&dss_48mhz_clk>, <&dss_sys_clk>;
+				clocks = <&l3_dss_clkctrl 0 9>,
+					 <&l3_dss_clkctrl 0 10>;
 				clock-names = "fck", "sys_clk";
 				dmas = <&sdma 76>;
 				dma-names = "audio_tx";
@@ -1045,4 +1060,4 @@
 	};
 };
 
-/include/ "omap44xx-clocks.dtsi"
+#include "omap44xx-clocks.dtsi"
