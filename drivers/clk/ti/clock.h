@@ -207,6 +207,7 @@ struct ti_dt_clk {
 struct omap_clkctrl_div_data {
 	const int *dividers;
 	int max_div;
+	u32 flags;
 };
 
 struct omap_clkctrl_bit_data {
@@ -221,6 +222,7 @@ struct omap_clkctrl_reg_data {
 	const struct omap_clkctrl_bit_data *bit_data;
 	u16 flags;
 	const char *parent;
+	const char *clkdm_name;
 };
 
 struct omap_clkctrl_data {
@@ -229,6 +231,12 @@ struct omap_clkctrl_data {
 };
 
 extern const struct omap_clkctrl_data omap4_clkctrl_data[];
+extern const struct omap_clkctrl_data omap5_clkctrl_data[];
+extern const struct omap_clkctrl_data dra7_clkctrl_data[];
+extern const struct omap_clkctrl_data am3_clkctrl_data[];
+extern const struct omap_clkctrl_data am4_clkctrl_data[];
+extern const struct omap_clkctrl_data dm814_clkctrl_data[];
+extern const struct omap_clkctrl_data dm816_clkctrl_data[];
 
 #define CLKF_SW_SUP	BIT(0)
 #define CLKF_HW_SUP	BIT(1)
