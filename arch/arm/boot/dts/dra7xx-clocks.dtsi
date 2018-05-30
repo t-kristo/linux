@@ -1564,6 +1564,9 @@
 			compatible = "ti,clkctrl";
 			reg = <0x20 0x4>;
 			#clock-cells = <2>;
+
+			assigned-clocks = <&ipu1_clkctrl DRA7_IPU1_MMU_IPU1_CLKCTRL 24>;
+			assigned-clock-parents = <&dpll_core_h22x2_ck>;
 		};
 
 		ipu_clkctrl: ipu-clkctrl@50 {
