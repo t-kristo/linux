@@ -3016,6 +3016,7 @@
 			ti,sysc-sidle = <SYSC_IDLE_FORCE>,
 					<SYSC_IDLE_NO>;
 			ti,syss-mask = <1>;
+			ti,no-idle-on-init;
 			clocks = <&gmac_clkctrl DRA7_GMAC_GMAC_CLKCTRL 0>;
 			clock-names = "fck";
 			#address-cells = <1>;
