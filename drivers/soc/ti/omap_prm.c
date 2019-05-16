@@ -54,7 +54,27 @@ struct omap_reset_data {
 
 #define OMAP_PRM_NO_RSTST	BIT(0)
 
+struct omap_prm_data omap4_prm_data[] = {
+	{ .name = "mpu", .base = 0x4a306300, .pwstst = 0x4 },
+	{ .name = "tesla", .base = 0x4a306400, .pwstst = 0x4, .rstctl = 0x10, .rstst = 0x14 },
+	{ .name = "abe", .base = 0x4a306500, .pwstst = 0x4 },
+	{ .name = "always_on_core", .base = 0x4a306600, .pwstst = 0x4 },
+	{ .name = "core", .base = 0x4a306700, .pwstst = 0x4, .rstctl = 0x210, .rstst = 0x214 },
+	{ .name = "ivahd", .base = 0x4a306f00, .pwstst = 0x4, .rstctl = 0x10, .rstst = 0x14 },
+	{ .name = "cam", .base = 0x4a307000, .pwstst = 0x4 },
+	{ .name = "dss", .base = 0x4a307100, .pwstst = 0x4 },
+	{ .name = "gfx", .base = 0x4a307200, .pwstst = 0x4 },
+	{ .name = "l3init", .base = 0x4a307300, .pwstst = 0x4 },
+	{ .name = "l4per", .base = 0x4a307400, .pwstst = 0x4 },
+	{ .name = "cefuse", .base = 0x4a307600, .pwstst = 0x4 },
+	{ .name = "wkup", .base = 0x4a307700, .pwstst = 0x4 },
+	{ .name = "emu", .base = 0x4a307900, .pwstst = 0x4 },
+	{ .name = "device", .base = 0x4a307b00, .rstctl = 0x0, .rstst = 0x4 },
+	{ },
+};
+
 static const struct of_device_id omap_prm_id_table[] = {
+	{ .compatible = "ti,omap4-prm-inst", .data = omap4_prm_data },
 	{ },
 };
 
