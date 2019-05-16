@@ -68,8 +68,25 @@ struct omap_prm_data omap4_prm_data[] = {
 	{ },
 };
 
+struct omap_rst_map am3_wkup_rst_map[] = {
+	{ .rst = 3, .st = 5 },
+	{ .rst = -1 },
+};
+
+struct omap_prm_data am3_prm_data[] = {
+	{ .name = "per", .base = 0x44e00c00, .pwstctrl = 0xc, .pwstst = 0x8, .flags = OMAP_PRM_NO_RSTST },
+	{ .name = "wkup", .base = 0x44e00d00, .pwstctrl = 0x4, .pwstst = 0x8, .rstst = 0xc, .rstmap = am3_wkup_rst_map },
+	{ .name = "mpu", .base = 0x44e00e00, .pwstst = 0x4 },
+	{ .name = "device", .base = 0x44e00f00, .rstctl = 0x0, .rstst = 0x8 },
+	{ .name = "rtc", .base = 0x44e01000, .pwstst = 0x4 },
+	{ .name = "gfx", .base = 0x44e01100, .pwstst = 0x10, .rstctl = 0x4, .rstst = 0x14 },
+	{ .name = "cefuse", .base = 0x44e01200, .pwstst = 0x4 },
+	{ },
+};
+
 static const struct of_device_id omap_prm_id_table[] = {
 	{ .compatible = "ti,omap4-prm-inst", .data = omap4_prm_data },
+	{ .compatible = "ti,am3-prm-inst", .data = am3_prm_data },
 	{ },
 };
 
