@@ -2550,7 +2550,6 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
 	return rc;
 }
 
-#ifdef CONFIG_CIFS_ACL
 static struct cifs_ntsd *
 get_smb2_acl_by_fid(struct cifs_sb_info *cifs_sb,
 		const struct cifs_fid *cifsfid, u32 *pacllen)
@@ -2635,7 +2634,6 @@ get_smb2_acl_by_path(struct cifs_sb_info *cifs_sb,
 	return pntsd;
 }
 
-#ifdef CONFIG_CIFS_ACL
 static int
 set_smb2_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
 		struct inode *inode, const char *path, int aclflag)
@@ -2693,7 +2691,6 @@ set_smb2_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
 	free_xid(xid);
 	return rc;
 }
-#endif /* CIFS_ACL */
 
 /* Retrieve an ACL from the server */
 static struct cifs_ntsd *
@@ -2713,7 +2710,6 @@ get_smb2_acl(struct cifs_sb_info *cifs_sb,
 	cifsFileInfo_put(open_file);
 	return pntsd;
 }
-#endif
 
 static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
 			    loff_t offset, loff_t len, bool keep_size)
@@ -4236,11 +4232,9 @@ struct smb_version_operations smb20_operations = {
 	.query_all_EAs = smb2_query_eas,
 	.set_EA = smb2_set_ea,
 #endif /* CIFS_XATTR */
-#ifdef CONFIG_CIFS_ACL
 	.get_acl = get_smb2_acl,
 	.get_acl_by_fid = get_smb2_acl_by_fid,
 	.set_acl = set_smb2_acl,
-#endif /* CIFS_ACL */
 	.next_header = smb2_next_header,
 	.ioctl_query_info = smb2_ioctl_query_info,
 	.make_node = smb2_make_node,
@@ -4337,11 +4331,9 @@ struct smb_version_operations smb21_operations = {
 	.query_all_EAs = smb2_query_eas,
 	.set_EA = smb2_set_ea,
 #endif /* CIFS_XATTR */
-#ifdef CONFIG_CIFS_ACL
 	.get_acl = get_smb2_acl,
 	.get_acl_by_fid = get_smb2_acl_by_fid,
 	.set_acl = set_smb2_acl,
-#endif /* CIFS_ACL */
 	.next_header = smb2_next_header,
 	.ioctl_query_info = smb2_ioctl_query_info,
 	.make_node = smb2_make_node,
@@ -4447,11 +4439,9 @@ struct smb_version_operations smb30_operations = {
 	.query_all_EAs = smb2_query_eas,
 	.set_EA = smb2_set_ea,
 #endif /* CIFS_XATTR */
-#ifdef CONFIG_CIFS_ACL
 	.get_acl = get_smb2_acl,
 	.get_acl_by_fid = get_smb2_acl_by_fid,
 	.set_acl = set_smb2_acl,
-#endif /* CIFS_ACL */
 	.next_header = smb2_next_header,
 	.ioctl_query_info = smb2_ioctl_query_info,
 	.make_node = smb2_make_node,
@@ -4558,11 +4548,9 @@ struct smb_version_operations smb311_operations = {
 	.query_all_EAs = smb2_query_eas,
 	.set_EA = smb2_set_ea,
 #endif /* CIFS_XATTR */
-#ifdef CONFIG_CIFS_ACL
 	.get_acl = get_smb2_acl,
 	.get_acl_by_fid = get_smb2_acl_by_fid,
 	.set_acl = set_smb2_acl,
-#endif /* CIFS_ACL */
 	.next_header = smb2_next_header,
 	.ioctl_query_info = smb2_ioctl_query_info,
 	.make_node = smb2_make_node,
