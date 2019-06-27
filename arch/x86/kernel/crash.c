@@ -73,14 +73,6 @@ static inline void cpu_crash_vmclear_loaded_vmcss(void)
 
 static void kdump_nmi_callback(int cpu, struct pt_regs *regs)
 {
-#ifdef CONFIG_X86_32
-	struct pt_regs fixed_regs;
-
-	if (!user_mode(regs)) {
-		crash_fixup_ss_esp(&fixed_regs, regs);
-		regs = &fixed_regs;
-	}
-#endif
 	crash_save_cpu(regs, cpu);
 
 	/*
@@ -380,6 +372,12 @@ int crash_setup_memmap_entries(struct kimage *image, struct boot_params *params)
 	cmd.type = E820_TYPE_NVS;
 	walk_iomem_res_desc(IORES_DESC_ACPI_NV_STORAGE, flags, 0, -1, &cmd,
 			memmap_entry_callback);
+
+	/* Add e820 reserved ranges */
+	cmd.type = E820_TYPE_RESERVED;
+	flags = IORESOURCE_MEM;
+	walk_iomem_res_desc(IORES_DESC_RESERVED, flags, 0, -1, &cmd,
+			   memmap_entry_callback);
 
 	/* Add crashk_low_res region */
 	if (crashk_low_res.end) {
