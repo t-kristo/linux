@@ -75,6 +75,9 @@ obj-$(CONFIG_MFD_WM8994)	+= wm8994.o
 obj-$(CONFIG_MFD_WM97xx)	+= wm97xx-core.o
 
 madera-objs			:= madera-core.o
+ifeq ($(CONFIG_MFD_CS47L15),y)
+madera-objs			+= cs47l15-tables.o
+endif
 ifeq ($(CONFIG_MFD_CS47L35),y)
 madera-objs			+= cs47l35-tables.o
 endif
@@ -83,6 +86,9 @@ madera-objs			+= cs47l85-tables.o
 endif
 ifeq ($(CONFIG_MFD_CS47L90),y)
 madera-objs			+= cs47l90-tables.o
+endif
+ifeq ($(CONFIG_MFD_CS47L92),y)
+madera-objs			+= cs47l92-tables.o
 endif
 obj-$(CONFIG_MFD_MADERA)	+= madera.o
 obj-$(CONFIG_MFD_MADERA_I2C)	+= madera-i2c.o
