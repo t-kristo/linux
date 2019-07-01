@@ -323,7 +323,7 @@ int rproc_add_virtio_dev(struct rproc_vdev *rvdev, int id)
 	int ret;
 
 	/* Try to find dedicated vdev buffer carveout */
-	mem = rproc_find_carveout_by_name(rproc, "vdev%dbuffer", rvdev->index);
+	mem = rproc_find_carveout_by_name(rproc, "vdev%dbuffer", rvdev->id);
 	if (mem) {
 		phys_addr_t pa;
 
@@ -340,7 +340,7 @@ int rproc_add_virtio_dev(struct rproc_vdev *rvdev, int id)
 		} else {
 			if (mem->va) {
 				dev_warn(dev, "vdev %d buffer already mapped\n",
-					 rvdev->index);
+					 rvdev->id);
 				pa = rproc_va_to_pa(mem->va);
 			} else {
 				/* Use dma address as carveout no memmapped yet */
