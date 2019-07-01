@@ -568,7 +568,7 @@ static int rproc_handle_vdev(struct rproc *rproc, struct fw_rsc_vdev *rsc,
 	rvdev->rproc = rproc;
 
 	/* Initialise vdev subdevice */
-	snprintf(name, sizeof(name), "vdev%dbuffer", rvdev->index);
+	snprintf(name, sizeof(name), "vdev%dbuffer", rvdev->id);
 	rvdev->dev.parent = rproc->dev.parent;
 	rvdev->dev.release = rproc_rvdev_release;
 	dev_set_name(&rvdev->dev, "%s#%s", dev_name(rvdev->dev.parent), name);
