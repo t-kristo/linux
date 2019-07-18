@@ -47,6 +47,7 @@ struct sysc_regbits {
 	s8 emufree_shift;
 };
 
+#define SYSC_QUIRK_DEV_CONTROL		BIT(18)
 #define SYSC_MODULE_QUIRK_HDQ1W		BIT(17)
 #define SYSC_MODULE_QUIRK_I2C		BIT(16)
 #define SYSC_MODULE_QUIRK_WDT		BIT(15)
@@ -150,5 +151,8 @@ struct ti_sysc_platform_data {
 	int (*shutdown_module)(struct device *dev,
 			       const struct ti_sysc_cookie *cookie);
 };
+
+int ti_sysc_resume(struct device *dev);
+int ti_sysc_suspend(struct device *dev);
 
 #endif	/* __TI_SYSC_DATA_H__ */

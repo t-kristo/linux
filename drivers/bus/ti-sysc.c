@@ -100,6 +100,7 @@ struct sysc {
 	void (*clk_enable_quirk)(struct sysc *sysc);
 	void (*clk_disable_quirk)(struct sysc *sysc);
 	void (*reset_done_quirk)(struct sysc *sysc);
+	atomic_t usecount;
 };
 
 static void sysc_parse_dts_quirks(struct sysc *ddata, struct device_node *np,
@@ -1061,7 +1062,7 @@ static int __maybe_unused sysc_runtime_resume_legacy(struct device *dev,
 	return 0;
 }
 
-static int __maybe_unused sysc_runtime_suspend(struct device *dev)
+static int __maybe_unused _sysc_runtime_suspend(struct device *dev, bool force)
 {
 	struct sysc *ddata;
 	int error = 0;
@@ -1069,6 +1070,9 @@ static int __maybe_unused sysc_runtime_suspend(struct device *dev)
 	ddata = dev_get_drvdata(dev);
 
 	if (!ddata->enabled)
+		return 0;
+
+	if ((ddata->cfg.quirks & SYSC_QUIRK_DEV_CONTROL) && !force)
 		return 0;
 
 	sysc_clkdm_deny_idle(ddata);
@@ -1099,7 +1103,29 @@ err_allow_idle:
 	return error;
 }
 
-static int __maybe_unused sysc_runtime_resume(struct device *dev)
+static int __maybe_unused sysc_runtime_suspend(struct device *dev)
+{
+	return _sysc_runtime_suspend(dev, false);
+}
+
+int ti_sysc_suspend(struct device *dev)
+{
+	struct sysc *ddata;
+	int ret = 0;
+
+	ddata = dev_get_drvdata(dev);
+
+	if (!(ddata->cfg.quirks & SYSC_QUIRK_DEV_CONTROL))
+		return -EACCES;
+
+	if (atomic_dec_return(&ddata->usecount) == 0)
+		ret = _sysc_runtime_suspend(dev, true);
+
+	return ret;
+}
+EXPORT_SYMBOL_GPL(ti_sysc_suspend);
+
+static int __maybe_unused _sysc_runtime_resume(struct device *dev, bool force)
 {
 	struct sysc *ddata;
 	int error = 0;
@@ -1109,6 +1135,8 @@ static int __maybe_unused sysc_runtime_resume(struct device *dev)
 	if (ddata->enabled)
 		return 0;
 
+	if ((ddata->cfg.quirks & SYSC_QUIRK_DEV_CONTROL) && !force)
+		return 0;
 
 	sysc_clkdm_deny_idle(ddata);
 
@@ -1151,6 +1179,27 @@ err_allow_idle:
 
 	return error;
 }
+
+static int __maybe_unused sysc_runtime_resume(struct device *dev)
+{
+	return _sysc_runtime_resume(dev, false);
+}
+
+int ti_sysc_resume(struct device *dev)
+{
+	struct sysc *ddata;
+
+	ddata = dev_get_drvdata(dev);
+
+	if (!(ddata->cfg.quirks & SYSC_QUIRK_DEV_CONTROL))
+		return -EACCES;
+
+	if (atomic_inc_return(&ddata->usecount) == 1)
+		return _sysc_runtime_resume(dev, true);
+
+	return 0;
+}
+EXPORT_SYMBOL_GPL(ti_sysc_resume);
 
 static int __maybe_unused sysc_noirq_suspend(struct device *dev)
 {
@@ -2417,6 +2466,20 @@ static int sysc_probe(struct platform_device *pdev)
 	error = sysc_init_resets(ddata);
 	if (error)
 		return error;
+
+	if (ddata->cfg.quirks & SYSC_QUIRK_DEV_CONTROL) {
+		ddata->disable_on_idle = true;
+		ddata->dev->type = &sysc_device_type;
+
+		pm_runtime_enable(ddata->dev);
+		pm_runtime_get_sync(ddata->dev);
+
+		error = of_platform_populate(ddata->dev->of_node,
+					    sysc_match_table,
+					    pdata ? pdata->auxdata : NULL,
+					    ddata->dev);
+		return error;
+	}
 
 	error = sysc_init_module(ddata);
 	if (error)
