@@ -2341,6 +2341,32 @@ static const struct sysc_capabilities sysc_omap4_usb_host_fs = {
 	.regbits = &sysc_regbits_omap4_usb_host_fs,
 };
 
+static const struct sysc_regbits sysc_regbits_omap4_rproc = {
+	.dmadisable_shift = -ENODEV,
+	.midle_shift = -ENODEV,
+	.sidle_shift = -ENODEV,
+	.clkact_shift = -ENODEV,
+	.enwkup_shift = -ENODEV,
+	.srst_shift = -ENODEV,
+	.emufree_shift = -ENODEV,
+	.autoidle_shift = -ENODEV,
+};
+
+static const struct sysc_capabilities sysc_omap4_rproc = {
+	.type = TI_SYSC_OMAP4_IPU,
+	.regbits = &sysc_regbits_omap4_rproc,
+	.mod_quirks = SYSC_QUIRK_DEV_CONTROL,
+};
+
+static const struct sysc_capabilities sysc_omap4_iommu = {
+	.type = TI_SYSC_OMAP4_IOMMU,
+	.sysc_mask = SYSC_OMAP2_CLOCKACTIVITY |
+		     SYSC_OMAP2_SOFTRESET |
+		     SYSC_OMAP2_AUTOIDLE,
+	.regbits = &sysc_regbits_omap4,
+	.mod_quirks = SYSC_QUIRK_DEV_CONTROL,
+};
+
 static const struct sysc_regbits sysc_regbits_dra7_mcan = {
 	.dmadisable_shift = -ENODEV,
 	.midle_shift = -ENODEV,
@@ -2558,6 +2584,8 @@ static const struct of_device_id sysc_match[] = {
 	{ .compatible = "ti,sysc-omap4", .data = &sysc_omap4, },
 	{ .compatible = "ti,sysc-omap4-timer", .data = &sysc_omap4_timer, },
 	{ .compatible = "ti,sysc-omap4-simple", .data = &sysc_omap4_simple, },
+	{ .compatible = "ti,sysc-omap4-rproc", .data = &sysc_omap4_rproc, },
+	{ .compatible = "ti,sysc-omap4-iommu", .data = &sysc_omap4_iommu, },
 	{ .compatible = "ti,sysc-omap3430-sr", .data = &sysc_34xx_sr, },
 	{ .compatible = "ti,sysc-omap3630-sr", .data = &sysc_36xx_sr, },
 	{ .compatible = "ti,sysc-omap4-sr", .data = &sysc_omap4_sr, },
