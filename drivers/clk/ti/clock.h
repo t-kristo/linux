@@ -82,6 +82,7 @@ enum {
 #define CLKF_SW_SUP			BIT(5)
 #define CLKF_HW_SUP			BIT(6)
 #define CLKF_NO_IDLEST			BIT(7)
+#define CLKF_NO_IDLE_POLL		BIT(8)
 
 #define CLKF_SOC_MASK			GENMASK(11, 8)
 
