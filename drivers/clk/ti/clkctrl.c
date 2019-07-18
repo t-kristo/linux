@@ -25,6 +25,7 @@
 #include "clock.h"
 
 #define NO_IDLEST			0x1
+#define NO_IDLE_POLL			0x2
 
 #define OMAP4_MODULEMODE_MASK		0x3
 
@@ -187,7 +188,7 @@ static void _omap4_clkctrl_clk_disable(struct clk_hw *hw)
 
 	ti_clk_ll_ops->clk_writel(val, &clk->enable_reg);
 
-	if (clk->flags & NO_IDLEST)
+	if (clk->flags & (NO_IDLEST | NO_IDLE_POLL))
 		goto exit;
 
 	/* Wait until module is disabled */
@@ -597,6 +598,8 @@ static void __init _ti_omap4_clkctrl_setup(struct device_node *node)
 			hw->enable_bit = MODULEMODE_HWCTRL;
 		if (reg_data->flags & CLKF_NO_IDLEST)
 			hw->flags |= NO_IDLEST;
+		if (reg_data->flags & CLKF_NO_IDLE_POLL)
+			hw->flags |= NO_IDLE_POLL;
 
 		if (reg_data->clkdm_name)
 			hw->clkdm_name = reg_data->clkdm_name;
