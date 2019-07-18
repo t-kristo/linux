@@ -29,6 +29,7 @@
 #include <linux/mfd/syscon.h>
 
 #include <linux/platform_data/iommu-omap.h>
+#include <linux/platform_data/ti-sysc.h>
 
 #include "omap-iopgtable.h"
 #include "omap-iommu.h"
@@ -1035,6 +1036,8 @@ static int omap_iommu_runtime_suspend(struct device *dev)
 
 	if (pdata && pdata->device_idle)
 		pdata->device_idle(pdev);
+	else
+		ti_sysc_suspend(dev->parent);
 
 	if (pdata && pdata->assert_reset)
 		pdata->assert_reset(pdev, pdata->reset_name);
@@ -1087,6 +1090,8 @@ static int omap_iommu_runtime_resume(struct device *dev)
 
 	if (pdata && pdata->device_enable)
 		pdata->device_enable(pdev);
+	else
+		ti_sysc_resume(dev->parent);
 
 	/* restore the TLBs only during resume, and not for power up */
 	if (obj->domain)
@@ -1255,7 +1260,6 @@ static int omap_iommu_probe(struct platform_device *pdev)
 			goto out_sysfs;
 	}
 
-	pm_runtime_irq_safe(obj->dev);
 	pm_runtime_enable(obj->dev);
 
 	omap_iommu_debugfs_add(obj);
