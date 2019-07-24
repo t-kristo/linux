@@ -107,6 +107,7 @@ static int omap_reset_deassert(struct reset_controller_dev *rcdev,
 	u32 v;
 	int st_bit = id;
 	bool has_rstst;
+	int timeout = 0;
 
 	/* check the current status to avoid de-asserting the line twice */
 	v = readl_relaxed(reset->prm->base + reset->prm->data->rstctl);
@@ -128,6 +129,22 @@ static int omap_reset_deassert(struct reset_controller_dev *rcdev,
 	v = readl_relaxed(reset->prm->base + reset->prm->data->rstctl);
 	v &= ~(1 << id);
 	writel_relaxed(v, reset->prm->base + reset->prm->data->rstctl);
+
+	if (!has_rstst)
+		return 0;
+
+	/* wait for the status to be set */
+	while (1) {
+		v = readl_relaxed(reset->prm->base + reset->prm->data->rstst);
+		v &= 1 << st_bit;
+		if (v)
+			break;
+		timeout++;
+		if (timeout > OMAP_RESET_MAX_WAIT)
+			return -EBUSY;
+
+		udelay(1);
+	}
 
 	return 0;
 }
