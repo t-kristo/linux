@@ -95,7 +95,6 @@ struct sysc {
 	unsigned int enabled:1;
 	unsigned int needs_resume:1;
 	unsigned int child_needs_resume:1;
-	unsigned int disable_on_idle:1;
 	struct delayed_work idle_work;
 	void (*clk_enable_quirk)(struct sysc *sysc);
 	void (*clk_disable_quirk)(struct sysc *sysc);
@@ -1031,8 +1030,7 @@ static int __maybe_unused sysc_runtime_suspend_legacy(struct device *dev,
 		dev_err(dev, "%s: could not idle: %i\n",
 			__func__, error);
 
-	if (ddata->disable_on_idle)
-		reset_control_assert(ddata->rsts);
+	reset_control_assert(ddata->rsts);
 
 	return 0;
 }
@@ -1042,9 +1040,6 @@ static int __maybe_unused sysc_runtime_resume_legacy(struct device *dev,
 {
 	struct ti_sysc_platform_data *pdata;
 	int error;
-
-	if (ddata->disable_on_idle)
-		reset_control_deassert(ddata->rsts);
 
 	pdata = dev_get_platdata(ddata->dev);
 	if (!pdata)
@@ -1057,6 +1052,8 @@ static int __maybe_unused sysc_runtime_resume_legacy(struct device *dev,
 	if (error)
 		dev_err(dev, "%s: could not enable: %i\n",
 			__func__, error);
+
+	reset_control_deassert(ddata->rsts);
 
 	return 0;
 }
@@ -1091,8 +1088,7 @@ static int __maybe_unused sysc_runtime_suspend(struct device *dev)
 	ddata->enabled = false;
 
 err_allow_idle:
-	if (ddata->disable_on_idle)
-		reset_control_assert(ddata->rsts);
+	reset_control_assert(ddata->rsts);
 
 	sysc_clkdm_allow_idle(ddata);
 
@@ -1112,9 +1108,6 @@ static int __maybe_unused sysc_runtime_resume(struct device *dev)
 
 	sysc_clkdm_deny_idle(ddata);
 
-	if (ddata->disable_on_idle)
-		reset_control_deassert(ddata->rsts);
-
 	if (sysc_opt_clks_needed(ddata)) {
 		error = sysc_enable_opt_clocks(ddata);
 		if (error)
@@ -1124,6 +1117,8 @@ static int __maybe_unused sysc_runtime_resume(struct device *dev)
 	error = sysc_enable_main_clocks(ddata);
 	if (error)
 		goto err_opt_clocks;
+
+	reset_control_deassert(ddata->rsts);
 
 	if (ddata->legacy_mode) {
 		error = sysc_runtime_resume_legacy(dev, ddata);
@@ -1517,42 +1512,6 @@ static int sysc_legacy_init(struct sysc *ddata)
 	return error;
 }
 
-/**
- * sysc_rstctrl_reset_deassert - deassert rstctrl reset
- * @ddata: device driver data
- * @reset: reset before deassert
- *
- * A module can have both OCP softreset control and external rstctrl.
- * If more complicated rstctrl resets are needed, please handle these
- * directly from the child device driver and map only the module reset
- * for the parent interconnect target module device.
- *
- * Automatic reset of the module on init can be skipped with the
- * "ti,no-reset-on-init" device tree property.
- */
-static int sysc_rstctrl_reset_deassert(struct sysc *ddata, bool reset)
-{
-	int error, val;
-
-	if (!ddata->rsts)
-		return 0;
-
-	if (reset) {
-		error = reset_control_assert(ddata->rsts);
-		if (error)
-			return error;
-	}
-
-	error = reset_control_deassert(ddata->rsts);
-	if (error == -EEXIST)
-		return 0;
-
-	error = readx_poll_timeout(reset_control_status, ddata->rsts, val,
-				   val == 0, 100, MAX_MODULE_SOFTRESET_WAIT);
-
-	return error;
-}
-
 /*
  * Note that the caller must ensure the interconnect target module is enabled
  * before calling reset. Otherwise reset will not complete.
@@ -1618,10 +1577,6 @@ static int sysc_init_module(struct sysc *ddata)
 	int error = 0;
 	bool manage_clocks = true;
 
-	error = sysc_rstctrl_reset_deassert(ddata, false);
-	if (error)
-		return error;
-
 	if (ddata->cfg.quirks &
 	    (SYSC_QUIRK_NO_IDLE | SYSC_QUIRK_NO_IDLE_ON_INIT))
 		manage_clocks = false;
@@ -1643,7 +1598,7 @@ static int sysc_init_module(struct sysc *ddata)
 	}
 
 	if (!(ddata->cfg.quirks & SYSC_QUIRK_NO_RESET_ON_INIT)) {
-		error = sysc_rstctrl_reset_deassert(ddata, true);
+		error = reset_control_deassert(ddata->rsts);
 		if (error)
 			goto err_main_clocks;
 	}
@@ -1655,13 +1610,13 @@ static int sysc_init_module(struct sysc *ddata)
 	if (ddata->legacy_mode) {
 		error = sysc_legacy_init(ddata);
 		if (error)
-			goto err_main_clocks;
+			goto err_reset;
 	}
 
 	if (!ddata->legacy_mode && manage_clocks) {
 		error = sysc_enable_module(ddata->dev);
 		if (error)
-			goto err_main_clocks;
+			goto err_reset;
 	}
 
 	error = sysc_reset(ddata);
@@ -1670,6 +1625,10 @@ static int sysc_init_module(struct sysc *ddata)
 
 	if (!ddata->legacy_mode && manage_clocks)
 		sysc_disable_module(ddata->dev);
+
+err_reset:
+	if (!(ddata->cfg.quirks & SYSC_QUIRK_NO_RESET_ON_INIT))
+		reset_control_assert(ddata->rsts);
 
 err_main_clocks:
 	if (manage_clocks)
@@ -2448,9 +2407,6 @@ static int sysc_probe(struct platform_device *pdev)
 	} else {
 		pm_runtime_put(&pdev->dev);
 	}
-
-	if (!of_get_available_child_count(ddata->dev->of_node))
-		ddata->disable_on_idle = true;
 
 	return 0;
 
