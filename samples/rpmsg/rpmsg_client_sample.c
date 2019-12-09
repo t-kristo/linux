@@ -15,7 +15,7 @@
 
 #define MSG		"hello world!"
 
-static int count = 100;
+static int count = 5;
 module_param(count, int, 0644);
 
 struct instance_data {
