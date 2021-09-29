@@ -651,6 +651,7 @@ void hid_setup_resolution_multiplier(struct hid_device *hid);
 int hid_open_report(struct hid_device *device);
 int hid_check_keys_pressed(struct hid_device *hid);
 int hid_connect(struct hid_device *hid, unsigned int connect_mask);
+int hid_reconnect(struct hid_device *hdev);
 void hid_disconnect(struct hid_device *hid);
 bool hid_match_one_id(const struct hid_device *hdev,
 		      const struct hid_device_id *id);
