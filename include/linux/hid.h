@@ -945,6 +945,7 @@ int hid_bpf_hw_raw_request(struct hid_device *hdev,
 int hid_bpf_hw_request(struct hid_device *hdev,
 		       struct hid_report *report, int reqtype);
 int hid_bpf_hw_output_report(struct hid_device *hdev, __u8 *buf, size_t len);
+int hid_bpf_event(struct hid_device *hdev, enum hid_bpf_event event);
 #else
 static inline void hid_bpf_init(struct hid_device *hdev) { return; }
 static inline void hid_bpf_remove(struct hid_device *hdev) { return; }
@@ -968,6 +969,7 @@ static inline int hid_bpf_hw_output_report(struct hid_device *hdev, __u8 *buf, s
 {
 	return 0;
 }
+static inline int hid_bpf_event(struct hid_device *hdev, enum hid_bpf_event event) { return 0; }
 #endif
 
 #endif

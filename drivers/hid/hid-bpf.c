@@ -214,10 +214,71 @@ unlock:
 const struct bpf_prog_ops hid_prog_ops = {
 };
 
+BPF_CALL_5(bpf_hid_raw_request, void*, ctx, void*, buf, u64, size,
+		u8, rtype, u8, reqtype)
+{
+	struct hid_bpf_ctx *bpf_ctx = ctx;
+	struct hid_device *hdev = bpf_ctx->hdev;
+	u8 *dma_data;
+	int ret;
+
+	/* check arguments */
+	switch (rtype) {
+	case HID_INPUT_REPORT:
+	case HID_OUTPUT_REPORT:
+	case HID_FEATURE_REPORT:
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	switch (reqtype) {
+	case HID_REQ_GET_REPORT:
+	case HID_REQ_GET_IDLE:
+	case HID_REQ_GET_PROTOCOL:
+	case HID_REQ_SET_REPORT:
+	case HID_REQ_SET_IDLE:
+	case HID_REQ_SET_PROTOCOL:
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	dma_data = kmemdup(buf, size, GFP_KERNEL);
+	if (!dma_data)
+		return -ENOMEM;
+
+	ret = hid_hw_raw_request(hdev,
+				 dma_data[0],
+				 dma_data,
+				 size,
+				 rtype,
+				 reqtype);
+
+	if (ret > 0)
+		memcpy(buf, dma_data, ret);
+
+	kfree(dma_data);
+	return ret;
+}
+
+static const struct bpf_func_proto bpf_hid_raw_request_proto = {
+	.func      = bpf_hid_raw_request,
+	.gpl_only  = true, /* hid_raw_request is EXPORT_SYMBOL_GPL */
+	.ret_type  = RET_INTEGER,
+	.arg1_type = ARG_PTR_TO_CTX,
+	.arg2_type = ARG_PTR_TO_MEM,
+	.arg3_type = ARG_CONST_SIZE_OR_ZERO,
+	.arg4_type = ARG_ANYTHING,
+	.arg5_type = ARG_ANYTHING,
+};
+
 static const struct bpf_func_proto *
 hid_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
 {
 	switch (func_id) {
+	case BPF_FUNC_hid_raw_request:
+		return &bpf_hid_raw_request_proto;
 	default:
 		return bpf_base_func_proto(func_id);
 	}
