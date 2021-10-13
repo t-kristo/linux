@@ -2438,7 +2438,7 @@ static int hid_device_probe(struct device *dev)
 			if (!ret)
 				ret = hid_hw_start(hdev, HID_CONNECT_DEFAULT);
 		}
-		if (ret) {
+		if (ret || hid_bpf_event(hdev, HID_BPF_PROBED)) {
 			hid_close_report(hdev);
 			hdev->driver = NULL;
 		}
@@ -2460,6 +2460,7 @@ static void hid_device_remove(struct device *dev)
 
 	hdrv = hdev->driver;
 	if (hdrv) {
+		hid_bpf_event(hdev, HID_BPF_REMOVE);
 		if (hdrv->remove)
 			hdrv->remove(hdev);
 		else /* default remove */

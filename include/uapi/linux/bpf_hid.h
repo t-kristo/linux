@@ -22,6 +22,8 @@ enum hid_bpf_event {
 	HID_BPF_REQUEST,
 	HID_BPF_RAW_REQUEST,
 	HID_BPF_OUTPUT_REPORT,
+	HID_BPF_PROBED,
+	HID_BPF_REMOVE,
 };
 
 struct hid_bpf_ctx {

@@ -598,3 +598,24 @@ int hid_bpf_hw_output_report(struct hid_device *hdev, __u8 *buf, size_t len)
 	kfree(ctx);
 	return size;
 }
+
+int hid_bpf_event(struct hid_device *hdev, enum hid_bpf_event event)
+{
+	struct hid_bpf_ctx *ctx;
+	int ret;
+
+	if (!hdev->bpf.ctx)
+		return 0;
+
+	ctx = hid_bpf_allocate(hdev);
+	if (IS_ERR(ctx))
+		return PTR_ERR(ctx);
+
+	if (hid_bpf_prog_run(hdev, ctx, event))
+		ret = -EIO;
+	else
+		ret = ctx->event.retval;
+
+	kfree(ctx);
+	return ret;
+}
