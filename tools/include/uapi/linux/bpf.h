@@ -4942,6 +4942,12 @@ union bpf_attr {
  *		**-ENOENT** if symbol is not found.
  *
  *		**-EPERM** if caller does not have permission to obtain kernel address.
+ * int bpf_hid_raw_request(void *ctx, void *buf, u64 size, u8 rtype, u8 reqtype)
+ *	Description
+ *		communicate with the HID device
+ *	Return
+ *		0 on success.
+ *		negative value on error.
  */
 #define __BPF_FUNC_MAPPER(FN)		\
 	FN(unspec),			\
@@ -5124,6 +5130,7 @@ union bpf_attr {
 	FN(trace_vprintk),		\
 	FN(skc_to_unix_sock),		\
 	FN(kallsyms_lookup_name),	\
+	FN(hid_raw_request),		\
 	/* */
 
 /* integer value in 'imm' field of BPF_CALL instruction selects which helper
