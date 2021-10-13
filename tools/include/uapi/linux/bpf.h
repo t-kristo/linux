@@ -4974,6 +4974,13 @@ union bpf_attr {
  *		ctx->event.data field
  *	Return
  *		The value at offset. In case of error: 0.
+ *
+ * u32 bpf_hid_foreach_rdesc_item(void *ctx, void *callback_fn, void *callback_ctx, u64 flags)
+ *	Description
+ *		Iterates over a report description item from the data context.
+ *	Return
+ *		The number of traversed items for success, **-EINVAL** for
+ *		invalid **flags**.
  */
 #define __BPF_FUNC_MAPPER(FN)		\
 	FN(unspec),			\
@@ -5161,6 +5168,7 @@ union bpf_attr {
 	FN(hid_hw_close),		\
 	FN(hid_set_data),		\
 	FN(hid_get_data),		\
+	FN(hid_foreach_rdesc_item),	\
 	/* */
 
 /* integer value in 'imm' field of BPF_CALL instruction selects which helper

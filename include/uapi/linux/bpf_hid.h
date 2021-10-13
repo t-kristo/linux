@@ -38,7 +38,66 @@ struct hid_bpf_ctx {
 	} event;
 };
 
+/* in sync with struct hid_item */
+struct hid_bpf_item {
+	unsigned  format;
+	__u8      size;
+	__u8      type;
+	__u8      tag;
+	union {
+	    __u8   u8;
+	    __s8   s8;
+	    __u16  u16;
+	    __s16  s16;
+	    __u32  u32;
+	    __s32  s32;
+	    __u8  *longdata;
+	} data;
+};
 
+/* in sync with struct hid_global */
+struct hid_bpf_global {
+	unsigned usage_page;
+	__s32    logical_minimum;
+	__s32    logical_maximum;
+	__s32    physical_minimum;
+	__s32    physical_maximum;
+	__s32    unit_exponent;
+	unsigned unit;
+	unsigned report_id;
+	unsigned report_size;
+	unsigned report_count;
+};
+
+#define HID_BPF_MAX_USAGES			12288
+
+/* in sync with struct hid_local */
+struct hid_bpf_local {
+	unsigned usage[HID_BPF_MAX_USAGES]; /* usage array */
+	__u8 usage_size[HID_BPF_MAX_USAGES]; /* usage size array */
+	unsigned collection_index[HID_BPF_MAX_USAGES]; /* collection index array */
+	unsigned usage_index;
+	unsigned usage_minimum;
+	unsigned delimiter_depth;
+	unsigned delimiter_branch;
+};
+
+struct hid_bpf_report {
+	unsigned int id;				/* id of this report */
+	unsigned int type;				/* report type */
+	unsigned int application;			/* application usage for this report */
+	unsigned int size;				/* size of the report (bits) */
+	unsigned int current_offset;			/* current offset of the parsed element */
+};
+
+
+struct hid_bpf_parser {
+	struct hid_bpf_item     item;
+	struct hid_bpf_global   global;
+	struct hid_bpf_local    local;
+	struct hid_bpf_report   report;
+	unsigned int            collection;
+};
 
 #endif /* _UAPI__LINUX_BPF_HID_H__ */
 
