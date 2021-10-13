@@ -689,6 +689,12 @@ static inline int hid_driver_reset_resume(struct hid_device *hdev) { return 0; }
 static inline int hid_driver_resume(struct hid_device *hdev) { return 0; }
 #endif
 
+int hid_parser_global(struct hid_parser *parser, struct hid_item *item);
+int hid_parser_local(struct hid_parser *parser, struct hid_item *item);
+int hid_parser_main(struct hid_parser *parser, struct hid_item *item);
+int hid_parser_reserved(struct hid_parser *parser, struct hid_item *item);
+void hid_concatenate_last_usage_page(struct hid_parser *parser);
+
 /**
  * hid_device_io_start - enable HID input during probe, remove
  *
@@ -905,6 +911,8 @@ static inline u32 hid_report_len(struct hid_report *report)
 
 int hid_report_raw_event(struct hid_device *hid, int type, u8 *data, u32 size,
 		int interrupt);
+
+u8 *hid_rdesc_fetch_item(__u8 *start, __u8 *end, struct hid_item *item);
 
 /* HID quirks API */
 unsigned long hid_lookup_quirk(const struct hid_device *hdev);

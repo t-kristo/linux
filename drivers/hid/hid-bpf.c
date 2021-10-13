@@ -214,6 +214,232 @@ unlock:
 const struct bpf_prog_ops hid_prog_ops = {
 };
 
+struct hid_bpf_report_enum {
+	unsigned numbered;
+	struct hid_bpf_report *report_id_hash[HID_MAX_IDS];
+};
+
+
+struct hid_bpf_parser_and_data {
+	struct hid_parser parser;
+	struct hid_bpf_parser callback_data;
+	struct hid_bpf_report_enum report_enum[HID_REPORT_TYPES];
+};
+
+struct hid_bpf_report *hid_bpf_add_report(struct hid_bpf_parser_and_data *data,
+					  unsigned int type, unsigned int id,
+					  unsigned int application)
+{
+	struct hid_bpf_report_enum *report_enum = data->report_enum + type;
+	struct hid_bpf_report *report;
+
+	if (id >= HID_MAX_IDS)
+		return NULL;
+	if (report_enum->report_id_hash[id])
+		return report_enum->report_id_hash[id];
+
+	report = kzalloc(sizeof(struct hid_bpf_report), GFP_KERNEL);
+	if (!report)
+		return NULL;
+
+	if (id != 0)
+		report_enum->numbered = 1;
+
+	report->id = id;
+	report->type = type;
+	report->size = 0;
+	report->application = application;
+	report_enum->report_id_hash[id] = report;
+
+	return report;
+}
+
+void hid_bpf_free_reports(struct hid_bpf_parser_and_data *data)
+{
+	unsigned i, j;
+
+	for (i = 0; i < HID_REPORT_TYPES; i++) {
+		struct hid_bpf_report_enum *report_enum = data->report_enum + i;
+
+		for (j = 0; j < HID_MAX_IDS; j++) {
+			struct hid_bpf_report *report = report_enum->report_id_hash[j];
+			kfree(report);
+		}
+		memset(report_enum, 0, sizeof(*report_enum));
+	}
+}
+
+static int hid_bpf_add_field(struct hid_parser *parser, unsigned report_type, unsigned flags)
+{
+	struct hid_bpf_parser_and_data *data = container_of(parser, struct hid_bpf_parser_and_data, parser);
+	struct hid_bpf_report *report;
+	unsigned int application = 0;
+
+	report = hid_bpf_add_report(data, report_type, parser->global.report_id, application);
+	if (!report) {
+		hid_err(parser->device, "hid_bpf_add_report failed\n");
+		return -1;
+	}
+
+	report->current_offset = report->size;
+	report->size += parser->global.report_size * parser->global.report_count;
+
+	/* Total size check: Allow for possible report index byte */
+	if (report->size > (HID_MAX_BUFFER_SIZE - 1) << 3) {
+		hid_err(parser->device, "report is too long\n");
+		return -1;
+	}
+
+	data->callback_data.report = *report;
+
+	return 0;
+}
+
+static u32 hid_bpf_item_udata(struct hid_item *item)
+{
+	switch (item->size) {
+	case 1: return item->data.u8;
+	case 2: return item->data.u16;
+	case 4: return item->data.u32;
+	}
+	return 0;
+}
+
+static int hid_bpf_parser_main(struct hid_parser *parser, struct hid_item *item)
+{
+	__u32 data;
+	int ret;
+
+	hid_concatenate_last_usage_page(parser);
+
+	data = hid_bpf_item_udata(item);
+
+	switch (item->tag) {
+	case HID_MAIN_ITEM_TAG_BEGIN_COLLECTION:
+		/* FIXME: handle open collection */
+		break;
+	case HID_MAIN_ITEM_TAG_END_COLLECTION:
+		/* FIXME: handle end collection */
+		break;
+	case HID_MAIN_ITEM_TAG_INPUT:
+		ret = hid_bpf_add_field(parser, HID_INPUT_REPORT, data);
+		break;
+	case HID_MAIN_ITEM_TAG_OUTPUT:
+		ret = hid_bpf_add_field(parser, HID_OUTPUT_REPORT, data);
+		break;
+	case HID_MAIN_ITEM_TAG_FEATURE:
+		ret = hid_bpf_add_field(parser, HID_FEATURE_REPORT, data);
+		break;
+	default:
+		hid_warn(parser->device, "unknown main item tag 0x%x\n", item->tag);
+		ret = 0;
+	}
+
+	return ret;
+}
+
+static void hid_bpf_store_bpf_parser(struct hid_bpf_parser *data,
+		struct hid_item *item, struct hid_parser *parser)
+{
+	data->item = *(struct hid_bpf_item *)item;
+	data->global = *(struct hid_bpf_global *)&parser->global;
+	data->local = *(struct hid_bpf_local *)&parser->local;
+	if (parser->collection_stack_size)
+		data->collection = parser->collection_stack[parser->collection_stack_ptr];
+}
+
+BPF_CALL_4(bpf_hid_foreach_rdesc_item, void*, ctx, void *, callback_fn, void *, callback_ctx, u64, flags)
+{
+	struct hid_bpf_ctx *bpf_ctx = ctx;
+	struct hid_bpf_parser_and_data *parser_and_data;
+	struct hid_parser *parser;
+	struct hid_bpf_parser *callback_data;
+	struct hid_item item;
+	u8 *data_copy, *start, *end, *next;
+	u64 cur_index;
+	u64 ret = 0;
+	u32 num_elems = 0;
+
+	static int (*dispatch_type[])(struct hid_parser *parser,
+				      struct hid_item *item) = {
+		hid_bpf_parser_main,
+		hid_parser_global,
+		hid_parser_local,
+		hid_parser_reserved
+	};
+
+
+	if (flags != 0)
+		return -EINVAL;
+
+	parser_and_data = vzalloc(sizeof(*parser_and_data));
+	if (!parser_and_data) {
+		ret = -ENOMEM;
+		goto exit;
+	}
+
+	parser = &parser_and_data->parser;
+	callback_data = &parser_and_data->callback_data;
+
+	parser->device = bpf_ctx->hdev;
+
+	data_copy = kmemdup(bpf_ctx->event.data, HID_BPF_MAX_BUFFER_SIZE, GFP_KERNEL);
+	if (!data_copy) {
+		ret = -ENOMEM;
+		goto exit;
+	}
+
+	start = data_copy;
+	end = start + bpf_ctx->event.size;
+
+	while((next = hid_rdesc_fetch_item(start, end, &item)) != NULL) {
+		cur_index = start - data_copy;
+		num_elems++;
+
+		dispatch_type[item.type](parser, &item);
+
+		hid_bpf_store_bpf_parser(callback_data, &item, parser);
+
+		ret = BPF_CAST_CALL(callback_fn)((u64)(long)ctx,
+						 (u64)(long)callback_data,
+						 (u64)(long)&cur_index,
+						 (u64)(long)callback_ctx, 0);
+		/* return value: 0 - continue, 1 - stop and return */
+		if (ret)
+			break;
+
+		/* Reset the local parser environment on main items */
+		if (item.type == HID_ITEM_TYPE_MAIN)
+			memset(&parser->local, 0, sizeof(parser->local));
+
+		/* clear item content */
+		memset(&item, 0, sizeof(item));
+
+		start = next;
+	}
+
+	hid_bpf_free_reports(parser_and_data);
+
+	kfree(data_copy);
+
+	ret = num_elems;
+
+ exit:
+	kfree(parser->collection_stack);
+	vfree(parser_and_data);
+	return ret;
+}
+
+static const struct bpf_func_proto bpf_hid_foreach_rdesc_item_proto = {
+	.func      = bpf_hid_foreach_rdesc_item,
+	.gpl_only  = true,
+	.ret_type  = RET_INTEGER,
+	.arg1_type = ARG_PTR_TO_CTX,
+	.arg2_type = ARG_PTR_TO_FUNC,
+	.arg3_type = ARG_PTR_TO_STACK_OR_NULL,
+	.arg4_type = ARG_ANYTHING,
+};
+
 BPF_CALL_3(bpf_hid_get_data, void*, ctx, u64, offset, u8, n)
 {
 	struct hid_bpf_ctx *bpf_ctx = ctx;
@@ -349,6 +575,8 @@ static const struct bpf_func_proto *
 hid_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
 {
 	switch (func_id) {
+	case BPF_FUNC_hid_foreach_rdesc_item:
+		return &bpf_hid_foreach_rdesc_item_proto;
 	case BPF_FUNC_hid_get_data:
 		return &bpf_hid_get_data_proto;
 	case BPF_FUNC_hid_hw_open:

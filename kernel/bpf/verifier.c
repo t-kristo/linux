@@ -22,6 +22,7 @@
 #include <linux/error-injection.h>
 #include <linux/bpf_lsm.h>
 #include <linux/btf_ids.h>
+#include <uapi/linux/bpf_hid.h>
 
 #include "disasm.h"
 
@@ -6130,6 +6131,35 @@ static int set_timer_callback_state(struct bpf_verifier_env *env,
 	return 0;
 }
 
+static int set_hid_foreach_rdesc_item_state(struct bpf_verifier_env *env,
+					    struct bpf_func_state *caller,
+					    struct bpf_func_state *callee,
+					    int insn_idx)
+{
+	/* bpf_hid_foreach_rdesc_item(struct hid_bpf_ctx *ctx, void *callback_fn,
+	 *	void *callback_ctx, u64 flags);
+	 * callback_fn(struct hid_bpf_ctx *ctx, struct hid_item *tag, void *idx,
+	 *	void *callback_ctx);
+	 */
+	callee->regs[BPF_REG_1] = caller->regs[BPF_REG_1];
+
+	callee->regs[BPF_REG_2].type = PTR_TO_MEM;
+	__mark_reg_known_zero(&callee->regs[BPF_REG_2]);
+	callee->regs[BPF_REG_2].mem_size = sizeof(struct hid_bpf_parser);
+
+	callee->regs[BPF_REG_3].type = PTR_TO_MEM;
+	__mark_reg_known_zero(&callee->regs[BPF_REG_3]);
+	callee->regs[BPF_REG_3].mem_size = sizeof(u64);
+
+	/* pointer to stack or null */
+	callee->regs[BPF_REG_4] = caller->regs[BPF_REG_3];
+
+	/* unused */
+	__mark_reg_not_init(env, &callee->regs[BPF_REG_5]);
+	callee->in_async_callback_fn = true;
+	return 0;
+}
+
 static int prepare_func_exit(struct bpf_verifier_env *env, int *insn_idx)
 {
 	struct bpf_verifier_state *state = env->cur_state;
@@ -6483,6 +6513,13 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 	if (func_id == BPF_FUNC_timer_set_callback) {
 		err = __check_func_call(env, insn, insn_idx_p, meta.subprogno,
 					set_timer_callback_state);
+		if (err < 0)
+			return -EINVAL;
+	}
+
+	if (func_id == BPF_FUNC_hid_foreach_rdesc_item) {
+		err = __check_func_call(env, insn, insn_idx_p, meta.subprogno,
+					set_hid_foreach_rdesc_item_state);
 		if (err < 0)
 			return -EINVAL;
 	}

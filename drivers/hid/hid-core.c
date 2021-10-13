@@ -364,7 +364,7 @@ static s32 item_sdata(struct hid_item *item)
  * Process a global item.
  */
 
-static int hid_parser_global(struct hid_parser *parser, struct hid_item *item)
+int hid_parser_global(struct hid_parser *parser, struct hid_item *item)
 {
 	__s32 raw_value;
 	switch (item->tag) {
@@ -470,7 +470,7 @@ static int hid_parser_global(struct hid_parser *parser, struct hid_item *item)
  * Process a local item.
  */
 
-static int hid_parser_local(struct hid_parser *parser, struct hid_item *item)
+int hid_parser_local(struct hid_parser *parser, struct hid_item *item)
 {
 	__u32 data;
 	unsigned n;
@@ -569,7 +569,7 @@ static int hid_parser_local(struct hid_parser *parser, struct hid_item *item)
  * usage value."
  */
 
-static void hid_concatenate_last_usage_page(struct hid_parser *parser)
+void hid_concatenate_last_usage_page(struct hid_parser *parser)
 {
 	int i;
 	unsigned int usage_page;
@@ -601,7 +601,7 @@ static void hid_concatenate_last_usage_page(struct hid_parser *parser)
  * Process a main item.
  */
 
-static int hid_parser_main(struct hid_parser *parser, struct hid_item *item)
+int hid_parser_main(struct hid_parser *parser, struct hid_item *item)
 {
 	__u32 data;
 	int ret;
@@ -640,7 +640,7 @@ static int hid_parser_main(struct hid_parser *parser, struct hid_item *item)
  * Process a reserved item.
  */
 
-static int hid_parser_reserved(struct hid_parser *parser, struct hid_item *item)
+int hid_parser_reserved(struct hid_parser *parser, struct hid_item *item)
 {
 	dbg_hid("reserved item type, tag 0x%x\n", item->tag);
 	return 0;
@@ -772,6 +772,11 @@ static u8 *fetch_item(__u8 *start, __u8 *end, struct hid_item *item)
 	}
 
 	return NULL;
+}
+
+u8 *hid_rdesc_fetch_item(__u8 *start, __u8 *end, struct hid_item *item)
+{
+	return fetch_item(start, end, item);
 }
 
 static void hid_scan_input_usage(struct hid_parser *parser, u32 usage)
