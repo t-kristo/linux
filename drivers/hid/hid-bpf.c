@@ -214,6 +214,36 @@ unlock:
 const struct bpf_prog_ops hid_prog_ops = {
 };
 
+BPF_CALL_1(bpf_hid_hw_open, void*, ctx)
+{
+	struct hid_bpf_ctx *bpf_ctx = ctx;
+
+	return hid_hw_open(bpf_ctx->hdev);
+}
+
+static const struct bpf_func_proto bpf_hid_hw_open_proto = {
+	.func      = bpf_hid_hw_open,
+	.gpl_only  = true,
+	.ret_type  = RET_INTEGER,
+	.arg1_type = ARG_PTR_TO_CTX,
+};
+
+BPF_CALL_1(bpf_hid_hw_close, void*, ctx)
+{
+	struct hid_bpf_ctx *bpf_ctx = ctx;
+
+	hid_hw_close(bpf_ctx->hdev);
+
+	return 0;
+}
+
+static const struct bpf_func_proto bpf_hid_hw_close_proto = {
+	.func      = bpf_hid_hw_close,
+	.gpl_only  = true,
+	.ret_type  = RET_VOID,
+	.arg1_type = ARG_PTR_TO_CTX,
+};
+
 BPF_CALL_5(bpf_hid_raw_request, void*, ctx, void*, buf, u64, size,
 		u8, rtype, u8, reqtype)
 {
@@ -277,6 +307,10 @@ static const struct bpf_func_proto *
 hid_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
 {
 	switch (func_id) {
+	case BPF_FUNC_hid_hw_open:
+		return &bpf_hid_hw_open_proto;
+	case BPF_FUNC_hid_hw_close:
+		return &bpf_hid_hw_close_proto;
 	case BPF_FUNC_hid_raw_request:
 		return &bpf_hid_raw_request_proto;
 	default:
