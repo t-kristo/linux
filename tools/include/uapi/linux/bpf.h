@@ -4948,6 +4948,18 @@ union bpf_attr {
  *	Return
  *		0 on success.
  *		negative value on error.
+ *
+ * int bpf_hid_hw_open(void *ctx)
+ *	Description
+ *		Tell underlying HW to start delivering events from the device.
+ *	Return
+ *		0 on success, a negative error on failure.
+ *
+ * void bpf_hid_hw_close(void *ctx)
+ *	Description
+ *		signal underlaying HW to stop delivering events
+ *	Return
+ *		Nothing
  */
 #define __BPF_FUNC_MAPPER(FN)		\
 	FN(unspec),			\
@@ -5131,6 +5143,8 @@ union bpf_attr {
 	FN(skc_to_unix_sock),		\
 	FN(kallsyms_lookup_name),	\
 	FN(hid_raw_request),		\
+	FN(hid_hw_open),		\
+	FN(hid_hw_close),		\
 	/* */
 
 /* integer value in 'imm' field of BPF_CALL instruction selects which helper
