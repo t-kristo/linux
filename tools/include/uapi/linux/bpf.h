@@ -4960,6 +4960,13 @@ union bpf_attr {
  *		signal underlaying HW to stop delivering events
  *	Return
  *		Nothing
+ *
+ * int bpf_hid_set_data(void *ctx, u64 offset, u8 n, u32 data)
+ *	Description
+ *		Set the data of size size at offset offset in the
+ *		ctx->event.data field
+ *	Return
+ *		0 on success, a negative error on failure.
  */
 #define __BPF_FUNC_MAPPER(FN)		\
 	FN(unspec),			\
@@ -5145,6 +5152,7 @@ union bpf_attr {
 	FN(hid_raw_request),		\
 	FN(hid_hw_open),		\
 	FN(hid_hw_close),		\
+	FN(hid_set_data),		\
 	/* */
 
 /* integer value in 'imm' field of BPF_CALL instruction selects which helper
