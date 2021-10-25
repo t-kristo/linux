@@ -1,0 +1,356 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ *  BPF in HID support for Linux
+ *
+ *  Copyright (c) 2021 Benjamin Tissoires
+ */
+
+/*
+ */
+
+#include <linux/filter.h>
+#include <linux/mutex.h>
+#include <linux/slab.h>
+
+#include <uapi/linux/bpf_hid.h>
+#include <linux/bpf_hid.h>
+#include <linux/hid.h>
+
+#define hid_bpf_rcu_dereference(p) \
+        rcu_dereference_protected(p, lockdep_is_held(&hdev->bpf.lock))
+#define hid_bpf_rcu_replace_pointer(p, new) \
+        rcu_replace_pointer(p, new, lockdep_is_held(&hdev->bpf.lock))
+
+#define BPF_MAX_PROGS 64
+
+static int __hid_bpf_prog_attach(struct hid_device *hdev, struct bpf_prog_array **array, struct bpf_prog *prog)
+{
+	struct bpf_prog_array *old_array;
+	struct bpf_prog_array *new_array;
+	int ret;
+
+	ret = mutex_lock_interruptible(&hdev->bpf.lock);
+	if (ret)
+		return ret;
+
+	old_array = hid_bpf_rcu_dereference(*array);
+	if (old_array && bpf_prog_array_length(old_array) >= BPF_MAX_PROGS) {
+		ret = -E2BIG;
+		goto unlock;
+	}
+
+	ret = bpf_prog_array_copy(old_array, NULL, prog, 0, &new_array);
+	if (ret < 0)
+		goto unlock;
+
+	rcu_assign_pointer(*array, new_array);
+	bpf_prog_array_free(old_array);
+
+unlock:
+	mutex_unlock(&hdev->bpf.lock);
+	return ret;
+
+}
+
+static int hid_bpf_prog_attach(struct hid_device *hdev, const union bpf_attr *attr, struct bpf_prog *prog)
+{
+	switch (attr->attach_type) {
+	case BPF_HID_RAW_EVENT:
+		return __hid_bpf_prog_attach(hdev, &hdev->bpf.event_progs, prog);
+	}
+
+	return -EINVAL;
+}
+
+static int __hid_bpf_prog_detach(struct hid_device *hdev, struct bpf_prog_array **array, struct bpf_prog *prog)
+{
+	struct bpf_prog_array *old_array;
+	struct bpf_prog_array *new_array;
+	int ret;
+
+	ret = mutex_lock_interruptible(&hdev->bpf.lock);
+	if (ret)
+		return ret;
+
+	old_array = hid_bpf_rcu_dereference(*array);
+	ret = bpf_prog_array_copy(old_array, prog, NULL, 0, &new_array);
+	/*
+	 * Do not use bpf_prog_array_delete_safe() as we would end up
+	 * with a dummy entry in the array, and the we would free the
+	 * dummy in hid_bpf_free()
+	 */
+	if (ret)
+		goto unlock;
+
+	rcu_assign_pointer(*array, new_array);
+	bpf_prog_array_free(old_array);
+	bpf_prog_put(prog);
+
+unlock:
+	mutex_unlock(&hdev->bpf.lock);
+	return ret;
+}
+
+int hid_bpf_prog_detach(struct hid_device *hdev, struct bpf_prog *prog)
+{
+	switch(prog->expected_attach_type) {
+	case BPF_HID_RAW_EVENT:
+		return __hid_bpf_prog_detach(hdev, &hdev->bpf.event_progs, prog);
+	default:
+		return -EINVAL;
+	}
+
+	return -EINVAL;
+}
+
+static int hid_bpf_prog_query(struct hid_device *hdev, const union bpf_attr *attr, union bpf_attr __user *uattr)
+{
+	__u32 __user *prog_ids = u64_to_user_ptr(attr->query.prog_ids);
+	struct bpf_prog_array *progs;
+	u32 cnt, flags = 0;
+	int ret;
+
+	if (attr->query.query_flags)
+		return -EINVAL;
+
+	ret = mutex_lock_interruptible(&hdev->bpf.lock);
+	if (ret)
+		return ret;
+
+	switch (attr->expected_attach_type) {
+	case BPF_HID_RAW_EVENT:
+		progs = hid_bpf_rcu_dereference(hdev->bpf.event_progs);
+		break;
+
+	default:
+		ret = -EINVAL;
+		goto unlock;
+	}
+
+	cnt = progs ? bpf_prog_array_length(progs) : 0;
+
+	if (copy_to_user(&uattr->query.prog_cnt, &cnt, sizeof(cnt))) {
+		ret = -EFAULT;
+		goto unlock;
+	}
+
+	if (copy_to_user(&uattr->query.attach_flags, &flags, sizeof(flags))) {
+		ret = -EFAULT;
+		goto unlock;
+	}
+
+	if (attr->query.prog_cnt != 0 && prog_ids && cnt)
+		ret = bpf_prog_array_copy_to_user(progs, prog_ids, attr->query.prog_cnt);
+
+unlock:
+	mutex_unlock(&hdev->bpf.lock);
+	return ret;
+
+}
+
+const struct bpf_prog_ops hid_prog_ops = {
+};
+
+static const struct bpf_func_proto *
+hid_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
+{
+	switch (func_id) {
+	default:
+		return bpf_base_func_proto(func_id);
+	}
+}
+
+static bool hid_is_valid_access(int off, int size,
+				enum bpf_access_type access_type,
+				const struct bpf_prog *prog,
+				struct bpf_insn_access_aux *info)
+{
+	/* everything not in ctx is prohibited */
+	if (off < 0 || off + size > sizeof(struct hid_bpf_ctx))
+		return false;
+
+	switch (off) {
+	/* type, hdev are read-only */
+	case bpf_ctx_range_till(struct hid_bpf_ctx, type, hdev):
+		return access_type == BPF_READ;
+	case bpf_ctx_range(struct hid_bpf_ctx, event):
+		return true;
+	/* everything else is read/write */
+	}
+
+	return true;
+}
+
+const struct bpf_verifier_ops hid_verifier_ops = {
+	.get_func_proto  = hid_func_proto,
+	.is_valid_access = hid_is_valid_access
+};
+
+static int __hid_bpf_match_sysfs(struct device *dev, const void *data)
+{
+	struct kernfs_node *kn = dev->kobj.sd;
+
+	return kn == data;
+}
+
+static struct hid_device *__hid_bpf_fd_to_hdev(int fd)
+{
+	struct device *dev;
+	struct hid_device *hdev;
+	struct fd f = fdget(fd);
+	struct inode *inode;
+	struct kernfs_node *node;
+
+	if (!f.file) {
+		hdev = ERR_PTR(-EBADF);
+		goto out;
+	}
+
+	inode = file_inode(f.file);
+	node = inode->i_private;
+
+	dev = bus_find_device(&hid_bus_type, NULL, kernfs_get_parent(node), __hid_bpf_match_sysfs);
+
+	if (dev)
+		hdev = to_hid_device(dev);
+	else
+		hdev = ERR_PTR(-EINVAL);
+
+ out:
+	fdput(f);
+	return hdev;
+}
+
+static struct hid_bpf_ctx *hid_bpf_allocate(struct hid_device *hdev)
+{
+	struct hid_bpf_ctx *ctx;
+
+	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+	if (!ctx)
+		return ERR_PTR(-ENOMEM);
+
+	ctx->hdev = hdev;
+
+	return ctx;
+}
+
+int hid_prog_attach(const union bpf_attr *attr, struct bpf_prog *prog)
+{
+	struct hid_device *hdev;
+
+	if (attr->attach_flags)
+		return -EINVAL;
+
+	hdev = __hid_bpf_fd_to_hdev(attr->target_fd);
+	if (IS_ERR(hdev))
+		return PTR_ERR(hdev);
+
+	if (!hdev->bpf.ctx) {
+		hdev->bpf.ctx = hid_bpf_allocate(hdev);
+
+		if (IS_ERR(hdev->bpf.ctx))
+			return PTR_ERR(hdev->bpf.ctx);
+	}
+
+	return hid_bpf_prog_attach(hdev, attr, prog);
+}
+EXPORT_SYMBOL_GPL(hid_prog_attach);
+
+int hid_prog_detach(const union bpf_attr *attr)
+{
+	struct bpf_prog *prog;
+	struct hid_device *hdev;
+	int ret;
+
+	if (attr->attach_flags)
+		return -EINVAL;
+
+	prog = bpf_prog_get_type(attr->attach_bpf_fd,
+				 BPF_PROG_TYPE_HID);
+	if (IS_ERR(prog))
+		return PTR_ERR(prog);
+
+	hdev = __hid_bpf_fd_to_hdev(attr->target_fd);
+	if (IS_ERR(hdev)) {
+		ret = PTR_ERR(hdev);
+		goto out;
+	}
+
+	ret = hid_bpf_prog_detach(hdev, prog);
+
+ out:
+	bpf_prog_put(prog);
+	return ret;
+}
+EXPORT_SYMBOL_GPL(hid_prog_detach);
+
+int hid_prog_query(const union bpf_attr *attr, union bpf_attr __user *uattr)
+{
+	struct hid_device *hdev;
+
+	if (attr->query.query_flags)
+		return -EINVAL;
+
+	hdev = __hid_bpf_fd_to_hdev(attr->query.target_fd);
+	if (IS_ERR(hdev))
+		return PTR_ERR(hdev);
+
+	return hid_bpf_prog_query(hdev, attr, uattr);
+
+}
+EXPORT_SYMBOL_GPL(hid_prog_query);
+
+u8 *hid_bpf_raw_event(struct hid_device *hdev, u8 *rd, int *size)
+{
+	if (!hdev->bpf.ctx)
+		return rd;
+
+	if (*size > sizeof(hdev->bpf.ctx->event.data))
+		return rd;
+
+	if (!hdev->bpf.event_progs)
+		return rd;
+
+	memset(&hdev->bpf.ctx->event, 0, sizeof(hdev->bpf.ctx->event));
+	memcpy(hdev->bpf.ctx->event.data, rd, *size);
+	hdev->bpf.ctx->event.size = *size;
+	hdev->bpf.ctx->type = HID_BPF_RAW_EVENT;
+
+	BPF_PROG_RUN_ARRAY(hdev->bpf.event_progs, hdev->bpf.ctx, bpf_prog_run);
+
+	if (!hdev->bpf.ctx->event.size)
+		return ERR_PTR(-EINVAL);
+
+	*size = hdev->bpf.ctx->event.size;
+
+	return hdev->bpf.ctx->event.data;
+}
+
+void hid_bpf_init(struct hid_device *hdev)
+{
+	mutex_init(&hdev->bpf.lock);
+}
+
+void hid_bpf_remove(struct hid_device *hdev)
+{
+	struct bpf_prog_array_item *item;
+	struct bpf_prog_array *event_array;
+
+	mutex_lock(&hdev->bpf.lock);
+
+	event_array = hid_bpf_rcu_dereference(hdev->bpf.event_progs);
+	if (!event_array)
+		goto unlock;
+
+	for (item = event_array->items; item->prog; item++)
+		bpf_prog_put(item->prog);
+
+	bpf_prog_array_free(event_array);
+
+ unlock:
+	mutex_unlock(&hdev->bpf.lock);
+
+	kfree(hdev->bpf.ctx);
+
+	mutex_destroy(&hdev->bpf.lock);
+}

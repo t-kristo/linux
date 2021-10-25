@@ -26,6 +26,15 @@ config HID
 
 if HID
 
+config BPF_HID
+	bool "Generic HID support through BPF"
+	depends on HID && BPF
+	default HID
+	help
+	Support for HID devices on the HID bus with a BPF processing.
+
+	If unsure, say Y.
+
 config HID_BATTERY_STRENGTH
 	bool "Battery level reporting for HID devices"
 	depends on HID
