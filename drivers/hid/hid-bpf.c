@@ -77,6 +77,8 @@ static int hid_bpf_prog_attach(struct hid_device *hdev, const union bpf_attr *at
 	switch (attr->attach_type) {
 	case BPF_HID_RAW_EVENT:
 		return __hid_bpf_prog_attach(hdev, &hdev->bpf.event_progs, prog);
+	case BPF_HID_KERNEL_EVENT:
+		return __hid_bpf_prog_attach(hdev, &hdev->bpf.kevent_progs, prog);
 	case BPF_HID_RDESC_FIXUP:
 		ret = __hid_bpf_prog_attach_rdesc(hdev, prog);
 		if (ret)
@@ -143,6 +145,8 @@ int hid_bpf_prog_detach(struct hid_device *hdev, struct bpf_prog *prog)
 	switch(prog->expected_attach_type) {
 	case BPF_HID_RAW_EVENT:
 		return __hid_bpf_prog_detach(hdev, &hdev->bpf.event_progs, prog);
+	case BPF_HID_KERNEL_EVENT:
+		return __hid_bpf_prog_detach(hdev, &hdev->bpf.kevent_progs, prog);
 	case BPF_HID_RDESC_FIXUP:
 		if (prog != hdev->bpf.rdesc_fixup_prog)
 			return -EINVAL;
@@ -176,6 +180,9 @@ static int hid_bpf_prog_query(struct hid_device *hdev, const union bpf_attr *att
 	switch (attr->expected_attach_type) {
 	case BPF_HID_RAW_EVENT:
 		progs = hid_bpf_rcu_dereference(hdev->bpf.event_progs);
+		break;
+	case BPF_HID_KERNEL_EVENT:
+		progs = hid_bpf_rcu_dereference(hdev->bpf.kevent_progs);
 		break;
 
 	default:
@@ -356,6 +363,20 @@ int hid_prog_query(const union bpf_attr *attr, union bpf_attr __user *uattr)
 }
 EXPORT_SYMBOL_GPL(hid_prog_query);
 
+static int hid_bpf_prog_run(struct hid_device *hdev, struct hid_bpf_ctx *ctx,
+		enum hid_bpf_event type)
+{
+	if (!hdev->bpf.kevent_progs)
+		return 0;
+
+	ctx->type = type;
+	ctx->event.retval = 0;
+
+	BPF_PROG_RUN_ARRAY(hdev->bpf.kevent_progs, ctx, bpf_prog_run);
+
+	return ctx->event.retval;
+}
+
 u8 *hid_bpf_raw_event(struct hid_device *hdev, u8 *rd, int *size)
 {
 	if (!hdev->bpf.ctx)
@@ -443,12 +464,13 @@ void hid_bpf_init(struct hid_device *hdev)
 void hid_bpf_remove(struct hid_device *hdev)
 {
 	struct bpf_prog_array_item *item;
-	struct bpf_prog_array *event_array;
+	struct bpf_prog_array *event_array, *init_array;
 
 	mutex_lock(&hdev->bpf.lock);
 
 	event_array = hid_bpf_rcu_dereference(hdev->bpf.event_progs);
-	if (!event_array)
+	init_array = hid_bpf_rcu_dereference(hdev->bpf.kevent_progs);
+	if (!event_array && !init_array)
 		goto unlock;
 
 	if (event_array) {
@@ -458,6 +480,12 @@ void hid_bpf_remove(struct hid_device *hdev)
 		bpf_prog_array_free(event_array);
 	}
 
+	if (init_array) {
+		for (item = init_array->items; item->prog; item++)
+			bpf_prog_put(item->prog);
+
+		bpf_prog_array_free(init_array);
+	}
 
 	if (hdev->bpf.rdesc_fixup_prog)
 		bpf_prog_put(hdev->bpf.rdesc_fixup_prog);
@@ -468,4 +496,105 @@ void hid_bpf_remove(struct hid_device *hdev)
 	kfree(hdev->bpf.ctx);
 
 	mutex_destroy(&hdev->bpf.lock);
+}
+
+int hid_bpf_hw_raw_request(struct hid_device *hdev,
+			   unsigned char reportnum, __u8 *buf,
+			   size_t len, unsigned char rtype, int reqtype)
+{
+	struct hid_bpf_ctx *ctx;
+	int size;
+
+	if (!hdev->bpf.ctx)
+		return len;
+
+	if (len >= sizeof(hdev->bpf.ctx->event.data))
+		return len;
+
+	ctx = hid_bpf_allocate(hdev);
+	if (IS_ERR(ctx))
+		return PTR_ERR(ctx);
+
+	memcpy(ctx->event.data, buf, len);
+
+	ctx->event.size = len;
+	ctx->event.request = reqtype;
+	ctx->event.report_type = rtype;
+
+	if (hid_bpf_prog_run(hdev, ctx, HID_BPF_RAW_REQUEST) ||
+	    !ctx->event.size) {
+		kfree(ctx);
+		return -EIO;
+	}
+
+	size = ctx->event.size;
+	memcpy(buf, ctx->event.data, size);
+
+	kfree(ctx);
+	return size;
+}
+
+int hid_bpf_hw_request(struct hid_device *hdev,
+		       struct hid_report *report, int reqtype)
+{
+	struct hid_bpf_ctx *ctx;
+	int len;
+
+	if (!hdev->bpf.ctx)
+		return 0;
+
+	len = hid_report_len(report);
+	if (len >= sizeof(hdev->bpf.ctx->event.data))
+		return 0;
+
+	ctx = hid_bpf_allocate(hdev);
+	if (IS_ERR(ctx))
+		return PTR_ERR(ctx);
+
+	hid_output_report(report, ctx->event.data);
+
+	ctx->event.size = len;
+	ctx->event.request = reqtype;
+	ctx->event.report_type = report->type;
+
+	if (hid_bpf_prog_run(hdev, ctx, HID_BPF_REQUEST)) {
+		kfree(ctx);
+		return -EIO;
+	}
+
+	kfree(ctx);
+
+	//FIXME: should convert buf -> report
+	return 0;
+}
+
+int hid_bpf_hw_output_report(struct hid_device *hdev, __u8 *buf, size_t len)
+{
+	struct hid_bpf_ctx *ctx;
+	int size;
+
+	if (!hdev->bpf.ctx)
+		return len;
+
+	if (len >= sizeof(hdev->bpf.ctx->event.data))
+		return len;
+
+	ctx = hid_bpf_allocate(hdev);
+	if (IS_ERR(ctx))
+		return PTR_ERR(ctx);
+
+	memcpy(ctx->event.data, buf, len);
+
+	ctx->event.size = len;
+
+	if (hid_bpf_prog_run(hdev, ctx, HID_BPF_OUTPUT_REPORT) ||
+	    !ctx->event.size) {
+		kfree(ctx);
+		return -EIO;
+	}
+
+	size = ctx->event.size;
+	memcpy(buf, ctx->event.data, size);
+	kfree(ctx);
+	return size;
 }
