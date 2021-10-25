@@ -52,11 +52,37 @@ unlock:
 
 }
 
+static int __hid_bpf_prog_attach_rdesc(struct hid_device *hdev, struct bpf_prog *prog)
+{
+	int ret;
+	struct bpf_prog *old_prog;
+
+	ret = mutex_lock_interruptible(&hdev->bpf.lock);
+	if (ret)
+		return ret;
+
+	old_prog = hid_bpf_rcu_replace_pointer(hdev->bpf.rdesc_fixup_prog, prog);
+
+	if (old_prog)
+		bpf_prog_put(old_prog);
+
+	mutex_unlock(&hdev->bpf.lock);
+	return 0;
+}
+
 static int hid_bpf_prog_attach(struct hid_device *hdev, const union bpf_attr *attr, struct bpf_prog *prog)
 {
+	int ret;
+
 	switch (attr->attach_type) {
 	case BPF_HID_RAW_EVENT:
 		return __hid_bpf_prog_attach(hdev, &hdev->bpf.event_progs, prog);
+	case BPF_HID_RDESC_FIXUP:
+		ret = __hid_bpf_prog_attach_rdesc(hdev, prog);
+		if (ret)
+			return ret;
+
+		return hid_reconnect(hdev);
 	}
 
 	return -EINVAL;
@@ -91,11 +117,41 @@ unlock:
 	return ret;
 }
 
+static int __hid_bpf_prog_detach_rdesc(struct hid_device *hdev)
+{
+	int ret;
+	struct bpf_prog *old_prog;
+
+	ret = mutex_lock_interruptible(&hdev->bpf.lock);
+	if (ret)
+		return ret;
+
+	old_prog = hid_bpf_rcu_replace_pointer(hdev->bpf.rdesc_fixup_prog, NULL);
+
+	if (old_prog)
+		bpf_prog_put(old_prog);
+
+
+	mutex_unlock(&hdev->bpf.lock);
+	return 0;
+}
+
 int hid_bpf_prog_detach(struct hid_device *hdev, struct bpf_prog *prog)
 {
+	int ret;
+
 	switch(prog->expected_attach_type) {
 	case BPF_HID_RAW_EVENT:
 		return __hid_bpf_prog_detach(hdev, &hdev->bpf.event_progs, prog);
+	case BPF_HID_RDESC_FIXUP:
+		if (prog != hdev->bpf.rdesc_fixup_prog)
+			return -EINVAL;
+
+		ret = __hid_bpf_prog_detach_rdesc(hdev);
+		if (ret)
+			return ret;
+
+		return hid_reconnect(hdev);
 	default:
 		return -EINVAL;
 	}
@@ -326,6 +382,59 @@ u8 *hid_bpf_raw_event(struct hid_device *hdev, u8 *rd, int *size)
 	return hdev->bpf.ctx->event.data;
 }
 
+
+__u8 *hid_bpf_report_fixup(struct hid_device *hdev, __u8 *rdesc,
+		unsigned int *size)
+{
+	struct hid_bpf_ctx *ctx;
+
+	if (!hdev->bpf.ctx)
+		goto ignore_bpf;
+
+	if (*size > sizeof(hdev->bpf.ctx->event.data)) {
+		hid_warn(hdev, "%s: report too big: %d, ignoring BPF",
+			 __func__, *size);
+		goto ignore_bpf;
+	}
+
+	mutex_lock(&hdev->bpf.lock);
+
+	if (!hdev->bpf.rdesc_fixup_prog) {
+		mutex_unlock(&hdev->bpf.lock);
+		goto ignore_bpf;
+	}
+
+	ctx = hid_bpf_allocate(hdev);
+	if (IS_ERR(ctx)){
+		mutex_unlock(&hdev->bpf.lock);
+		goto ignore_bpf;
+	}
+
+	memcpy(ctx->event.data, rdesc, *size);
+
+	ctx->event.size = *size;
+	ctx->type = HID_BPF_RDESC_FIXUP;
+
+	bpf_prog_run(hdev->bpf.rdesc_fixup_prog, ctx);
+
+	*size = ctx->event.size;
+
+	if (!*size) {
+		rdesc = NULL;
+		goto unlock;
+	}
+
+	rdesc = kmemdup(ctx->event.data, *size, GFP_KERNEL);
+
+ unlock:
+	kfree(ctx);
+	mutex_unlock(&hdev->bpf.lock);
+	return rdesc;
+
+ ignore_bpf:
+	return kmemdup(rdesc, *size, GFP_KERNEL);
+}
+
 void hid_bpf_init(struct hid_device *hdev)
 {
 	mutex_init(&hdev->bpf.lock);
@@ -342,10 +451,16 @@ void hid_bpf_remove(struct hid_device *hdev)
 	if (!event_array)
 		goto unlock;
 
-	for (item = event_array->items; item->prog; item++)
-		bpf_prog_put(item->prog);
+	if (event_array) {
+		for (item = event_array->items; item->prog; item++)
+			bpf_prog_put(item->prog);
 
-	bpf_prog_array_free(event_array);
+		bpf_prog_array_free(event_array);
+	}
+
+
+	if (hdev->bpf.rdesc_fixup_prog)
+		bpf_prog_put(hdev->bpf.rdesc_fixup_prog);
 
  unlock:
 	mutex_unlock(&hdev->bpf.lock);

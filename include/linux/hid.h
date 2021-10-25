@@ -370,6 +370,7 @@ struct hid_device {							/* device report descriptor */
 #ifdef CONFIG_BPF_HID
 	struct {
 		struct mutex lock;
+		struct bpf_prog __rcu *rdesc_fixup_prog;
 		struct bpf_prog_array __rcu *event_progs;
 		struct hid_bpf_ctx *ctx;
 	} bpf;
@@ -945,10 +946,18 @@ do {									\
 void hid_bpf_init(struct hid_device *hdev);
 void hid_bpf_remove(struct hid_device *hdev);
 u8 *hid_bpf_raw_event(struct hid_device *hdev, u8 *rd, int *size);
+__u8 *hid_bpf_report_fixup(struct hid_device *hdev, __u8 *rdesc,
+		unsigned int *size);
 #else
 static inline void hid_bpf_init(struct hid_device *hdev) { return; }
 static inline void hid_bpf_remove(struct hid_device *hdev) { return; }
 static inline u8 *hid_bpf_raw_event(struct hid_device *hdev, u8 *rd, int *size) { return rd; }
+
+static inline __u8 *hid_bpf_report_fixup(struct hid_device *hdev, __u8 *rdesc,
+		unsigned int *size)
+{
+	return kmemdup(rdesc, *size, GFP_KERNEL);
+}
 #endif
 
 #endif
