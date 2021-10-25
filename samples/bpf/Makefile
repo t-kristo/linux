@@ -61,6 +61,7 @@ tprogs-y += xdp_redirect
 tprogs-y += xdp_monitor
 
 tprogs-y += hid_mouse
+tprogs-y += hid_surface_dial
 
 # Libbpf dependencies
 LIBBPF_SRC = $(TOOLS_PATH)/lib/bpf
@@ -127,6 +128,7 @@ xdp_redirect_map-objs := xdp_redirect_map_user.o $(XDP_SAMPLE)
 xdp_redirect-objs := xdp_redirect_user.o $(XDP_SAMPLE)
 xdp_monitor-objs := xdp_monitor_user.o $(XDP_SAMPLE)
 hid_mouse-objs := hid_mouse_user.o
+hid_surface_dial-objs := hid_surface_dial_user.o
 
 # Tell kbuild to always build the programs
 always-y := $(tprogs-y)
@@ -185,6 +187,7 @@ always-y += hbm_out_kern.o
 always-y += hbm_edt_kern.o
 always-y += xdpsock_kern.o
 always-y += hid_mouse_kern.o
+always-y += hid_surface_dial_kern.o
 
 ifeq ($(ARCH), arm)
 # Strip all except -D__LINUX_ARM_ARCH__ option needed to handle linux
