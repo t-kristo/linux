@@ -370,6 +370,7 @@ struct hid_device {							/* device report descriptor */
 		struct mutex lock;
 		struct bpf_prog __rcu *rdesc_fixup_prog;
 		struct bpf_prog_array __rcu *event_progs;
+		struct bpf_prog_array __rcu *kevent_progs;
 		struct hid_bpf_ctx *ctx;
 	} bpf;
 #endif
@@ -938,6 +939,12 @@ void hid_bpf_remove(struct hid_device *hdev);
 u8 *hid_bpf_raw_event(struct hid_device *hdev, u8 *rd, int *size);
 __u8 *hid_bpf_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 		unsigned int *size);
+int hid_bpf_hw_raw_request(struct hid_device *hdev,
+			   unsigned char reportnum, __u8 *buf,
+			   size_t len, unsigned char rtype, int reqtype);
+int hid_bpf_hw_request(struct hid_device *hdev,
+		       struct hid_report *report, int reqtype);
+int hid_bpf_hw_output_report(struct hid_device *hdev, __u8 *buf, size_t len);
 #else
 static inline void hid_bpf_init(struct hid_device *hdev) { return; }
 static inline void hid_bpf_remove(struct hid_device *hdev) { return; }
@@ -947,6 +954,19 @@ static inline __u8 *hid_bpf_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 		unsigned int *size)
 {
 	return kmemdup(rdesc, *size, GFP_KERNEL);
+}
+static inline int hid_bpf_hw_raw_request(struct hid_device *hdev,
+			   unsigned char reportnum, __u8 *buf,
+			   size_t len, unsigned char rtype, int reqtype)
+{
+	return 0;
+}
+
+static inline int hid_bpf_hw_request(struct hid_device *hdev,
+		       struct hid_report *report, int reqtype) { return 0; }
+static inline int hid_bpf_hw_output_report(struct hid_device *hdev, __u8 *buf, size_t len)
+{
+	return 0;
 }
 #endif
 

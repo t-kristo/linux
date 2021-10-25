@@ -2154,10 +2154,17 @@ EXPORT_SYMBOL_GPL(hid_hw_close);
 void hid_hw_request(struct hid_device *hdev,
 		    struct hid_report *report, int reqtype)
 {
+	if ((reqtype == HID_REQ_SET_REPORT) &&
+	    hid_bpf_hw_request(hdev, report, reqtype))
+		return;
+
 	if (hdev->ll_driver->request)
 		return hdev->ll_driver->request(hdev, report, reqtype);
 
 	__hid_request(hdev, report, reqtype);
+
+	if (reqtype == HID_REQ_GET_REPORT)
+		hid_bpf_hw_request(hdev, report, reqtype);
 }
 EXPORT_SYMBOL_GPL(hid_hw_request);
 
@@ -2179,11 +2186,35 @@ int hid_hw_raw_request(struct hid_device *hdev,
 		       unsigned char reportnum, __u8 *buf,
 		       size_t len, unsigned char rtype, int reqtype)
 {
+	int ret;
+
 	if (len < 1 || len > HID_MAX_BUFFER_SIZE || !buf)
 		return -EINVAL;
 
-	return hdev->ll_driver->raw_request(hdev, reportnum, buf, len,
-					    rtype, reqtype);
+	if (reqtype == HID_REQ_SET_REPORT) {
+		ret = hid_bpf_hw_raw_request(hdev, reportnum, buf, len, rtype, reqtype);
+		if (ret < 0)
+			return ret;
+
+		len = ret;
+	}
+
+	ret = hdev->ll_driver->raw_request(hdev, reportnum, buf, len,
+					   rtype, reqtype);
+	if (ret < 0)
+		return ret;
+
+	len = ret;
+
+	if (reqtype == HID_REQ_GET_REPORT) {
+		ret = hid_bpf_hw_raw_request(hdev, reportnum, buf, len, rtype, reqtype);
+		if (ret < 0)
+			return ret;
+
+		len = ret;
+	}
+
+	return len;
 }
 EXPORT_SYMBOL_GPL(hid_hw_raw_request);
 
@@ -2198,8 +2229,14 @@ EXPORT_SYMBOL_GPL(hid_hw_raw_request);
  */
 int hid_hw_output_report(struct hid_device *hdev, __u8 *buf, size_t len)
 {
+	int ret;
+
 	if (len < 1 || len > HID_MAX_BUFFER_SIZE || !buf)
 		return -EINVAL;
+
+	ret = hid_bpf_hw_output_report(hdev, buf, len);
+	if (ret)
+		return ret;
 
 	if (hdev->ll_driver->output_report)
 		return hdev->ll_driver->output_report(hdev, buf, len);

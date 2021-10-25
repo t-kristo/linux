@@ -19,6 +19,9 @@ enum hid_bpf_event {
 	HID_BPF_UNDEF = 0,
 	HID_BPF_RAW_EVENT,
 	HID_BPF_RDESC_FIXUP,
+	HID_BPF_REQUEST,
+	HID_BPF_RAW_REQUEST,
+	HID_BPF_OUTPUT_REPORT,
 };
 
 struct hid_bpf_ctx {
@@ -27,6 +30,9 @@ struct hid_bpf_ctx {
 	struct {
 		__u8 data[HID_BPF_MAX_BUFFER_SIZE];
 		unsigned long size;
+		unsigned char report_type;
+		unsigned char request;
+		int retval;
 	} event;
 };
 

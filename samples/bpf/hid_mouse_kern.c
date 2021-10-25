@@ -65,6 +65,36 @@ int hid_x_event(struct hid_bpf_ctx *ctx)
 	return 0;
 }
 
+SEC("hid/event")
+int test_event(struct hid_bpf_ctx *ctx)
+{
+	switch (ctx->type) {
+	case HID_BPF_RAW_REQUEST:
+		bpf_printk("raw_request %d: ", ctx->event.request);
+		bpf_printk("raw_request : report id %d(%d) ", ctx->event.data[0], ctx->event.report_type);
+		break;
+	case HID_BPF_REQUEST:
+		bpf_printk("request %d: report id %d(%d) ", ctx->event.request, ctx->event.data[0], ctx->event.report_type);
+		break;
+	default:
+		bpf_printk("unknown request type %d report id %d(%d)", ctx->type, ctx->event.data[0], ctx->event.report_type);
+	}
+
+	bpf_printk("data: %02x %02x %02x",
+		   ctx->event.data[0],
+		   ctx->event.data[1],
+		   ctx->event.data[2]);
+	bpf_printk("      %02x %02x %02x",
+		   ctx->event.data[3],
+		   ctx->event.data[4],
+		   ctx->event.data[5]);
+	bpf_printk("      %02x %02x %02x ...",
+		   ctx->event.data[6],
+		   ctx->event.data[7],
+		   ctx->event.data[8]);
+	return 0;
+}
+
 SEC("hid/rdesc_fixup")
 int hid_rdesc_fixup(struct hid_bpf_ctx *ctx)
 {
