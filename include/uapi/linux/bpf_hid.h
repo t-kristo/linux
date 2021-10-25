@@ -18,6 +18,7 @@ struct hid_device;
 enum hid_bpf_event {
 	HID_BPF_UNDEF = 0,
 	HID_BPF_RAW_EVENT,
+	HID_BPF_RDESC_FIXUP,
 };
 
 struct hid_bpf_ctx {

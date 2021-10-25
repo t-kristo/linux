@@ -3182,6 +3182,7 @@ attach_type_to_prog_type(enum bpf_attach_type attach_type)
 	case BPF_XDP:
 		return BPF_PROG_TYPE_XDP;
 	case BPF_HID_RAW_EVENT:
+	case BPF_HID_RDESC_FIXUP:
 		return BPF_PROG_TYPE_HID;
 	default:
 		return BPF_PROG_TYPE_UNSPEC;
@@ -3327,6 +3328,7 @@ static int bpf_prog_query(const union bpf_attr *attr,
 	case BPF_SK_LOOKUP:
 		return netns_bpf_prog_query(attr, uattr);
 	case BPF_HID_RAW_EVENT:
+	case BPF_HID_RDESC_FIXUP:
 		return hid_prog_query(attr, uattr);
 	default:
 		return -EINVAL;
