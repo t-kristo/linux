@@ -36,6 +36,7 @@
 #include <linux/inet.h>
 #include <linux/configfs.h>
 #include <linux/etherdevice.h>
+#include <linux/workqueue.h>
 
 MODULE_AUTHOR("Maintainer: Matt Mackall <mpm@selenic.com>");
 MODULE_DESCRIPTION("Console driver for network interfaces");
@@ -45,6 +46,7 @@ MODULE_LICENSE("GPL");
 #define MAX_PRINT_CHUNK		1000
 
 static char config[MAX_PARAM_LENGTH];
+static char config_save[MAX_PARAM_LENGTH];
 module_param_string(netconsole, config, MAX_PARAM_LENGTH, 0);
 MODULE_PARM_DESC(netconsole, " netconsole=[src-port]@[src-ip]/[dev],[tgt-port]@<tgt-ip>/[tgt-macaddr]");
 
@@ -56,6 +58,7 @@ MODULE_PARM_DESC(oops_only, "Only log oops messages");
 static int __init option_setup(char *opt)
 {
 	strlcpy(config, opt, MAX_PARAM_LENGTH);
+	strlcpy(config_save, opt, MAX_PARAM_LENGTH);
 	return 1;
 }
 __setup("netconsole=", option_setup);
@@ -109,7 +112,7 @@ struct netconsole_target {
 static struct configfs_subsystem netconsole_subsys;
 static DEFINE_MUTEX(dynamic_netconsole_mutex);
 
-static int __init dynamic_netconsole_init(void)
+static int dynamic_netconsole_init(void)
 {
 	config_group_init(&netconsole_subsys.su_group);
 	mutex_init(&netconsole_subsys.su_mutex);
@@ -140,7 +143,7 @@ static void netconsole_target_put(struct netconsole_target *nt)
 
 #else	/* !CONFIG_NETCONSOLE_DYNAMIC */
 
-static int __init dynamic_netconsole_init(void)
+static int dynamic_netconsole_init(void)
 {
 	return 0;
 }
@@ -879,7 +882,15 @@ static struct console netconsole = {
 	.write	= write_msg,
 };
 
-static int __init init_netconsole(void)
+static struct delayed_work init_work;
+static int init_netconsole(void);
+
+static void _init_netconsole(struct work_struct *work)
+{
+	init_netconsole();
+}
+
+static int init_netconsole(void)
 {
 	int err;
 	struct netconsole_target *nt, *tmp;
@@ -887,11 +898,20 @@ static int __init init_netconsole(void)
 	char *target_config;
 	char *input = config;
 
+	strcpy(config, config_save);
+
 	if (strnlen(input, MAX_PARAM_LENGTH)) {
 		while ((target_config = strsep(&input, ";"))) {
 			nt = alloc_param_target(target_config);
 			if (IS_ERR(nt)) {
 				err = PTR_ERR(nt);
+				/* Setup retry timer */
+				INIT_DELAYED_WORK(&init_work,
+						  _init_netconsole);
+
+				schedule_delayed_work(&init_work,
+					msecs_to_jiffies(1000));
+
 				goto fail;
 			}
 			/* Dump existing printks when we register */
