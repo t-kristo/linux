@@ -4967,6 +4967,13 @@ union bpf_attr {
  *		ctx->event.data field
  *	Return
  *		0 on success, a negative error on failure.
+ *
+ * u32 bpf_hid_get_data(void *ctx, u64 offset, u8 n)
+ *	Description
+ *		Get the data of size size at offset offset in the
+ *		ctx->event.data field
+ *	Return
+ *		The value at offset. In case of error: 0.
  */
 #define __BPF_FUNC_MAPPER(FN)		\
 	FN(unspec),			\
@@ -5153,6 +5160,7 @@ union bpf_attr {
 	FN(hid_hw_open),		\
 	FN(hid_hw_close),		\
 	FN(hid_set_data),		\
+	FN(hid_get_data),		\
 	/* */
 
 /* integer value in 'imm' field of BPF_CALL instruction selects which helper

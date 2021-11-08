@@ -214,6 +214,26 @@ unlock:
 const struct bpf_prog_ops hid_prog_ops = {
 };
 
+BPF_CALL_3(bpf_hid_get_data, void*, ctx, u64, offset, u8, n)
+{
+	struct hid_bpf_ctx *bpf_ctx = ctx;
+
+	if (n > 32 ||
+	    ((offset + n) >> 3) >= HID_BPF_MAX_BUFFER_SIZE)
+		return 0;
+
+	return hid_field_extract(bpf_ctx->hdev, bpf_ctx->event.data, offset, n);
+}
+
+static const struct bpf_func_proto bpf_hid_get_data_proto = {
+	.func      = bpf_hid_get_data,
+	.gpl_only  = true,
+	.ret_type  = RET_INTEGER,
+	.arg1_type = ARG_PTR_TO_CTX,
+	.arg2_type = ARG_ANYTHING,
+	.arg3_type = ARG_ANYTHING,
+};
+
 BPF_CALL_1(bpf_hid_hw_open, void*, ctx)
 {
 	struct hid_bpf_ctx *bpf_ctx = ctx;
@@ -329,6 +349,8 @@ static const struct bpf_func_proto *
 hid_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
 {
 	switch (func_id) {
+	case BPF_FUNC_hid_get_data:
+		return &bpf_hid_get_data_proto;
 	case BPF_FUNC_hid_hw_open:
 		return &bpf_hid_hw_open_proto;
 	case BPF_FUNC_hid_hw_close:
