@@ -1567,8 +1567,8 @@ static void hid_input_field(struct hid_device *hid, struct hid_field *field,
 	}
 
 	for (n = 0; n < count; n++) {
-
-		if (HID_MAIN_ITEM_VARIABLE & field->flags) {
+		if (HID_MAIN_ITEM_VARIABLE & field->flags ||
+		    field->logical == HID_DG_PEN_LINE_STYLE) {
 			hid_process_event(hid, field, &field->usage[n], value[n], interrupt);
 			continue;
 		}
