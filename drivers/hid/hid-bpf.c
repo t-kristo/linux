@@ -15,6 +15,7 @@
 #include <uapi/linux/bpf_hid.h>
 #include <linux/bpf_hid.h>
 #include <linux/hid.h>
+#include <linux/hidraw.h>
 
 #define hid_bpf_rcu_dereference(p) \
         rcu_dereference_protected(p, lockdep_is_held(&hdev->bpf.lock))
@@ -618,37 +619,26 @@ const struct bpf_verifier_ops hid_verifier_ops = {
 	.is_valid_access = hid_is_valid_access
 };
 
-static int __hid_bpf_match_sysfs(struct device *dev, const void *data)
-{
-	struct kernfs_node *kn = dev->kobj.sd;
-
-	return kn == data;
-}
-
 static struct hid_device *__hid_bpf_fd_to_hdev(int fd)
 {
-	struct device *dev;
 	struct hid_device *hdev;
 	struct fd f = fdget(fd);
-	struct inode *inode;
-	struct kernfs_node *node;
+	struct hidraw_list *list;
 
 	if (!f.file) {
 		hdev = ERR_PTR(-EBADF);
 		goto out;
 	}
 
-	inode = file_inode(f.file);
-	node = inode->i_private;
+	list = f.file->private_data;
+	if (!list) {
+		hdev = ERR_PTR(-EBADF);
+		goto out;
+	}
 
-	dev = bus_find_device(&hid_bus_type, NULL, kernfs_get_parent(node), __hid_bpf_match_sysfs);
+	hdev = list->hidraw->hid;
 
-	if (dev)
-		hdev = to_hid_device(dev);
-	else
-		hdev = ERR_PTR(-EINVAL);
-
- out:
+out:
 	fdput(f);
 	return hdev;
 }
