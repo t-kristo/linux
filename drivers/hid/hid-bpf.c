@@ -698,6 +698,8 @@ int hid_prog_detach(const union bpf_attr *attr)
 		goto out;
 	}
 
+	prog->expected_attach_type = attr->attach_type;
+
 	ret = hid_bpf_prog_detach(hdev, prog);
 
  out:
