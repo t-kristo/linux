@@ -734,6 +734,39 @@ int hid_prog_query(const union bpf_attr *attr, union bpf_attr __user *uattr)
 }
 EXPORT_SYMBOL_GPL(hid_prog_query);
 
+static int _hid_bpf_prog_run(const struct bpf_prog_array __rcu *array_rcu,
+			     const void *ctx, bpf_prog_run_fn run_prog)
+{
+	const struct bpf_prog_array_item *item;
+	const struct bpf_prog *prog;
+	const struct bpf_prog_array *array;
+	struct bpf_run_ctx *old_run_ctx;
+	struct bpf_trace_run_ctx run_ctx;
+	u32 ret = 1;
+
+	migrate_disable();
+	rcu_read_lock();
+	array = rcu_dereference(array_rcu);
+	rcu_read_unlock();
+
+	if (unlikely(!array))
+		goto out;
+
+	old_run_ctx = bpf_set_run_ctx(&run_ctx.run_ctx);
+	item = &array->items[0];
+	while ((prog = READ_ONCE(item->prog))) {
+		run_ctx.bpf_cookie = item->bpf_cookie;
+		ret &= run_prog(prog, ctx);
+		item++;
+	}
+
+	bpf_reset_run_ctx(old_run_ctx);
+
+out:
+	migrate_enable();
+	return ret;
+}
+
 static int hid_bpf_prog_run(struct hid_device *hdev, struct hid_bpf_ctx *ctx,
 		enum hid_bpf_event type)
 {
@@ -743,7 +776,7 @@ static int hid_bpf_prog_run(struct hid_device *hdev, struct hid_bpf_ctx *ctx,
 	ctx->type = type;
 	ctx->event.retval = 0;
 
-	BPF_PROG_RUN_ARRAY(hdev->bpf.kevent_progs, ctx, bpf_prog_run);
+	_hid_bpf_prog_run(hdev->bpf.kevent_progs, ctx, bpf_prog_run);
 
 	return ctx->event.retval;
 }
@@ -764,7 +797,7 @@ u8 *hid_bpf_raw_event(struct hid_device *hdev, u8 *rd, int *size)
 	hdev->bpf.ctx->event.size = *size;
 	hdev->bpf.ctx->type = HID_BPF_RAW_EVENT;
 
-	BPF_PROG_RUN_ARRAY(hdev->bpf.event_progs, hdev->bpf.ctx, bpf_prog_run);
+	_hid_bpf_prog_run(hdev->bpf.event_progs, hdev->bpf.ctx, bpf_prog_run);
 
 	if (!hdev->bpf.ctx->event.size)
 		return ERR_PTR(-EINVAL);
@@ -807,7 +840,11 @@ __u8 *hid_bpf_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 	ctx->event.size = *size;
 	ctx->type = HID_BPF_RDESC_FIXUP;
 
+	migrate_disable();
+
 	bpf_prog_run(hdev->bpf.rdesc_fixup_prog, ctx);
+
+	migrate_enable();
 
 	*size = ctx->event.size;
 
