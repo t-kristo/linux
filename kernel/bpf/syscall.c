@@ -3201,24 +3201,35 @@ static int bpf_prog_attach(const union bpf_attr *attr)
 	struct bpf_prog *prog;
 	int ret;
 
-	if (CHECK_ATTR(BPF_PROG_ATTACH))
+	if (CHECK_ATTR(BPF_PROG_ATTACH)) {
+		pr_info("%s: check_attr failed\n", __func__);
 		return -EINVAL;
+	}
 
-	if (attr->attach_flags & ~BPF_F_ATTACH_MASK)
+	if (attr->attach_flags & ~BPF_F_ATTACH_MASK) {
+		pr_info("%s: bad attach flags\n", __func__);
 		return -EINVAL;
+	}
 
 	ptype = attach_type_to_prog_type(attr->attach_type);
-	if (ptype == BPF_PROG_TYPE_UNSPEC)
+	if (ptype == BPF_PROG_TYPE_UNSPEC) {
+		pr_info("%s: bad ptype\n", __func__);
 		return -EINVAL;
+	}
 
 	prog = bpf_prog_get_type(attr->attach_bpf_fd, ptype);
-	if (IS_ERR(prog))
+	if (IS_ERR(prog)) {
+		pr_info("%s: bad type\n", __func__);
 		return PTR_ERR(prog);
+	}
 
 	if (bpf_prog_attach_check_attach_type(prog, attr->attach_type)) {
 		bpf_prog_put(prog);
+		pr_info("%s: bad attach type\n", __func__);
 		return -EINVAL;
 	}
+
+	pr_info("%s: attaching, ptype=%d\n", __func__, ptype);
 
 	switch (ptype) {
 	case BPF_PROG_TYPE_SK_SKB:
@@ -3242,6 +3253,7 @@ static int bpf_prog_attach(const union bpf_attr *attr)
 		break;
 	case BPF_PROG_TYPE_HID:
 		ret = hid_prog_attach(attr, prog);
+		pr_info("%s: hid_prog_attach returns %d\n", __func__, ret);
 		break;
 	default:
 		ret = -EINVAL;
