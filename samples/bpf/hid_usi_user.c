@@ -14,6 +14,8 @@
 #include <libgen.h>
 #include <sys/resource.h>
 #include <getopt.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
 #include "bpf_util.h"
 #include <bpf/bpf.h>
@@ -24,15 +26,15 @@
 #include "hid_usi.h"
 
 static char *sysfs_path;
-static char *fifoname = "/tmp/usi";
+static char *sockname = "/tmp/usi";
 static int sysfs_fd;
-static int fifo_fd;
+static int sock_fd;
 static int prog_count;
 static int cache, wr_cache;
 
 static const struct option long_options[] = {
 	{ "help", no_argument, NULL, 'h' },
-	{ "fifo", required_argument, NULL, 'f' },
+	{ "sock", required_argument, NULL, 's' },
 };
 
 struct prog {
@@ -53,15 +55,15 @@ static void int_exit(int sig)
 	}
 
 	close(sysfs_fd);
-	close(fifo_fd);
-	remove(fifoname);
+	close(sock_fd);
+	remove(sockname);
 	exit(0);
 }
 
 static void usage(const char *prog)
 {
 	fprintf(stderr,
-		"usage: %s [-f <fifoname>] /dev/HIDRAW\n\n",
+		"usage: %s [-s <sockname>] /dev/HIDRAW\n\n",
 		prog);
 }
 
@@ -84,15 +86,17 @@ static int write_value(const char *param, int value)
 
 	printf("%s: param=%s (%d), value=%d\n", __func__, param, idx, value);
 	err = bpf_map_update_elem(wr_cache, &idx, &value, BPF_ANY);
-	if (err)
+	if (err) {
 		printf("Update failed for %d, err=%d\n", idx, err);
+		return err;
+	}
 
 	return 0;
 }
 
 static int read_value(const char *param)
 {
-	int value;
+	int value = -ENOENT;
 	int idx = param_to_idx(param);
 
 	printf("%s: param=%s (%d)\n", __func__, param, idx);
@@ -102,7 +106,7 @@ static int read_value(const char *param)
 	else
 		printf("Value for %d = %d\n", idx, value);
 
-	return 0;
+	return value;
 }
 
 static int attach_progs(int argc, char **argv)
@@ -118,6 +122,9 @@ static int attach_progs(int argc, char **argv)
 	char op[8];
 	int value;
 	int m, n;
+	struct sockaddr_un addr;
+	struct sockaddr_un from;
+	socklen_t from_len = sizeof(from);
 
 	snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
 	obj = bpf_object__open_file(filename, NULL);
@@ -177,28 +184,48 @@ static int attach_progs(int argc, char **argv)
 		goto cleanup;
 	}
 
-	mkfifo(fifoname, 0666);
+	sock_fd = socket(PF_UNIX, SOCK_DGRAM, 0);
+	if (sock_fd < 0) {
+		perror("socket open error.\n");
+		err = sock_fd;
+		goto cleanup;
+	}
 
-	fifo_fd = open(fifoname, O_RDWR);
-	if (fifo_fd < 0) {
-		perror("Fifo open error.\n");
-		err = fifo_fd;
+	addr.sun_family = AF_UNIX;
+	strcpy(addr.sun_path, sockname);
+	unlink(sockname);
+
+	if (bind(sock_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+		perror("bind");
 		goto cleanup;
 	}
 
 	while (1) {
-		n = read(fifo_fd, buf, BUFSIZ);
+		n = recvfrom(sock_fd, buf, BUFSIZ, 0, (struct sockaddr *)&from,
+			     &from_len);
 		if (n < 0)
 			break;
 		buf[n] = 0;
 
 		printf("%s: received '%s'\n", __func__, buf);
 
+		printf("%s: from_len=%d, from=%s\n", __func__, from_len,
+		       from.sun_path);
+
 		m = sscanf(buf, "%16s %8s %d", param, op, &value);
-		if (m == 2 && strcmp(op, "get") == 0)
-			read_value(param);
-		else if (m == 3 && strcmp(op, "set") == 0)
-			write_value(param, value);
+		if (m == 2 && strcmp(op, "get") == 0) {
+			value = read_value(param);
+			sprintf(buf, "%s: %d\n", param, value);
+			printf("%s: sending '%s'\n", __func__, buf);
+			sendto(sock_fd, buf, strlen(buf) + 1, 0,
+			       (struct sockaddr *)&from, from_len);
+		} else if (m == 3 && strcmp(op, "set") == 0) {
+			err = write_value(param, value);
+			sprintf(buf, "%s: %d, err=%d\n", param, value, err);
+			printf("%s: sending '%s'\n", __func__, buf);
+			sendto(sock_fd, buf, strlen(buf) + 1, 0,
+			       (struct sockaddr *)&from, from_len);
+		}
 	}
 
 	return 0;
@@ -217,11 +244,11 @@ int main(int argc, char **argv)
 {
 	int opt;
 
-	while ((opt = getopt_long(argc, argv, "f:", long_options,
+	while ((opt = getopt_long(argc, argv, "s:", long_options,
 				  NULL)) != -1) {
 		switch (opt) {
-		case 'f':
-			fifoname = optarg;
+		case 's':
+			sockname = optarg;
 			break;
 		default:
 			usage(basename(argv[0]));
@@ -240,7 +267,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	printf("fifoname: %s\n", fifoname);
+	printf("sockname: %s\n", sockname);
 	printf("sysfs_path: %s\n", sysfs_path);
 
 	return attach_progs(argc, argv);
