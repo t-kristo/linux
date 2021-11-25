@@ -349,7 +349,7 @@ static void hid_bpf_store_bpf_parser(struct hid_bpf_parser *data,
 		data->collection = parser->collection_stack[parser->collection_stack_ptr];
 }
 
-BPF_CALL_4(bpf_hid_foreach_rdesc_item, void*, ctx, void *, callback_fn, void *, callback_ctx, u64, flags)
+BPF_CALL_4(bpf_hid_foreach_rdesc_item, void*, ctx, bpf_callback_t, callback_fn, void *, callback_ctx, u64, flags)
 {
 	struct hid_bpf_ctx *bpf_ctx = ctx;
 	struct hid_bpf_parser_and_data *parser_and_data;
@@ -401,10 +401,9 @@ BPF_CALL_4(bpf_hid_foreach_rdesc_item, void*, ctx, void *, callback_fn, void *, 
 
 		hid_bpf_store_bpf_parser(callback_data, &item, parser);
 
-		ret = BPF_CAST_CALL(callback_fn)((u64)(long)ctx,
-						 (u64)(long)callback_data,
-						 (u64)(long)&cur_index,
-						 (u64)(long)callback_ctx, 0);
+		ret = callback_fn((u64)(long)ctx, (u64)(long)callback_data,
+				  (u64)(long)&cur_index,
+				  (u64)(long)callback_ctx, 0);
 		/* return value: 0 - continue, 1 - stop and return */
 		if (ret)
 			break;
