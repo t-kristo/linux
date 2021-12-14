@@ -23,7 +23,9 @@
 
 #define BPF_MAX_PROGS 64
 
-static int __hid_bpf_prog_attach(struct hid_device *hdev, struct bpf_prog_array **array, struct bpf_prog *prog)
+static int __hid_bpf_prog_attach_array(struct hid_device *hdev,
+				       struct bpf_prog_array **array,
+				       struct bpf_prog *prog)
 {
 	struct bpf_prog_array *old_array;
 	struct bpf_prog_array *new_array;
@@ -52,7 +54,9 @@ unlock:
 
 }
 
-static int __hid_bpf_prog_attach_rdesc(struct hid_device *hdev, struct bpf_prog *prog)
+static int __hid_bpf_prog_attach(struct hid_device *hdev,
+				 struct bpf_prog **target,
+				 struct bpf_prog *prog)
 {
 	int ret;
 	struct bpf_prog *old_prog;
@@ -61,7 +65,7 @@ static int __hid_bpf_prog_attach_rdesc(struct hid_device *hdev, struct bpf_prog 
 	if (ret)
 		return ret;
 
-	old_prog = hid_bpf_rcu_replace_pointer(hdev->bpf.rdesc_fixup_prog, prog);
+	old_prog = hid_bpf_rcu_replace_pointer(*target, prog);
 
 	if (old_prog)
 		bpf_prog_put(old_prog);
@@ -76,11 +80,11 @@ static int hid_bpf_prog_attach(struct hid_device *hdev, const union bpf_attr *at
 
 	switch (attr->attach_type) {
 	case BPF_HID_RAW_EVENT:
-		return __hid_bpf_prog_attach(hdev, &hdev->bpf.event_progs, prog);
+		return __hid_bpf_prog_attach_array(hdev, &hdev->bpf.event_progs, prog);
 	case BPF_HID_KERNEL_EVENT:
-		return __hid_bpf_prog_attach(hdev, &hdev->bpf.kevent_progs, prog);
+		return __hid_bpf_prog_attach_array(hdev, &hdev->bpf.kevent_progs, prog);
 	case BPF_HID_RDESC_FIXUP:
-		ret = __hid_bpf_prog_attach_rdesc(hdev, prog);
+		ret = __hid_bpf_prog_attach(hdev, &hdev->bpf.rdesc_fixup_prog, prog);
 		if (ret)
 			return ret;
 
@@ -90,7 +94,9 @@ static int hid_bpf_prog_attach(struct hid_device *hdev, const union bpf_attr *at
 	return -EINVAL;
 }
 
-static int __hid_bpf_prog_detach(struct hid_device *hdev, struct bpf_prog_array **array, struct bpf_prog *prog)
+static int __hid_bpf_prog_detach_array(struct hid_device *hdev,
+				       struct bpf_prog_array **array,
+				       struct bpf_prog *prog)
 {
 	struct bpf_prog_array *old_array;
 	struct bpf_prog_array *new_array;
@@ -119,7 +125,8 @@ unlock:
 	return ret;
 }
 
-static int __hid_bpf_prog_detach_rdesc(struct hid_device *hdev)
+static int __hid_bpf_prog_detach(struct hid_device *hdev,
+				 struct bpf_prog **prog)
 {
 	int ret;
 	struct bpf_prog *old_prog;
@@ -128,7 +135,7 @@ static int __hid_bpf_prog_detach_rdesc(struct hid_device *hdev)
 	if (ret)
 		return ret;
 
-	old_prog = hid_bpf_rcu_replace_pointer(hdev->bpf.rdesc_fixup_prog, NULL);
+	old_prog = hid_bpf_rcu_replace_pointer(*prog, NULL);
 
 	if (old_prog)
 		bpf_prog_put(old_prog);
@@ -144,14 +151,14 @@ int hid_bpf_prog_detach(struct hid_device *hdev, struct bpf_prog *prog)
 
 	switch(prog->expected_attach_type) {
 	case BPF_HID_RAW_EVENT:
-		return __hid_bpf_prog_detach(hdev, &hdev->bpf.event_progs, prog);
+		return __hid_bpf_prog_detach_array(hdev, &hdev->bpf.event_progs, prog);
 	case BPF_HID_KERNEL_EVENT:
-		return __hid_bpf_prog_detach(hdev, &hdev->bpf.kevent_progs, prog);
+		return __hid_bpf_prog_detach_array(hdev, &hdev->bpf.kevent_progs, prog);
 	case BPF_HID_RDESC_FIXUP:
 		if (prog != hdev->bpf.rdesc_fixup_prog)
 			return -EINVAL;
 
-		ret = __hid_bpf_prog_detach_rdesc(hdev);
+		ret = __hid_bpf_prog_detach(hdev, &hdev->bpf.rdesc_fixup_prog);
 		if (ret)
 			return ret;
 
