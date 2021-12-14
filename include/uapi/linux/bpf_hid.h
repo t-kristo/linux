@@ -10,6 +10,7 @@
 #define _UAPI__LINUX_BPF_HID_H__
 
 #include <linux/types.h>
+#include <linux/workqueue.h>
 
 #define HID_BPF_MAX_BUFFER_SIZE		16384		/* 16kb */
 
@@ -36,6 +37,7 @@ struct hid_bpf_ctx {
 		unsigned char request;
 		int retval;
 	} event;
+	struct delayed_work work;
 };
 
 /* in sync with struct hid_item */

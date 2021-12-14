@@ -999,6 +999,7 @@ enum bpf_attach_type {
 	BPF_HID_RAW_EVENT,
 	BPF_HID_RDESC_FIXUP,
 	BPF_HID_KERNEL_EVENT,
+	BPF_HID_WORK,
 	__MAX_BPF_ATTACH_TYPE
 };
 
@@ -4981,6 +4982,12 @@ union bpf_attr {
  *	Return
  *		The number of traversed items for success, **-EINVAL** for
  *		invalid **flags**.
+ *
+ * u32 bpf_hid_schedule_work(void *ctx, u64 timeout)
+ *	Description
+ *		Schedules a delayed work after the specified timeout.
+ *	Return
+ *		0 on success, a negative error on failure.
  */
 #define __BPF_FUNC_MAPPER(FN)		\
 	FN(unspec),			\
@@ -5169,6 +5176,7 @@ union bpf_attr {
 	FN(hid_set_data),		\
 	FN(hid_get_data),		\
 	FN(hid_foreach_rdesc_item),	\
+	FN(hid_schedule_work),		\
 	/* */
 
 /* integer value in 'imm' field of BPF_CALL instruction selects which helper

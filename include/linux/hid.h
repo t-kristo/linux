@@ -371,6 +371,7 @@ struct hid_device {							/* device report descriptor */
 	struct {
 		struct mutex lock;
 		struct bpf_prog __rcu *rdesc_fixup_prog;
+		struct bpf_prog __rcu *work_prog;
 		struct bpf_prog_array __rcu *event_progs;
 		struct bpf_prog_array __rcu *kevent_progs;
 		struct hid_bpf_ctx *ctx;

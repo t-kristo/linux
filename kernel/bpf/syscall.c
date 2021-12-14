@@ -3184,6 +3184,7 @@ attach_type_to_prog_type(enum bpf_attach_type attach_type)
 	case BPF_HID_KERNEL_EVENT:
 	case BPF_HID_RAW_EVENT:
 	case BPF_HID_RDESC_FIXUP:
+	case BPF_HID_WORK:
 		return BPF_PROG_TYPE_HID;
 	default:
 		return BPF_PROG_TYPE_UNSPEC;

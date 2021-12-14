@@ -89,6 +89,8 @@ static int hid_bpf_prog_attach(struct hid_device *hdev, const union bpf_attr *at
 			return ret;
 
 		return hid_reconnect(hdev);
+	case BPF_HID_WORK:
+		return __hid_bpf_prog_attach(hdev, &hdev->bpf.work_prog, prog);
 	}
 
 	return -EINVAL;
@@ -163,6 +165,11 @@ int hid_bpf_prog_detach(struct hid_device *hdev, struct bpf_prog *prog)
 			return ret;
 
 		return hid_reconnect(hdev);
+	case BPF_HID_WORK:
+		if (prog != hdev->bpf.work_prog)
+			return -EINVAL;
+
+		return __hid_bpf_prog_detach(hdev, &hdev->bpf.work_prog);
 	default:
 		return -EINVAL;
 	}
@@ -577,6 +584,24 @@ static const struct bpf_func_proto bpf_hid_set_data_proto = {
 	.arg4_type = ARG_ANYTHING,
 };
 
+BPF_CALL_2(bpf_hid_schedule_work, void*, ctx, u64, timeout)
+{
+	struct hid_bpf_ctx *bpf_ctx = ctx;
+
+	if (!delayed_work_pending(&bpf_ctx->work))
+		schedule_delayed_work(&bpf_ctx->work, timeout);
+
+	return 0;
+}
+
+static const struct bpf_func_proto bpf_hid_schedule_work_proto = {
+	.func      = bpf_hid_schedule_work,
+	.gpl_only  = true,
+	.ret_type  = RET_INTEGER,
+	.arg1_type = ARG_PTR_TO_CTX,
+	.arg2_type = ARG_ANYTHING,
+};
+
 static const struct bpf_func_proto *
 hid_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
 {
@@ -593,6 +618,8 @@ hid_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
 		return &bpf_hid_raw_request_proto;
 	case BPF_FUNC_hid_set_data:
 		return &bpf_hid_set_data_proto;
+	case BPF_FUNC_hid_schedule_work:
+		return &bpf_hid_schedule_work_proto;
 	default:
 		return bpf_base_func_proto(func_id);
 	}
@@ -659,6 +686,18 @@ static struct hid_device *__hid_bpf_fd_to_hdev(int fd)
 	return hdev;
 }
 
+static void hid_bpf_work(struct work_struct *work)
+{
+	struct hid_bpf_ctx *ctx =
+		container_of(work, struct hid_bpf_ctx, work.work);
+
+	migrate_disable();
+
+	bpf_prog_run(ctx->hdev->bpf.work_prog, ctx);
+
+	migrate_enable();
+}
+
 static struct hid_bpf_ctx *hid_bpf_allocate(struct hid_device *hdev)
 {
 	struct hid_bpf_ctx *ctx;
@@ -668,6 +707,8 @@ static struct hid_bpf_ctx *hid_bpf_allocate(struct hid_device *hdev)
 		return ERR_PTR(-ENOMEM);
 
 	ctx->hdev = hdev;
+
+	INIT_DELAYED_WORK(&ctx->work, hid_bpf_work);
 
 	return ctx;
 }
