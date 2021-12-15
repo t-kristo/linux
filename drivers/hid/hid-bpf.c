@@ -854,7 +854,11 @@ __u8 *hid_bpf_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 	ctx->event.size = *size;
 	ctx->type = HID_BPF_RDESC_FIXUP;
 
+	migrate_disable();
+
 	bpf_prog_run(hdev->bpf.rdesc_fixup_prog, ctx);
+
+	migrate_enable();
 
 	*size = ctx->event.size;
 
